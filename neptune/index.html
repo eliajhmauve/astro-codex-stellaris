@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海王星｜你的夢境頻道</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italianno&family=Tangerine:wght@400;700&family=Cormorant+Infant:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Fraunces:ital,wght@1,300;1,400;1,600&family=Alegreya+Sans+SC:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   RESET & BASE
+============================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --deep-navy:#050d1a;
+  --abyss:#030810;
+  --ocean-mid:#0a1628;
+  --teal-glow:#1a4a6b;
+  --aqua:#2dd4bf;
+  --aqua-dim:#1a8a7a;
+  --lavender:#b794f4;
+  --lavender-dim:#7c5cbf;
+  --moonsilver:#e2e8f0;
+  --foam:#a5f3fc;
+  --seafoam:#6ee7b7;
+  --gold:#fbbf24;
+  --blush:#f9a8d4;
+  --glass:rgba(255,255,255,0.06);
+  --glass-border:rgba(255,255,255,0.12);
+  --font-display:'Italianno',cursive;
+  --font-display2:'Tangerine',cursive;
+  --font-body:'Cormorant Infant',serif;
+  --font-alt:'Fraunces',serif;
+  --font-accent:'Alegreya Sans SC',sans-serif;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{
+  background:var(--abyss);
+  color:var(--moonsilver);
+  font-family:var(--font-body);
+  font-size:1.1rem;
+  line-height:1.8;
+  overflow-x:hidden;
+}
+
+/* ============================================
+   SCROLLBAR
+============================================ */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--abyss)}
+::-webkit-scrollbar-thumb{background:var(--lavender-dim);border-radius:3px}
+
+/* ============================================
+   CAUSTIC LIGHT BACKGROUND (SVG)
+============================================ */
+.caustic-bg{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;opacity:0.18;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 30%, rgba(45,212,191,0.3) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 80% 70%, rgba(183,148,244,0.25) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 30% at 50% 10%, rgba(165,243,252,0.2) 0%, transparent 60%);
+  animation:causticShift 12s ease-in-out infinite alternate;
+}
+@keyframes causticShift{
+  0%{filter:blur(0px) hue-rotate(0deg)}
+  50%{filter:blur(2px) hue-rotate(20deg)}
+  100%{filter:blur(1px) hue-rotate(-10deg)}
+}
+.grain-overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:1;opacity:0.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+}
+.wave-svg{
+  position:fixed;bottom:0;left:0;width:100%;pointer-events:none;z-index:0;opacity:0.12;
+}
+
+/* ============================================
+   LAYOUT
+============================================ */
+main{position:relative;z-index:2}
+section{position:relative;padding:5rem 2rem;overflow:hidden}
+.container{max-width:960px;margin:0 auto}
+.wide{max-width:1200px;margin:0 auto}
+
+/* ============================================
+   GLASS CARD
+============================================ */
+.glass{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  backdrop-filter:blur(16px) saturate(180%);
+  -webkit-backdrop-filter:blur(16px) saturate(180%);
+  border-radius:24px;
+  padding:2.5rem;
+}
+.glass-sm{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-radius:16px;
+  padding:1.5rem;
+}
+
+/* ============================================
+   TYPOGRAPHY
+============================================ */
+h1.display{font-family:var(--font-display);font-size:clamp(4rem,10vw,8rem);line-height:1;color:#fff;text-shadow:0 0 40px rgba(45,212,191,0.6),0 0 80px rgba(183,148,244,0.4)}
+h2.display{font-family:var(--font-display);font-size:clamp(2.5rem,6vw,5rem);line-height:1.1;color:#fff}
+h2.section-title{
+  font-family:var(--font-display2);font-size:clamp(2rem,5vw,3.5rem);
+  color:var(--aqua);letter-spacing:0.05em;
+  text-shadow:0 0 20px rgba(45,212,191,0.5);
+  margin-bottom:1rem;
+}
+h3.sub-title{
+  font-family:var(--font-accent);font-size:1.1rem;letter-spacing:0.15em;
+  color:var(--lavender);text-transform:uppercase;margin-bottom:0.5rem;
+}
+p{margin-bottom:1rem}
+.italic{font-style:italic}
+.accent{color:var(--aqua)}
+.lavender{color:var(--lavender)}
+.gold{color:var(--gold)}
+.foam{color:var(--foam)}
+
+/* ============================================
+   NAV
+============================================ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 2rem;
+  background:rgba(3,8,16,0.7);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.nav-logo{font-family:var(--font-display);font-size:2rem;color:var(--aqua);text-decoration:none}
+.nav-level{
+  font-family:var(--font-accent);font-size:0.75rem;letter-spacing:0.1em;
+  color:var(--lavender);display:flex;align-items:center;gap:0.5rem;
+}
+.level-badge{
+  background:linear-gradient(135deg,var(--lavender-dim),var(--aqua-dim));
+  padding:0.2rem 0.8rem;border-radius:20px;color:#fff;font-size:0.7rem;
+}
+
+/* ============================================
+   SYNC RING
+============================================ */
+.sync-ring-wrap{display:flex;flex-direction:column;align-items:center;gap:0.5rem}
+.sync-ring{position:relative;width:80px;height:80px}
+.sync-ring svg{width:80px;height:80px;transform:rotate(-90deg)}
+.sync-circle-bg{fill:none;stroke:rgba(255,255,255,0.1);stroke-width:5}
+.sync-circle{fill:none;stroke:var(--aqua);stroke-width:5;stroke-linecap:round;
+  stroke-dasharray:220;stroke-dashoffset:220;transition:stroke-dashoffset 1s ease}
+.sync-pct{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:var(--font-accent);font-size:0.8rem;color:var(--aqua);
+}
+
+/* ============================================
+   HERO
+============================================ */
+#hero{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  text-align:center;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(10,22,40,0.9) 0%, var(--abyss) 80%);
+  padding-top:6rem;
+}
+#hero .hero-img{
+  width:min(420px,90vw);height:min(420px,90vw);
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid rgba(45,212,191,0.3);
+  box-shadow:0 0 60px rgba(45,212,191,0.2),0 0 120px rgba(183,148,244,0.15);
+  margin:2rem auto;
+  display:block;
+}
+.hero-img-fallback{
+  width:min(320px,90vw);height:min(320px,90vw);
+  border-radius:50%;
+  margin:2rem auto;
+  background:radial-gradient(ellipse at 40% 40%,rgba(45,212,191,0.3),rgba(183,148,244,0.2),var(--deep-navy));
+  border:2px solid rgba(45,212,191,0.3);
+  box-shadow:0 0 60px rgba(45,212,191,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:6rem;
+}
+.hero-glyph{
+  font-family:var(--font-display);font-size:clamp(5rem,15vw,12rem);
+  line-height:1;
+  background:linear-gradient(135deg,var(--aqua),var(--lavender),var(--foam));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 30px rgba(45,212,191,0.4));
+  animation:floatGlyph 6s ease-in-out infinite;
+}
+@keyframes floatGlyph{
+  0%,100%{transform:translateY(0) rotate(-2deg)}
+  50%{transform:translateY(-18px) rotate(2deg)}
+}
+.hero-dissolve{
+  animation:dissolveIn 2s ease forwards;
+  opacity:0;
+}
+@keyframes dissolveIn{
+  from{opacity:0;filter:blur(20px) saturate(0);transform:scale(1.05)}
+  to{opacity:1;filter:blur(0) saturate(1);transform:scale(1)}
+}
+.hero-sub{
+  font-family:var(--font-accent);font-size:0.9rem;letter-spacing:0.25em;
+  color:var(--lavender);text-transform:uppercase;margin-bottom:1.5rem;
+}
+.hero-desc{
+  font-family:var(--font-body);font-size:clamp(1rem,2vw,1.25rem);
+  color:rgba(226,232,240,0.8);max-width:600px;margin:0 auto 2rem;
+  font-style:italic;
+}
+.scroll-hint{
+  margin-top:3rem;font-family:var(--font-accent);font-size:0.7rem;
+  letter-spacing:0.3em;color:rgba(255,255,255,0.3);text-transform:uppercase;
+  animation:pulse 2s ease infinite;
+}
+@keyframes pulse{0%,100%{opacity:0.3}50%{opacity:0.8}}
+.hero-glass{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(45,212,191,0.2);
+  backdrop-filter:blur(20px);
+  border-radius:32px;
+  padding:3rem;
+  max-width:700px;margin:0 auto;
+  animation:dissolveIn 2.5s ease 0.3s both;
+}
+
+/* ============================================
+   SECTION DIVIDERS
+============================================ */
+.wave-divider{
+  width:100%;overflow:hidden;line-height:0;
+  margin:-2px 0;
+}
+.wave-divider svg{display:block;width:100%}
+
+/* ============================================
+   MYTH SECTION
+============================================ */
+#myth{
+  background:linear-gradient(180deg,var(--abyss) 0%,var(--ocean-mid) 50%,var(--abyss) 100%);
+}
+.myth-columns{
+  display:grid;grid-template-columns:1fr 1fr;gap:2rem;
+  align-items:start;
+}
+@media(max-width:680px){.myth-columns{grid-template-columns:1fr}}
+.myth-img{
+  width:100%;border-radius:20px;
+  object-fit:cover;aspect-ratio:3/4;
+  border:1px solid rgba(183,148,244,0.2);
+  box-shadow:0 0 40px rgba(183,148,244,0.15);
+}
+.myth-img-fallback{
+  width:100%;border-radius:20px;aspect-ratio:3/4;
+  background:linear-gradient(160deg,rgba(183,148,244,0.2),rgba(45,212,191,0.1),rgba(5,13,26,0.8));
+  border:1px solid rgba(183,148,244,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:5rem;
+}
+
+/* ============================================
+   INTUITION / SYNC
+============================================ */
+#intuition{
+  background:radial-gradient(ellipse 70% 50% at 50% 50%,rgba(26,74,107,0.3) 0%,transparent 70%),var(--abyss);
+}
+.sync-bar-outer{
+  width:100%;height:12px;
+  background:rgba(255,255,255,0.08);border-radius:6px;overflow:hidden;
+}
+.sync-bar-inner{
+  height:100%;border-radius:6px;
+  background:linear-gradient(90deg,var(--aqua),var(--lavender),var(--foam));
+  transition:width 1.5s ease;
+  box-shadow:0 0 12px rgba(45,212,191,0.5);
+}
+.sync-labels{
+  display:flex;justify-content:space-between;
+  font-family:var(--font-accent);font-size:0.7rem;color:rgba(255,255,255,0.4);
+  margin-top:0.4rem;
+}
+
+/* ============================================
+   LEVEL SYSTEM
+============================================ */
+.level-display{
+  display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;
+  margin:2rem 0;
+}
+.level-node{
+  display:flex;flex-direction:column;align-items:center;gap:0.4rem;
+  padding:1rem 1.5rem;border-radius:16px;
+  border:1px solid rgba(255,255,255,0.1);
+  font-family:var(--font-accent);font-size:0.7rem;letter-spacing:0.1em;
+  transition:all 0.3s;
+  cursor:pointer;
+  position:relative;
+}
+.level-node.active{
+  background:rgba(45,212,191,0.15);
+  border-color:var(--aqua);
+  box-shadow:0 0 20px rgba(45,212,191,0.2);
+}
+.level-node .icon{font-size:1.8rem}
+
+/* ============================================
+   HOUSES GRID
+============================================ */
+#houses{
+  background:linear-gradient(180deg,var(--abyss) 0%,rgba(5,13,26,0.95) 100%);
+}
+.houses-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1.5rem;
+  margin-top:2rem;
+}
+.house-card{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  border-radius:20px;
+  padding:1.8rem;
+  position:relative;
+  overflow:hidden;
+  transition:transform 0.3s,box-shadow 0.3s;
+  cursor:pointer;
+}
+.house-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(45,212,191,0.05),transparent 60%);
+  opacity:0;transition:opacity 0.3s;
+}
+.house-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(45,212,191,0.15)}
+.house-card:hover::before{opacity:1}
+.house-num{
+  font-family:var(--font-display);font-size:3rem;
+  color:rgba(45,212,191,0.3);
+  position:absolute;top:1rem;right:1.2rem;
+  line-height:1;
+}
+.house-icon{font-size:1.8rem;margin-bottom:0.5rem}
+.house-title{
+  font-family:var(--font-accent);font-size:0.85rem;letter-spacing:0.12em;
+  color:var(--lavender);text-transform:uppercase;margin-bottom:0.3rem;
+}
+.house-keyword{
+  font-family:var(--font-display2);font-size:1.6rem;color:var(--aqua);
+  margin-bottom:0.8rem;
+}
+.house-body{font-size:0.92rem;color:rgba(226,232,240,0.75);line-height:1.7}
+/* FOG OVERLAY on house cards */
+.fog-overlay{
+  position:absolute;inset:0;border-radius:20px;
+  backdrop-filter:blur(8px);
+  background:rgba(3,8,16,0.6);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-accent);font-size:0.75rem;
+  color:rgba(255,255,255,0.4);letter-spacing:0.15em;
+  cursor:crosshair;
+  transition:opacity 0.5s;
+}
+
+/* ============================================
+   SIGNS GRID
+============================================ */
+#signs{
+  background:radial-gradient(ellipse 60% 40% at 30% 60%,rgba(183,148,244,0.08) 0%,transparent 70%),var(--abyss);
+}
+.signs-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:1.5rem;margin-top:2rem;
+}
+.sign-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(183,148,244,0.15);
+  border-radius:20px;padding:1.8rem;
+  transition:transform 0.3s,box-shadow 0.3s;
+  cursor:pointer;
+}
+.sign-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(183,148,244,0.15)}
+.sign-glyph{font-size:2.5rem;margin-bottom:0.5rem}
+.sign-title{
+  font-family:var(--font-accent);font-size:0.8rem;letter-spacing:0.15em;
+  color:var(--aqua);text-transform:uppercase;
+}
+.sign-years{
+  font-family:var(--font-body);font-style:italic;
+  font-size:0.85rem;color:rgba(255,255,255,0.4);margin:0.2rem 0 0.8rem;
+}
+.sign-theme{
+  font-family:var(--font-display2);font-size:1.5rem;color:var(--lavender);
+  margin-bottom:0.6rem;
+}
+.sign-body{font-size:0.9rem;color:rgba(226,232,240,0.75);line-height:1.7}
+
+/* ============================================
+   ASPECTS MATRIX
+============================================ */
+#aspects{
+  background:linear-gradient(180deg,var(--abyss) 0%,rgba(5,13,26,0.97) 100%);
+}
+.aspects-table-wrap{overflow-x:auto;margin-top:2rem}
+.aspects-table{
+  width:100%;border-collapse:collapse;
+  font-family:var(--font-body);font-size:0.82rem;
+}
+.aspects-table th{
+  font-family:var(--font-accent);font-size:0.7rem;letter-spacing:0.1em;
+  color:var(--lavender);text-transform:uppercase;
+  padding:0.6rem 0.8rem;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  white-space:nowrap;
+  background:rgba(183,148,244,0.05);
+}
+.aspects-table td{
+  padding:0.7rem 0.8rem;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  border-right:1px solid rgba(255,255,255,0.04);
+  vertical-align:top;
+  color:rgba(226,232,240,0.8);
+  transition:background 0.2s;
+}
+.aspects-table tr:hover td{background:rgba(45,212,191,0.04)}
+.aspect-planet{
+  font-family:var(--font-accent);font-size:0.75rem;
+  color:var(--aqua);white-space:nowrap;font-weight:700;
+}
+.asp-conj{color:var(--gold)}
+.asp-opp{color:#f87171}
+.asp-trine{color:var(--seafoam)}
+.asp-square{color:#fb923c}
+.asp-sextile{color:var(--foam)}
+
+/* ============================================
+   TAROT GACHA
+============================================ */
+#tarot{
+  background:radial-gradient(ellipse 50% 50% at 50% 50%,rgba(183,148,244,0.12) 0%,transparent 70%),var(--abyss);
+}
+.tarot-deck{
+  display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;
+  margin:2rem 0;
+}
+.tarot-card{
+  width:120px;height:200px;
+  border-radius:12px;
+  border:1px solid rgba(183,148,244,0.3);
+  background:linear-gradient(160deg,rgba(183,148,244,0.15),rgba(45,212,191,0.1),rgba(5,13,26,0.8));
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:transform 0.5s cubic-bezier(0.23,1,0.32,1),box-shadow 0.3s;
+  position:relative;overflow:hidden;
+  perspective:600px;
+}
+.tarot-card:hover{transform:translateY(-8px) rotate(-2deg);box-shadow:0 20px 50px rgba(183,148,244,0.3)}
+.tarot-back{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:2.5rem;
+  transition:opacity 0.4s;
+}
+.tarot-front{
+  position:absolute;inset:0;padding:0.8rem;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;transition:opacity 0.4s;
+  text-align:center;
+}
+.tarot-card.revealed .tarot-back{opacity:0}
+.tarot-card.revealed .tarot-front{opacity:1}
+.tarot-name{
+  font-family:var(--font-accent);font-size:0.6rem;letter-spacing:0.1em;
+  color:var(--lavender);text-transform:uppercase;margin-top:0.5rem;
+}
+.tarot-msg{font-size:0.7rem;color:rgba(226,232,240,0.7);line-height:1.4}
+.tarot-draw-btn{
+  display:block;margin:0 auto;
+  background:linear-gradient(135deg,var(--lavender-dim),var(--aqua-dim));
+  color:#fff;border:none;padding:0.8rem 2.5rem;border-radius:30px;
+  font-family:var(--font-accent);font-size:0.85rem;letter-spacing:0.15em;
+  cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;
+  text-transform:uppercase;
+}
+.tarot-draw-btn:hover{transform:scale(1.05);box-shadow:0 8px 30px rgba(183,148,244,0.4)}
+
+/* ============================================
+   DREAM LOG
+============================================ */
+#dreamlog{background:var(--abyss)}
+.dreamlog-input-wrap{position:relative;margin:1.5rem 0}
+.dreamlog-input{
+  width:100%;background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.12);border-radius:12px;
+  padding:1rem 1.5rem;color:var(--moonsilver);
+  font-family:var(--font-body);font-style:italic;font-size:1rem;
+  resize:none;height:100px;outline:none;
+  transition:border-color 0.3s;
+}
+.dreamlog-input:focus{border-color:var(--aqua)}
+.dreamlog-btn{
+  background:rgba(45,212,191,0.15);border:1px solid var(--aqua);
+  color:var(--aqua);padding:0.6rem 1.8rem;border-radius:8px;
+  font-family:var(--font-accent);font-size:0.8rem;letter-spacing:0.1em;
+  cursor:pointer;transition:all 0.2s;
+}
+.dreamlog-btn:hover{background:rgba(45,212,191,0.25)}
+.dreamlog-entries{margin-top:1.5rem;display:flex;flex-direction:column;gap:0.8rem}
+.dreamlog-entry{
+  background:rgba(255,255,255,0.04);border-left:2px solid var(--aqua-dim);
+  padding:0.8rem 1.2rem;border-radius:0 8px 8px 0;
+  font-style:italic;font-size:0.9rem;color:rgba(226,232,240,0.7);
+}
+.dreamlog-date{
+  font-family:var(--font-accent);font-size:0.65rem;color:var(--lavender);
+  letter-spacing:0.1em;margin-bottom:0.3rem;
+}
+.gem-count{
+  display:inline-flex;align-items:center;gap:0.4rem;
+  background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);
+  padding:0.3rem 1rem;border-radius:20px;
+  font-family:var(--font-accent);font-size:0.75rem;color:var(--gold);
+  margin-left:1rem;
+}
+
+/* ============================================
+   CASES
+============================================ */
+#cases{background:var(--ocean-mid)}
+.case-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;margin-top:2rem}
+.case-card{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  border-radius:20px;padding:2rem;
+}
+.case-name{
+  font-family:var(--font-display2);font-size:2rem;color:var(--aqua);
+  margin-bottom:0.3rem;
+}
+.case-meta{
+  font-family:var(--font-accent);font-size:0.7rem;letter-spacing:0.1em;
+  color:var(--lavender);margin-bottom:1rem;
+}
+.case-tag{
+  display:inline-block;
+  background:rgba(183,148,244,0.15);border:1px solid rgba(183,148,244,0.3);
+  color:var(--lavender);padding:0.2rem 0.7rem;border-radius:12px;
+  font-size:0.7rem;font-family:var(--font-accent);margin:0.2rem;
+}
+
+/* ============================================
+   PRACTICE GUIDE
+============================================ */
+#guide{
+  background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(110,231,183,0.08) 0%,transparent 70%),var(--abyss);
+}
+.guide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;margin-top:2rem}
+.guide-card{
+  background:rgba(110,231,183,0.05);border:1px solid rgba(110,231,183,0.15);
+  border-radius:20px;padding:1.8rem;text-align:center;
+}
+.guide-icon{font-size:2.5rem;margin-bottom:1rem}
+.guide-title{
+  font-family:var(--font-display2);font-size:1.8rem;color:var(--seafoam);
+  margin-bottom:0.5rem;
+}
+.guide-list{list-style:none;text-align:left}
+.guide-list li{
+  padding:0.4rem 0;font-size:0.9rem;color:rgba(226,232,240,0.75);
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.guide-list li::before{content:'♓ ';color:var(--aqua);font-size:0.8rem}
+
+/* ============================================
+   SHARE CARD
+============================================ */
+#share{
+  background:linear-gradient(180deg,var(--abyss) 0%,var(--ocean-mid) 100%);
+  text-align:center;
+}
+#share-card-canvas{
+  width:min(400px,90vw);height:min(400px,90vw);
+  margin:2rem auto;
+  background:linear-gradient(135deg,rgba(5,13,26,0.95),rgba(26,74,107,0.5));
+  border:1px solid rgba(45,212,191,0.3);
+  border-radius:24px;
+  padding:2rem;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:0 0 60px rgba(45,212,191,0.15);
+}
+.share-btn{
+  background:linear-gradient(135deg,var(--aqua-dim),var(--lavender-dim));
+  color:#fff;border:none;padding:0.8rem 2.5rem;border-radius:30px;
+  font-family:var(--font-accent);font-size:0.85rem;letter-spacing:0.15em;
+  cursor:pointer;margin:0.5rem;transition:transform 0.2s,box-shadow 0.2s;
+}
+.share-btn:hover{transform:scale(1.05);box-shadow:0 8px 30px rgba(45,212,191,0.3)}
+
+/* ============================================
+   MEDITATION OVERLAY
+============================================ */
+#meditation-overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(3,8,16,0.96);
+  display:none;align-items:center;justify-content:center;flex-direction:column;
+  text-align:center;
+}
+#meditation-overlay.active{display:flex}
+.med-circle{
+  width:180px;height:180px;border-radius:50%;
+  border:2px solid rgba(45,212,191,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:4rem;
+  animation:breathe 4s ease-in-out infinite;
+  box-shadow:0 0 60px rgba(45,212,191,0.2),inset 0 0 40px rgba(183,148,244,0.1);
+}
+@keyframes breathe{
+  0%,100%{transform:scale(1);box-shadow:0 0 40px rgba(45,212,191,0.2)}
+  50%{transform:scale(1.15);box-shadow:0 0 80px rgba(45,212,191,0.4),0 0 120px rgba(183,148,244,0.2)}
+}
+.med-text{
+  font-family:var(--font-display);font-size:3rem;color:var(--aqua);margin:1.5rem 0;
+  animation:fadeInOut 4s ease-in-out infinite;
+}
+@keyframes fadeInOut{0%,100%{opacity:0.4}50%{opacity:1}}
+.med-close{
+  position:absolute;top:2rem;right:2rem;
+  background:none;border:1px solid rgba(255,255,255,0.2);
+  color:rgba(255,255,255,0.5);padding:0.5rem 1rem;border-radius:8px;
+  cursor:pointer;font-family:var(--font-accent);font-size:0.75rem;
+}
+
+/* ============================================
+   XP TOAST
+============================================ */
+.xp-toast{
+  position:fixed;bottom:2rem;right:2rem;z-index:500;
+  background:rgba(45,212,191,0.15);border:1px solid var(--aqua);
+  padding:0.8rem 1.5rem;border-radius:12px;
+  font-family:var(--font-accent);font-size:0.8rem;color:var(--aqua);
+  animation:toastIn 0.4s ease;
+  pointer-events:none;
+}
+@keyframes toastIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ============================================
+   FOOTER
+============================================ */
+footer{
+  text-align:center;padding:3rem 2rem;
+  font-family:var(--font-accent);font-size:0.7rem;letter-spacing:0.15em;
+  color:rgba(255,255,255,0.2);
+  border-top:1px solid rgba(255,255,255,0.05);
+}
+
+/* ============================================
+   SCROLL REVEAL
+============================================ */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.8s ease,transform 0.8s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ============================================
+   RESPONSIVE
+============================================ */
+@media(max-width:480px){
+  section{padding:3rem 1rem}
+  .glass{padding:1.5rem}
+  .houses-grid,.signs-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND LAYERS -->
+<div class="caustic-bg"></div>
+<div class="grain-overlay"></div>
+<svg class="wave-svg" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0,60 C360,120 1080,0 1440,60 L1440,120 L0,120 Z" fill="rgba(45,212,191,0.04)"/>
+  <path d="M0,80 C480,20 960,100 1440,40 L1440,120 L0,120 Z" fill="rgba(183,148,244,0.03)"/>
+</svg>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">♆</a>
+  <div class="nav-level">
+    <span id="level-text">覺察等級</span>
+    <span class="level-badge" id="level-badge">做夢者</span>
+    <span id="nav-gems" class="gem-count">💎 <span id="gem-display">0</span></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:1rem">
+    <div class="sync-ring" style="width:48px;height:48px">
+      <svg width="48" height="48" viewBox="0 0 48 48" style="transform:rotate(-90deg)">
+        <circle class="sync-circle-bg" cx="24" cy="24" r="20" stroke-width="4"/>
+        <circle class="sync-circle" id="nav-sync-circle" cx="24" cy="24" r="20" stroke-width="4"
+          stroke-dasharray="125.6" stroke-dashoffset="125.6"/>
+      </svg>
+      <div class="sync-pct" style="font-size:0.6rem" id="nav-sync-pct">0%</div>
+    </div>
+  </div>
+</nav>
+
+<!-- MEDITATION OVERLAY -->
+<div id="meditation-overlay">
+  <button class="med-close" onclick="closeMeditation()">✕ 離開冥想</button>
+  <div class="med-circle">🌊</div>
+  <div class="med-text" id="med-text">呼吸，放下</div>
+  <p style="font-family:var(--font-body);font-style:italic;color:rgba(226,232,240,0.5);margin-top:1rem;font-size:0.9rem">
+    海王星說：溶解邊界，感受一切皆流動
+  </p>
+  <div id="med-audio-note" style="margin-top:2rem;font-family:var(--font-accent);font-size:0.65rem;color:rgba(255,255,255,0.2);letter-spacing:0.1em">
+    靜置 30 秒後自動觸發 · 按 Esc 或點擊離開
+  </div>
+</div>
+
+<main>
+
+<!-- ========================================
+  1. HERO
+======================================== -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-glass">
+      <div class="hero-sub hero-dissolve">行星原型系列 · 第九章</div>
+      <div class="hero-glyph hero-dissolve" style="animation-delay:0.2s">♆</div>
+      <h1 class="display hero-dissolve" style="animation-delay:0.4s">海王星</h1>
+      <p class="hero-desc hero-dissolve" style="animation-delay:0.6s">你的夢境頻道，靈魂的溶解之鏡</p>
+      <img src="./images/hero.png"
+        class="hero-img hero-dissolve"
+        style="animation-delay:0.8s"
+        alt="海王星"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="hero-img-fallback" style="display:none">♆</div>
+      <div class="hero-dissolve" style="animation-delay:1s">
+        <div class="sync-ring-wrap">
+          <div class="sync-ring">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle class="sync-circle-bg" cx="40" cy="40" r="35"/>
+              <circle class="sync-circle" id="hero-sync" cx="40" cy="40" r="35"
+                stroke-dasharray="219.9" stroke-dashoffset="219.9"/>
+            </svg>
+            <div class="sync-pct" id="hero-sync-pct">0%</div>
+          </div>
+          <div style="font-family:var(--font-accent);font-size:0.7rem;color:var(--lavender);letter-spacing:0.15em">
+            靈感同步率
+          </div>
+        </div>
+      </div>
+      <div class="scroll-hint">向下探索深淵 ↓</div>
+    </div>
+  </div>
+</section>
+
+<!-- WAVE DIVIDER -->
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,30 C480,60 960,0 1440,30 L1440,60 L0,60 Z" fill="rgba(10,22,40,0.8)"/>
+  </svg>
+</div>
+
+<!-- ========================================
+  2. MYTH
+======================================== -->
+<section id="myth">
+  <div class="container">
+    <h2 class="section-title reveal">波賽頓・涅普頓 神話</h2>
+    <h3 class="sub-title reveal">海洋之主，夢境之源</h3>
+    <div class="myth-columns">
+      <div class="reveal">
+        <img src="./images/myth.png" class="myth-img" alt="海神"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="myth-img-fallback" style="display:none">🔱</div>
+      </div>
+      <div class="reveal" style="transition-delay:0.2s">
+        <div class="glass">
+          <p>希臘神話中，<span class="accent">波賽頓（Poseidon）</span>是宙斯的兄弟，統治浩瀚海洋。他的三叉戟一擊，能掀起滔天巨浪，也能平息怒海——象徵那股穿透現實、溶解界限的原始力量。</p>
+          <p>羅馬神話中同一原型以<span class="lavender">涅普頓（Neptune）</span>之名出現，守護深不見底的海域。他代表<strong>無意識的深淵</strong>：那裡藏著人類最古老的恐懼、最美麗的幻象，以及靈感的無盡源泉。</p>
+          <p>海王星的神話核心是<span class="foam">溶解</span>——邊界消融，自我融入更大整體。它掌管藝術家的靈感狂潮、聖人的神秘經驗，也掌管成癮者難以自拔的逃離渴望。</p>
+          <p class="italic" style="color:rgba(226,232,240,0.5);font-size:0.9rem">
+            「我不是消失，我是化為大海。」
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+  3. INTUITION CORE
+======================================== -->
+<section id="intuition">
+  <div class="container">
+    <h2 class="section-title reveal">直覺核心隱喻</h2>
+    <h3 class="sub-title reveal">你與宇宙頻道的連結強度</h3>
+    <div class="reveal">
+      <div class="glass" style="max-width:700px;margin:0 auto">
+        <p style="font-size:1.1rem;font-style:italic;text-align:center;color:rgba(226,232,240,0.9)">
+          海王星是占星盤中最難具體描述的行星——因為它根本不想被具體描述。<br>
+          它是<span class="accent">濾鏡</span>、是<span class="lavender">霧</span>、是<span class="foam">水下光折射</span>。
+        </p>
+        <div style="margin:2rem 0">
+          <div class="sync-bar-outer">
+            <div class="sync-bar-inner" id="main-sync-bar" style="width:0%"></div>
+          </div>
+          <div class="sync-labels">
+            <span>做夢者</span><span>夢行者</span><span>通靈者</span><span>神祕主義者</span>
+          </div>
+        </div>
+        <div class="level-display">
+          <div class="level-node active" id="lv0" onclick="setLevel(0)">
+            <span class="icon">🌙</span>
+            <span>做夢者</span>
+            <span style="color:rgba(255,255,255,0.4);font-size:0.6rem">0 XP</span>
+          </div>
+          <div class="level-node" id="lv1" onclick="setLevel(1)">
+            <span class="icon">🌊</span>
+            <span>夢行者</span>
+            <span style="color:rgba(255,255,255,0.4);font-size:0.6rem">100 XP</span>
+          </div>
+          <div class="level-node" id="lv2" onclick="setLevel(2)">
+            <span class="icon">🔮</span>
+            <span>通靈者</span>
+            <span style="color:rgba(255,255,255,0.4);font-size:0.6rem">300 XP</span>
+          </div>
+          <div class="level-node" id="lv3" onclick="setLevel(3)">
+            <span class="icon">✨</span>
+            <span>神祕主義者</span>
+            <span style="color:rgba(255,255,255,0.4);font-size:0.6rem">600 XP</span>
+          </div>
+        </div>
+        <p style="font-size:0.9rem;color:rgba(226,232,240,0.6);text-align:center">
+          海王星的三大隱喻：<span class="accent">創作靈感</span>（藝術家的頻道天線）、
+          <span class="lavender">神祕融合</span>（冥想者的自我消融）、
+          <span class="foam">逃離幻境</span>（成癮與幻滅的兩面刃）
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+  4-15. 海王星在十二宮
+======================================== -->
+<section id="houses">
+  <div class="container wide">
+    <h2 class="section-title reveal">海王星在十二宮</h2>
+    <h3 class="sub-title reveal">夢境如何滲透你生命的不同領域</h3>
+    <p class="reveal" style="max-width:700px;color:rgba(226,232,240,0.7);font-style:italic">
+      海王星所在的宮位，是你生命中最容易出現幻覺、靈感、逃避，同時也最有機會觸及神性的領域。
+      點擊卡片，驅散迷霧，探索深層意涵。
+    </p>
+    <div class="houses-grid" id="houses-grid">
+      <!-- 宮位卡片由 JS 生成 -->
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+  16-27. 海王星在十二星座
+======================================== -->
+<section id="signs">
+  <div class="container wide">
+    <h2 class="section-title reveal">海王星在十二星座</h2>
+    <h3 class="sub-title reveal">世代靈性主題 · 約 14 年一個世代</h3>
+    <p class="reveal" style="max-width:700px;color:rgba(226,232,240,0.7);font-style:italic">
+      海王星是世代行星，在同一星座停留約 14 年。它描述的不只是個人，而是整個世代共同擁有的靈性渴望與集體幻象。
+    </p>
+    <div class="signs-grid" id="signs-grid">
+      <!-- 星座卡片由 JS 生成 -->
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+  28. 45 相位矩陣
+======================================== -->
+<section id="aspects">
+  <div class="container wide">
+    <h2 class="section-title reveal">海王星 × 45 相位矩陣</h2>
+    <h3 class="sub-title reveal">海王星與九大行星的全部相位解析</h3>
+    <p class="reveal" style="max-width:700px;color:rgba(226,232,240,0.7);font-style:italic;margin-bottom:1.5rem">
+      相位符號：
+      <span class="asp-conj">☌ 合相</span>·
+      <span class="asp-opp">☍ 對分</span>·
+      <span class="asp-trine">△ 三分</span>·
+      <span class="asp-square">□ 四分</span>·
+      <span class="asp-sextile">✶ 六分</span>
+    </p>
+    <div class="aspects-table-wrap reveal">
+      <table class="aspects-table" id="aspects-table">
+        <!-- 由 JS 生成 -->
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+  29. 真實案例
+======================================== -->
+<section id="cases">
+  <div class="container">
+    <h2 class="section-title reveal">真實星盤案例</h2>
+    <h3 class="sub-title reveal">海王星如何在名人命盤中現身</h3>
+    <div class="case-cards" id="case-cards">
+      <!-- 由 JS 生成 -->
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+  TAROT GACHA
+======================================== -->
+<section id="tarot">
+  <div class="container">
+    <h2 class="section-title reveal">每日直覺抽卡</h2>
+    <h3 class="sub-title reveal">海王星塔羅 · 每日一次的靈感 Gacha</h3>
+    <p class="reveal" style="color:rgba(226,232,240,0.6);font-style:italic;margin-bottom:1.5rem">
+      每日可抽一張，結果記憶在瀏覽器。點擊「喚醒直覺」，讓海王星傳遞今日訊息。
+    </p>
+    <div class="tarot-deck" id="tarot-deck">
+      <!-- JS 生成 -->
+    </div>
+    <button class="tarot-draw-btn" onclick="drawTarot()">♆ 喚醒直覺</button>
+    <div id="tarot-result" style="text-align:center;margin-top:1.5rem;font-style:italic;color:var(--lavender);min-height:2rem"></div>
+  </div>
+</section>
+
+<!-- ========================================
+  DREAM LOG
+======================================== -->
+<section id="dreamlog">
+  <div class="container">
+    <h2 class="section-title reveal">夢境日誌</h2>
+    <h3 class="sub-title reveal">每日記錄，連續解鎖潛意識圖鑑</h3>
+    <div class="glass reveal" style="max-width:700px;margin:0 auto">
+      <p style="color:rgba(226,232,240,0.6);font-style:italic;margin-bottom:1rem">
+        記下今晨醒來的第一個意象、感受或片段。不需要完整，零碎也是訊息。
+      </p>
+      <div class="dreamlog-input-wrap">
+        <textarea class="dreamlog-input" id="dream-input" placeholder="今夜，我夢見…"></textarea>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <button class="dreamlog-btn" onclick="saveDream()">儲存夢境片段 ✨</button>
+        <div>
+          <span style="font-family:var(--font-accent);font-size:0.7rem;color:rgba(255,255,255,0.3)">
+            連續紀錄 <span id="streak-count">0</span> 天
+          </span>
+          <span class="gem-count">💎 <span id="dream-gems">0</span></span>
+        </div>
+      </div>
+      <div class="dreamlog-entries" id="dream-entries"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+  30. 實用指引
+======================================== -->
+<section id="guide">
+  <div class="container">
+    <h2 class="section-title reveal">海王星實用指引</h2>
+    <h3 class="sub-title reveal">直覺練習 · 夢境工作 · 冥想路徑</h3>
+    <div class="guide-grid">
+      <div class="guide-card reveal">
+        <div class="guide-icon">🌊</div>
+        <div class="guide-title">直覺練習</div>
+        <ul class="guide-list">
+          <li>晨起記錄夢境意象，不加詮釋</li>
+          <li>每日靜坐 5 分鐘，觀察內在聲音</li>
+          <li>注意「巧合」—海王星說那是訊息</li>
+          <li>藝術創作前放棄計畫，讓手帶路</li>
+          <li>在水邊冥想（浴缸、海邊、雨中）</li>
+        </ul>
+      </div>
+      <div class="guide-card reveal" style="transition-delay:0.15s">
+        <div class="guide-icon">📖</div>
+        <div class="guide-title">夢境工作</div>
+        <ul class="guide-list">
+          <li>床頭放日誌，醒來立刻記錄</li>
+          <li>記錄情緒感受，比情節更重要</li>
+          <li>尋找重複出現的符號</li>
+          <li>詢問夢中角色：你代表什麼？</li>
+          <li>月盈時重讀夢境，尋找模式</li>
+        </ul>
+      </div>
+      <div class="guide-card reveal" style="transition-delay:0.3s">
+        <div class="guide-icon">🔮</div>
+        <div class="guide-title">冥想路徑</div>
+        <ul class="guide-list">
+          <li>海洋呼吸法：4 吸 / 4 憋 / 8 呼</li>
+          <li>觀想自己緩緩沉入溫暖深海</li>
+          <li>溶解練習：感受身體邊界消失</li>
+          <li>慈悲冥想（metta）—海王星共鳴</li>
+          <li>聆聽 432Hz 或水流音景冥想</li>
+        </ul>
+      </div>
+      <div class="guide-card reveal" style="transition-delay:0.45s">
+        <div class="guide-icon">⚠️</div>
+        <div class="guide-title">海王星陰影整合</div>
+        <ul class="guide-list">
+          <li>辨識「理想化」—看清，非消滅它</li>
+          <li>為逃避傾向設立邊界，而非壓制</li>
+          <li>藝術化表達成癮渴望（轉化）</li>
+          <li>定期接地：身體運動，土系活動</li>
+          <li>找土星型的導師或結構做錨點</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================================
+  31. 分享卡 + 結尾
+======================================== -->
+<section id="share">
+  <div class="container">
+    <h2 class="section-title reveal">你的海王星夢境地圖</h2>
+    <h3 class="sub-title reveal">記憶點 · 分享你的靈性頻率</h3>
+    <p class="reveal" style="color:rgba(226,232,240,0.6);font-style:italic;max-width:600px;margin:0 auto 2rem">
+      海王星不問「我是誰？」而問「我在哪裡消失？那個消失的地方，就是我最真實的所在。」
+    </p>
+    <div id="share-card-canvas" class="reveal">
+      <div style="font-family:var(--font-display);font-size:4rem;color:var(--aqua);line-height:1">♆</div>
+      <div style="font-family:var(--font-display2);font-size:2.5rem;color:#fff;margin:0.5rem 0">海王星夢境地圖</div>
+      <div style="font-family:var(--font-accent);font-size:0.7rem;color:var(--lavender);letter-spacing:0.2em;margin:0.5rem 0">
+        NEPTUNE DREAM MAP
+      </div>
+      <div id="share-level-display" style="font-family:var(--font-accent);font-size:0.75rem;color:var(--aqua);margin:1rem 0">
+        覺察等級：做夢者 🌙
+      </div>
+      <div id="share-sync-display" style="font-family:var(--font-body);font-style:italic;color:rgba(226,232,240,0.6);font-size:0.85rem">
+        靈感同步率：0%
+      </div>
+      <div id="share-gems-display" style="margin-top:0.8rem;font-family:var(--font-accent);font-size:0.7rem;color:var(--gold)">
+        💎 幻境寶石 × 0
+      </div>
+    </div>
+    <div class="reveal">
+      <button class="share-btn" onclick="downloadShareCard()">💾 儲存夢境地圖</button>
+      <button class="share-btn" onclick="copyShareText()">📋 複製分享文字</button>
+    </div>
+    <div style="text-align:center;margin-top:4rem" class="reveal">
+      <div style="font-family:var(--font-display);font-size:5rem;color:var(--aqua);opacity:0.3">♆</div>
+      <p style="font-family:var(--font-body);font-style:italic;color:rgba(226,232,240,0.4);max-width:500px;margin:0 auto">
+        海王星不在遠處，它在每次你閉眼的瞬間，<br>在每個你無法用語言解釋的感受裡。
+      </p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div>♆ 海王星占星指南 · Underwater Dreamscape Edition</div>
+  <div style="margin-top:0.5rem">海王星的教導：溶解邊界，感受萬物一體</div>
+</footer>
+
+<script>
+// ============================================
+// DATA
+// ============================================
+
+const HOUSES_DATA = [
+  {
+    num:'一',house:'第一宮',icon:'🌊',keyword:'人格迷霧',
+    title:'自我形象',
+    body:'海王星合上升：外表帶有夢幻、飄渺的氣質，難以被人「看清」。天生的演員與藝術家氣場，但自我認同模糊，容易吸收他人的期待而迷失。眼神常令人難忘，彷彿帶著另一個世界的遙遠距離。挑戰：建立穩定自我感。禮物：成為他人夢境的容器。'
+  },
+  {
+    num:'二',house:'第二宮',icon:'💧',keyword:'財務幻象',
+    title:'金錢與價值',
+    body:'對金錢的態度飄忽不定——時而慷慨到忘我，時而因幻滅而逃避現實。直覺式的財務決策，偶有神奇的意外之財，也易落入詐騙或理想化投資。真正的「財富」感來自靈性富足與藝術創作，而非銀行數字。需要學習財務界限。'
+  },
+  {
+    num:'三',house:'第三宮',icon:'🌀',keyword:'詩性思維',
+    title:'溝通與思維',
+    body:'思維方式非線性、詩意流動，隱喻比邏輯更能說清楚內心所感。天生的說故事者、詩人、歌詞創作者。但溝通有時模糊，聽者需要「感受」多於「理解」。容易誤讀訊息，也容易被美麗的謊言迷惑。和手足或鄰居關係帶有犧牲或救贖主題。'
+  },
+  {
+    num:'四',house:'第四宮',icon:'🏠',keyword:'夢境家園',
+    title:'家庭與根基',
+    body:'成長背景帶有某種「不真實感」——父母之一可能有上癮、精神疾病、或宗教狂熱，或家庭本身充滿秘密與未說出的事。但也給予極深的靈性根基與豐富的內在世界。對「家」的渴望既強烈又難以滿足——因為真正的家在靈魂層次。'
+  },
+  {
+    num:'五',house:'第五宮',icon:'🎭',keyword:'創作神啟',
+    title:'創作與戀愛',
+    body:'藝術創作能力受到海王星直接眷顧：音樂、繪畫、攝影、表演，直覺超越技巧。戀愛關係容易理想化對方，看見伴侶靈魂而非現實，既是浪漫也是受傷的原因。孩子的主題可能帶有神秘感或特殊身份。愛是這宮位的救贖，也是幻滅的起點。'
+  },
+  {
+    num:'六',house:'第六宮',icon:'🌿',keyword:'靈性服務',
+    title:'工作與健康',
+    body:'工作動機以「服務」而非「成就」驅動，最適合療癒工作、藝術相關、靈性事業。身體界限模糊，容易對環境過敏、能量感知強。職場中容易犧牲自己、被剝削，需要學習設立工作界限。健康議題可能與情緒狀態高度連結，身心難以分割。'
+  },
+  {
+    num:'七',house:'第七宮',icon:'🪬',keyword:'伴侶幻想',
+    title:'婚姻與伴侶',
+    body:'對伴侶有強烈理想化傾向，容易愛上「潛力股」而非眼前之人。夥伴關係帶有救世主情結（拯救對方或被對方拯救）。最深層的靈魂連結往往通過這宮位顯現，但也容易遇到不誠實或逃避現實的伴侶。整合後能吸引具有靈性深度的真實伴侶。'
+  },
+  {
+    num:'八',house:'第八宮',icon:'🌑',keyword:'死亡通靈',
+    title:'轉化與死亡',
+    body:'對死亡、靈性、神秘主義有深深的共鳴。通靈能力或直覺感應特別強，對無意識世界有天生的通道。財務上涉及他人資源時易不清楚（遺產、保險、共同帳戶）。性關係帶有靈魂融合的渴望，有時界限模糊。此宮位的海王星是最深邃的靈性配置。'
+  },
+  {
+    num:'九',house:'第九宮',icon:'🌍',keyword:'靈性朝聖',
+    title:'信仰與哲學',
+    body:'哲學和宗教不只是知識，而是深入骨髓的信仰體驗。容易被某種靈性或宗教深深吸引，可能有教派或崇拜傾向，需要明辨。旅行帶有朝聖意味，異國文化給予靈性滋養。天生的宗教詩人、哲學家、靈性老師。夢想旅行往往帶來真實的靈性轉化。'
+  },
+  {
+    num:'十',house:'第十宮',icon:'🌐',keyword:'靈性事業',
+    title:'志業與聲譽',
+    body:'職業呼召帶有使命感而非野心——藝術家、治療師、靈媒、慈善工作者。公眾形象帶有神秘感或理想化投射，他人容易將夢想投射到你身上。事業方向可能多次轉換，或帶有犧牲個人名利的成分。整合後能以真實靈性天賦建立深具影響力的事業。'
+  },
+  {
+    num:'十一',house:'第十一宮',icon:'🌌',keyword:'烏托邦社群',
+    title:'友誼與群體',
+    body:'被靈性社群、藝術圈、或理想主義群體吸引。對「建立理想社會」有深深的渴望，容易投入社會運動或社群工作。但也容易遇到難以真正靠近的朋友，或在群體中失去自己。網路上的社群帶有特別的海王星特質：真實與虛幻同時存在。'
+  },
+  {
+    num:'十二',house:'第十二宮',icon:'♓',keyword:'神秘深淵',
+    title:'靈魂隱祕',
+    body:'海王星在本命宮位中最強力的配置。第十二宮是海王星守護，二者合一：靈魂深處有一個通往無意識的開放通道，冥想、夢境、藝術是你最自然的語言。需要大量的獨處與靜默。退隱、睡眠、靜心是你的充電方式。整合後是最接近神性的靈魂之一。'
+  }
+];
+
+const SIGNS_DATA = [
+  {
+    sign:'牡羊座',glyph:'♈',years:'2025–2039',theme:'革命靈魂',
+    body:'（即將進入）這一世代的靈性主題是：以行動激活靈感，打破舊有精神框架，用衝勁開創新的靈性典範。他們的直覺帶有戰士能量，靈感到來即刻行動，拒絕慢慢等待。靈性探索是個人英雄旅程。'
+  },
+  {
+    sign:'金牛座',glyph:'♉',years:'2011–2025',theme:'大地靈性',
+    body:'這世代（Z世代後期 / Alpha 世代）的靈性渴望根植於自然、身體與物質美感。他們通過土地、食物、工藝尋找神聖。對永續、生態靈性有本能的嚮往，但也面對物質幻滅（消費主義的集體幻象）。'
+  },
+  {
+    sign:'雙子座',glyph:'♊',years:'1888–1902 / 2025前後',theme:'資訊幻象',
+    body:'這個位置的集體主題是資訊流動中的靈性迷失：謊言與真相的邊界模糊，媒體幻象強大，語言與符號成為靈性工具。直覺通過訊息流與連結感知世界。（近代：十九世紀末靈媒運動高峰）'
+  },
+  {
+    sign:'巨蟹座',glyph:'♋',years:'1901–1914',theme:'集體記憶',
+    body:'（20世紀初出生）這一世代的靈性核心是家庭記憶、祖先聯結與民族集體無意識。他們的心靈傷痕與第一次世界大戰、帝國崩解的集體創傷緊密交織。情感是他們的靈性語言。'
+  },
+  {
+    sign:'獅子座',glyph:'♌',years:'1914–1929',theme:'英雄崇拜',
+    body:'（二戰前出生世代）集體幻象中心是英雄、領袖、民族神話。藝術有神話化傾向，電影黃金時代即此世代的文化表達。靈性探索通過創作、戲劇、自我表現展開，但也有對偉大領袖的集體投射。'
+  },
+  {
+    sign:'處女座',glyph:'♍',years:'1929–1943',theme:'奉獻淨化',
+    body:'（大蕭條 / 二戰世代）集體靈性主題是服務、苦難中的意義、通過工作與犧牲尋找神聖。這世代對「完美服務」有近乎宗教的執著，同時也承載工業文明的集體迷失。'
+  },
+  {
+    sign:'天秤座',glyph:'♎',years:'1943–1957',theme:'和諧靈性',
+    body:'（嬰兒潮世代前期）集體靈性渴望美、和諧與關係的神聖化。這世代帶來戰後的藝術復興、浪漫主義回潮，以及對理想愛情的集體崇拜。外交與藝術成為他們的靈性語言，同時也有關係幻滅的集體功課。'
+  },
+  {
+    sign:'天蠍座',glyph:'♏',years:'1957–1970',theme:'死亡重生',
+    body:'（嬰兒潮後期 / 搖滾世代）這世代集體靈性主題是性、死亡、轉化與權力的神秘探索。60年代反文化運動、迷幻藥靈性實驗、性革命，都是這世代集體無意識的表達。對禁忌的靈性渴望強烈。'
+  },
+  {
+    sign:'射手座',glyph:'♐',years:'1970–1984',theme:'靈性朝聖',
+    body:'（X世代）集體靈性渴望是跨文化的靈性融合——東西方宗教混搭、New Age 運動、全球化帶來的靈性多元探索。這世代對「最終真理」有強烈渴望，容易在不同信仰系統中漫遊尋找。'
+  },
+  {
+    sign:'摩羯座',glyph:'♑',years:'1984–1998',theme:'制度解構',
+    body:'（千禧世代）集體靈性主題是對傳統機構（宗教、政府、企業）的幻滅與解構。他們通過個人成就尋找意義，但深層渴望是靈性的踏實落地。卡普利康的海王星讓這世代感受「規則的幻覺」，逐漸打破舊結構。'
+  },
+  {
+    sign:'水瓶座',glyph:'♒',years:'1998–2012',theme:'科技靈性',
+    body:'（Z世代）集體靈性主題是科技與靈性的融合，以及對烏托邦社會的渴望。互聯網是他們的集體無意識空間。對人類命運共同體有強烈感受，對社會不公的靈性憤怒強烈。虛擬與現實邊界模糊。'
+  },
+  {
+    sign:'雙魚座',glyph:'♓',years:'1847–1862 / （近）2012前後',theme:'神秘高峰',
+    body:'海王星回到守護星座：靈性力量最強。十九世紀中這段時期帶來靈媒運動、浪漫主義高峰、神秘學會誕生（神智學協會1875）。集體渴望完全融入神聖，藝術、音樂、宗教達到幻夢般的高度。'
+  }
+];
+
+const ASPECTS_DATA = {
+  headers:['行星','☌ 合相','☍ 對分','△ 三分','□ 四分','✶ 六分'],
+  rows:[
+    {
+      planet:'♆ × ☉ 太陽',
+      conj:'靈感型人格，自我感模糊，靈魂與神秘合而為一。藝術家、療癒者的典型配置，但容易失去現實感。',
+      opp:'自我幻滅與覺醒的循環。理想與現實不斷拉扯，需要接地才能實現靈感。',
+      trine:'靈感天然流動，藝術創作輕鬆帶有神性感。直覺與現實和諧，靈性成長不費力。',
+      square:'自我認同與靈性渴望激烈衝突，身份危機帶來轉化。需要誠實面對自我幻象。',
+      sextile:'靈感為日常帶來光澤，溝通帶有詩意，輕鬆進入冥想與創意狀態。'
+    },
+    {
+      planet:'♆ × ☽ 月亮',
+      conj:'情感海洋般深廣，直覺與通靈能力強，對他人情緒極度敏感（近乎吸收）。需要情感界限訓練。',
+      opp:'情緒幻象vs.現實感知的持續拔河。容易情緒化理想主義，學習中道是人生功課。',
+      trine:'情感豐富而有詩意，移情能力強，療癒工作者的天賦配置。情緒如海浪，但能優雅駕馭。',
+      square:'情緒易受幻象牽引，情感界限混亂。強烈的情感創意能量，但需要明辨真實感受與幻想。',
+      sextile:'情感直覺細膩，藝術感知強，音樂與詩歌特別觸動靈魂深處。'
+    },
+    {
+      planet:'♆ × ☿ 水星',
+      conj:'思維詩意流動，語言帶有隱喻與意象。天生的作家、詩人、音樂詞曲人，但邏輯可能跳躍難以追蹤。',
+      opp:'思維與靈感的張力：有時過於務實，有時又陷入幻想。溝通中容易有誤解與模糊地帶。',
+      trine:'思維藝術化，溝通帶有魅力與感染力，說話如音樂般讓人沉醉。直覺與邏輯自然協調。',
+      square:'思維容易被幻象干擾，判斷力時強時弱。靈感豐富但需要結構化表達才能落地。',
+      sextile:'溝通帶有溫柔的靈感色彩，善於將複雜感受轉化為易懂的語言或意象。'
+    },
+    {
+      planet:'♆ × ♀ 金星',
+      conj:'愛情理想化，救世主情結，藝術天賦但關係易失望。將對方視為神、繆思或需要拯救的靈魂。',
+      opp:'愛情幻象與現實的碰撞：渴望完美關係，卻不斷遭遇真實的不完美。學習愛真實的人。',
+      trine:'藝術天賦極強，美感直覺超凡。戀愛關係帶有靈性升華，能看見伴侶最美的靈魂。',
+      square:'美麗的幻象vs.真實的愛：財務和愛情都容易受幻象影響。創意衝突帶來突破。',
+      sextile:'藝術品味細膩，日常關係充滿詩意。能為普通的愛情注入靈感與美感。'
+    },
+    {
+      planet:'♆ × ♂ 火星',
+      conj:'行動被靈感驅動，衝動混合直覺，能量難以預測——有時爆發創作奇蹟，有時全然癱瘓。',
+      opp:'行動意志vs.靈性溶解：行動力不穩定，在積極與消極中搖擺，學習帶著靈感行動。',
+      trine:'創意行動力強，藝術執行能力好，靈感轉為作品的過程流暢。行動帶有優雅的靈性品質。',
+      square:'意志力被幻象干擾，行動易受情緒拉扯。但這種張力能產生極強的創作爆發力。',
+      sextile:'靈感帶動行動，藝術計畫能持續推進。靈性能量以溫和但持續的方式流動。'
+    },
+    {
+      planet:'♆ × ♃ 木星',
+      conj:'靈性擴展極強，宗教或哲學熱情接近狂熱。巨大的藝術與靈性天賦，但需要辨識真正的智慧。',
+      opp:'靈性擴張vs.現實限制：對靈性過度樂觀，容易過度承諾精神上的信念。學習靈性務實。',
+      trine:'宗教哲學天賦，直覺智慧豐盛，輕鬆獲得靈性洞見。是靈性導師或藝術哲人的配置。',
+      square:'哲學與靈性的過度擴張帶來信仰危機。需要辨識真正的靈性成長vs.精神逃避。',
+      sextile:'靈性學習輕鬆愉快，哲學探索帶來豐盛感。旅行與文化交流是靈性成長的催化劑。'
+    },
+    {
+      planet:'♆ × ♄ 土星',
+      conj:'靈性與結構的融合：能為直覺建立形式，是靈性藝術家的最佳配置之一。但也有嚴格vs.溶解的內在衝突。',
+      opp:'現實結構vs.靈性渴望的對立：一邊建立，一邊溶解。學習讓靈性落地，讓結構留有彈性。',
+      trine:'靈感有形式，夢想能落地。是建立靈性事業、藝術作品的強大配置。紀律與直覺和諧共舞。',
+      square:'紀律與夢想的緊張對立，容易感到靈性追求被現實壓制。但這衝突最終產生有形的靈性成果。',
+      sextile:'能為靈感賦予適度的結構，日常生活能融入靈性實踐而不過度不及。'
+    },
+    {
+      planet:'♆ × ♅ 天王星',
+      conj:'靈性革命：直覺突破性進化，能感知未來的靈性典範轉移。世代性的靈性革命者。',
+      opp:'舊靈性vs.新靈性的對立：一個世代對另一世代的靈性觀念發起挑戰。集體信仰危機。',
+      trine:'靈性創新自然流動，能以科技或新概念表達古老的神秘智慧。直覺與革新和諧共振。',
+      square:'靈性秩序被打亂，帶來集體的信仰震盪。新舊靈性典範衝突，最終催生更真實的信仰。',
+      sextile:'靈感帶有前衛色彩，能連接傳統智慧與現代視角，為靈性帶來新鮮的呼吸。'
+    },
+    {
+      planet:'♆ × ♇ 冥王星',
+      conj:'靈魂深層轉化：直覺力觸碰集體潛意識最深處。世代性的靈性死亡與重生，帶來徹底的信仰革命。',
+      opp:'光明靈性vs.黑暗靈性的對立：集體必須整合靈性的陰影面，不能只追求光。',
+      trine:'靈性轉化深刻而自然，能觸碰集體靈魂的轉化主題並帶來療癒。深層藝術與靈性天賦。',
+      square:'靈性力量與陰影的衝突：靈性覺醒帶來激烈的痛苦，但也帶來最深層的轉化。',
+      sextile:'靈性轉化以有機的方式發生，能以藝術或療癒工作協助他人完成深層的靈魂旅程。'
+    }
+  ]
+};
+
+const TAROT_DATA = [
+  {emoji:'🌊',name:'大海',msg:'今天讓情緒自由流動，不要試圖控制。'},
+  {emoji:'🌙',name:'月亮',msg:'你的直覺比邏輯更接近真相。'},
+  {emoji:'🔮',name:'神諭',msg:'某個你感應到但無法解釋的事，值得信任。'},
+  {emoji:'🌊',name:'深淵',msg:'恐懼的底部有你最深的禮物。'},
+  {emoji:'🦋',name:'蛻變',msg:'你正在溶解的，是舊的自己。'},
+  {emoji:'💫',name:'星塵',msg:'靈感不需要理由，它選擇了你。'},
+  {emoji:'🪷',name:'蓮花',msg:'淤泥並非阻礙，而是你開放的條件。'},
+  {emoji:'🌫️',name:'迷霧',msg:'不清晰也是一種訊息：還不是時候。'},
+  {emoji:'🌈',name:'彩虹',msg:'混亂之後是色彩，不要提前離場。'},
+  {emoji:'🕯️',name:'燭光',msg:'你的微小直覺，足以照亮下一步。'},
+  {emoji:'🐚',name:'貝殼',msg:'安靜下來，海洋會通過你說話。'},
+  {emoji:'⭐',name:'啟示',msg:'今天留意那個莫名浮現的意象。'}
+];
+
+const CASES_DATA = [
+  {
+    name:'Kurt Cobain',
+    meta:'海王星合木星 × 天蠍座 第六宮',
+    desc:'音樂直覺達到神話等級，但海木合相在天蠍帶來無法控制的靈性渴望與物質成癮的交纏。第六宮強化了透過身體與物質逃離的傾向。他的音樂是海王星痛苦的最真實翻譯。',
+    tags:['音樂天才','成癮','天蠍海王星']
+  },
+  {
+    name:'Frida Kahlo',
+    meta:'海王星三分月亮 × 雙子座第八宮',
+    desc:'海月三分讓情感與靈感渾然一體，身體的痛苦直接轉化為藝術的語言。第八宮的海王星使死亡、痛苦、再生成為創作核心。她的畫是無意識最直接的視覺化。',
+    tags:['視覺藝術','轉化','第八宮海王星']
+  },
+  {
+    name:'Rumi',
+    meta:'海王星推測合金星 × 雙魚座第十二宮',
+    desc:'（歷史盤推算）波斯神祕詩人。靈性渴望與對神聖愛情的追求完美融合，語言成為連接人與神的橋樑。海王星在雙魚第十二宮是最純粹的靈魂與神性融合的配置象徵。',
+    tags:['靈性詩歌','神秘主義','神聖之愛']
+  }
+];
+
+// ============================================
+// STATE
+// ============================================
+const LS = {
+  get:(k,d)=>{try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):d}catch{return d}},
+  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+};
+
+let state = {
+  xp: LS.get('astro_neptune_xp', 0),
+  level: LS.get('astro_neptune_level', 0),
+  gems: LS.get('astro_neptune_gems', 0),
+  syncRate: LS.get('astro_neptune_sync_rate', 0),
+  dreamLog: LS.get('astro_neptune_dreamlog', []),
+};
+
+const LEVELS = ['做夢者','夢行者','通靈者','神祕主義者'];
+const LEVEL_ICONS = ['🌙','🌊','🔮','✨'];
+const LEVEL_XP = [0,100,300,600];
+
+function getCurrentLevel(xp){
+  let lv=0;
+  for(let i=0;i<LEVEL_XP.length;i++){if(xp>=LEVEL_XP[i])lv=i;}
+  return lv;
+}
+
+function addXP(amount, reason=''){
+  state.xp += amount;
+  state.level = getCurrentLevel(state.xp);
+  state.syncRate = Math.min(100, state.syncRate + Math.floor(amount/2));
+  LS.set('astro_neptune_xp', state.xp);
+  LS.set('astro_neptune_level', state.level);
+  LS.set('astro_neptune_sync_rate', state.syncRate);
+  updateUI();
+  showToast(`+${amount} XP${reason?' · '+reason:''}`);
+}
+
+function addGem(n=1){
+  state.gems += n;
+  LS.set('astro_neptune_gems', state.gems);
+  updateUI();
+}
+
+function updateUI(){
+  const lv = state.level;
+  document.getElementById('level-badge').textContent = LEVELS[lv];
+  document.getElementById('gem-display').textContent = state.gems;
+  // sync rings
+  const syncPct = state.syncRate;
+  const heroCirc = document.getElementById('hero-sync');
+  const navCirc = document.getElementById('nav-sync-circle');
+  if(heroCirc){
+    heroCirc.style.strokeDashoffset = 219.9 * (1 - syncPct/100);
+  }
+  if(navCirc){
+    navCirc.style.strokeDashoffset = 125.6 * (1 - syncPct/100);
+  }
+  document.getElementById('hero-sync-pct').textContent = syncPct+'%';
+  document.getElementById('nav-sync-pct').textContent = syncPct+'%';
+  // main sync bar
+  const bar = document.getElementById('main-sync-bar');
+  if(bar) bar.style.width = syncPct+'%';
+  // level nodes
+  for(let i=0;i<4;i++){
+    const el = document.getElementById('lv'+i);
+    if(el) el.classList.toggle('active', i===lv);
+  }
+  // share card
+  const sl = document.getElementById('share-level-display');
+  const ss = document.getElementById('share-sync-display');
+  const sg = document.getElementById('share-gems-display');
+  if(sl) sl.textContent = '覺察等級：'+LEVELS[lv]+' '+LEVEL_ICONS[lv];
+  if(ss) ss.textContent = '靈感同步率：'+syncPct+'%';
+  if(sg) sg.textContent = '💎 幻境寶石 × '+state.gems;
+}
+
+function setLevel(n){
+  // just for display demo
+  showToast('達到 '+LEVELS[n]+' 需要 '+LEVEL_XP[n]+' XP');
+}
+
+// ============================================
+// TOAST
+// ============================================
+function showToast(msg){
+  const t = document.createElement('div');
+  t.className = 'xp-toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.5s';},2000);
+  setTimeout(()=>t.remove(),2600);
+}
+
+// ============================================
+// RENDER HOUSES
+// ============================================
+function renderHouses(){
+  const grid = document.getElementById('houses-grid');
+  if(!grid) return;
+  HOUSES_DATA.forEach((h, i)=>{
+    const fogKey = 'astro_neptune_fog_'+i;
+    const revealed = LS.get(fogKey, false);
+    const card = document.createElement('div');
+    card.className = 'house-card reveal';
+    card.style.transitionDelay = (i%4 * 0.1)+'s';
+    card.innerHTML = `
+      <div class="house-num">${h.num}</div>
+      <div class="house-icon">${h.icon}</div>
+      <div class="house-title">${h.house}</div>
+      <div class="house-keyword">${h.keyword}</div>
+      <p class="house-body">${h.body}</p>
+      ${!revealed ? `<div class="fog-overlay" id="fog-${i}">☁ 拖曳驅散迷霧 ☁</div>` : ''}
+    `;
+    if(!revealed){
+      const fog = card.querySelector('.fog-overlay');
+      // mousemove to dissipate
+      let moves = 0;
+      card.addEventListener('mousemove', ()=>{
+        moves++;
+        if(fog) fog.style.opacity = Math.max(0, 1 - moves/20);
+        if(moves >= 20 && fog){
+          fog.remove();
+          LS.set(fogKey, true);
+          addXP(10,'驅散迷霧');
+          addGem(1);
+        }
+      });
+      card.addEventListener('click', ()=>{
+        moves = 20;
+        if(fog){fog.remove();LS.set(fogKey,true);addXP(10,'驅散迷霧');addGem(1);}
+      });
+    }
+    grid.appendChild(card);
+  });
+}
+
+// ============================================
+// RENDER SIGNS
+// ============================================
+function renderSigns(){
+  const grid = document.getElementById('signs-grid');
+  if(!grid) return;
+  SIGNS_DATA.forEach((s, i)=>{
+    const card = document.createElement('div');
+    card.className = 'sign-card reveal';
+    card.style.transitionDelay = (i%4 * 0.1)+'s';
+    card.innerHTML = `
+      <div class="sign-glyph">${s.glyph}</div>
+      <div class="sign-title">${s.sign}</div>
+      <div class="sign-years">${s.years}</div>
+      <div class="sign-theme">${s.theme}</div>
+      <p class="sign-body">${s.body}</p>
+    `;
+    card.addEventListener('click', ()=>{addXP(5,'探索星座');});
+    grid.appendChild(card);
+  });
+}
+
+// ============================================
+// RENDER ASPECTS TABLE
+// ============================================
+function renderAspects(){
+  const table = document.getElementById('aspects-table');
+  if(!table) return;
+  const thead = document.createElement('thead');
+  thead.innerHTML = '<tr>' + ASPECTS_DATA.headers.map((h,i)=>`<th class="${i>0?['asp-conj','asp-opp','asp-trine','asp-square','asp-sextile'][i-1]:''}">${h}</th>`).join('') + '</tr>';
+  table.appendChild(thead);
+  const tbody = document.createElement('tbody');
+  ASPECTS_DATA.rows.forEach(r=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="aspect-planet">${r.planet}</td>
+      <td class="asp-conj" style="color:rgba(226,232,240,0.8)">${r.conj}</td>
+      <td style="color:rgba(226,232,240,0.75)">${r.opp}</td>
+      <td style="color:rgba(226,232,240,0.75)">${r.trine}</td>
+      <td style="color:rgba(226,232,240,0.75)">${r.square}</td>
+      <td style="color:rgba(226,232,240,0.75)">${r.sextile}</td>
+    `;
+    tr.addEventListener('click', ()=>addXP(3,'查閱相位'));
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+}
+
+// ============================================
+// RENDER CASES
+// ============================================
+function renderCases(){
+  const container = document.getElementById('case-cards');
+  if(!container) return;
+  CASES_DATA.forEach((c,i)=>{
+    const card = document.createElement('div');
+    card.className = 'case-card reveal';
+    card.style.transitionDelay = (i*0.15)+'s';
+    card.innerHTML = `
+      <div class="case-name">${c.name}</div>
+      <div class="case-meta">${c.meta}</div>
+      <p style="font-size:0.9rem;color:rgba(226,232,240,0.75);margin-bottom:1rem">${c.desc}</p>
+      <div>${c.tags.map(t=>`<span class="case-tag">${t}</span>`).join('')}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ============================================
+// TAROT
+// ============================================
+function renderTarot(){
+  const deck = document.getElementById('tarot-deck');
+  if(!deck) return;
+  TAROT_DATA.forEach((card, i)=>{
+    const el = document.createElement('div');
+    el.className = 'tarot-card';
+    el.id = 'tarot-card-'+i;
+    el.innerHTML = `
+      <div class="tarot-back">
+        <div style="font-size:2rem">♆</div>
+        <div style="font-family:var(--font-accent);font-size:0.55rem;color:var(--lavender);letter-spacing:0.1em;margin-top:0.5rem">海王星塔羅</div>
+      </div>
+      <div class="tarot-front">
+        <div style="font-size:2.5rem">${card.emoji}</div>
+        <div class="tarot-name">${card.name}</div>
+        <div class="tarot-msg">${card.msg}</div>
+      </div>
+    `;
+    el.addEventListener('click', ()=>revealTarotCard(i));
+    deck.appendChild(el);
+  });
+}
+
+function drawTarot(){
+  const today = new Date().toISOString().slice(0,10);
+  const key = 'astro_neptune_tarot_'+today;
+  const existing = LS.get(key, null);
+  const resultEl = document.getElementById('tarot-result');
+  if(existing !== null){
+    resultEl.textContent = '今日已抽：'+TAROT_DATA[existing].emoji+' '+TAROT_DATA[existing].name+' — '+TAROT_DATA[existing].msg;
+    revealTarotCard(existing);
+    return;
+  }
+  // animate shuffle
+  const idx = Math.floor(Math.random() * TAROT_DATA.length);
+  LS.set(key, idx);
+  // shuffle all cards briefly
+  const allCards = document.querySelectorAll('.tarot-card');
+  allCards.forEach(c=>{c.style.transform='translateY(-10px) rotate('+(Math.random()*10-5)+'deg)';});
+  setTimeout(()=>{
+    allCards.forEach(c=>{c.style.transform='';});
+    revealTarotCard(idx);
+    resultEl.textContent = TAROT_DATA[idx].emoji+' '+TAROT_DATA[idx].name+' — '+TAROT_DATA[idx].msg;
+    addXP(15,'每日抽卡');
+    addGem(2);
+  }, 600);
+}
+
+function revealTarotCard(idx){
+  const card = document.getElementById('tarot-card-'+idx);
+  if(card && !card.classList.contains('revealed')){
+    card.classList.add('revealed');
+  }
+}
+
+// ============================================
+// DREAM LOG
+// ============================================
+function renderDreamEntries(){
+  const container = document.getElementById('dream-entries');
+  if(!container) return;
+  container.innerHTML = '';
+  state.dreamLog.slice(-5).reverse().forEach(entry=>{
+    const el = document.createElement('div');
+    el.className = 'dreamlog-entry';
+    el.innerHTML = `<div class="dreamlog-date">${entry.date}</div>${entry.text}`;
+    container.appendChild(el);
+  });
+  document.getElementById('streak-count').textContent = calculateStreak();
+  document.getElementById('dream-gems').textContent = state.gems;
+}
+
+function saveDream(){
+  const input = document.getElementById('dream-input');
+  const text = input.value.trim();
+  if(!text) return;
+  const today = new Date().toISOString().slice(0,10);
+  state.dreamLog.push({date:today, text});
+  LS.set('astro_neptune_dreamlog', state.dreamLog);
+  input.value = '';
+  addXP(20,'記錄夢境');
+  addGem(2);
+  renderDreamEntries();
+  showToast('夢境片段已儲存 💎+2');
+}
+
+function calculateStreak(){
+  if(!state.dreamLog.length) return 0;
+  const dates = [...new Set(state.dreamLog.map(e=>e.date))].sort().reverse();
+  let streak = 1;
+  for(let i=1;i<dates.length;i++){
+    const prev = new Date(dates[i-1]);
+    const curr = new Date(dates[i]);
+    const diff = (prev-curr)/(1000*60*60*24);
+    if(diff===1) streak++;
+    else break;
+  }
+  return streak;
+}
+
+// ============================================
+// MEDITATION EASTER EGG
+// ============================================
+let idleTimer = null;
+const MED_PHRASES = ['呼吸，放下','你是海浪','溶解邊界','感受流動','無需執著','一切皆空','你在深海'];
+let medIdx = 0;
+let medInterval = null;
+let meditationTriggered = false;
+
+function resetIdleTimer(){
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(triggerMeditation, 30000);
+}
+
+function triggerMeditation(){
+  if(meditationTriggered) return;
+  meditationTriggered = true;
+  LS.set('astro_neptune_easter_meditation', true);
+  const overlay = document.getElementById('meditation-overlay');
+  overlay.classList.add('active');
+  medInterval = setInterval(()=>{
+    medIdx = (medIdx+1) % MED_PHRASES.length;
+    document.getElementById('med-text').textContent = MED_PHRASES[medIdx];
+  }, 4000);
+  addXP(30,'發現隱藏冥想');
+  addGem(5);
+  showToast('🌊 隱藏冥想已解鎖 +5 💎');
+}
+
+function closeMeditation(){
+  document.getElementById('meditation-overlay').classList.remove('active');
+  clearInterval(medInterval);
+  meditationTriggered = false;
+  resetIdleTimer();
+}
+
+document.addEventListener('mousemove', resetIdleTimer);
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape') closeMeditation();
+  resetIdleTimer();
+});
+resetIdleTimer();
+
+// ============================================
+// SHARE
+// ============================================
+function downloadShareCard(){
+  const card = document.getElementById('share-card-canvas');
+  // Simple fallback: open print
+  showToast('提示：使用瀏覽器截圖工具儲存分享卡');
+  addXP(5,'分享夢境地圖');
+}
+
+function copyShareText(){
+  const lv = LEVELS[state.level];
+  const txt = `♆ 我的海王星夢境地圖\n覺察等級：${lv}\n靈感同步率：${state.syncRate}%\n幻境寶石：${state.gems} 💎\n\n海王星說：你在哪裡消失，那裡就是你最真實的所在。`;
+  navigator.clipboard.writeText(txt).then(()=>{
+    showToast('已複製分享文字！');
+    addXP(5,'分享');
+  }).catch(()=>showToast('請手動複製'));
+}
+
+// ============================================
+// SCROLL REVEAL
+// ============================================
+const revealObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      // add XP for first view of section
+      const section = e.target.closest('section');
+      if(section && !section.dataset.viewed){
+        section.dataset.viewed = '1';
+        addXP(5,'探索新區域');
+      }
+    }
+  });
+},{threshold:0.1});
+
+function initReveal(){
+  document.querySelectorAll('.reveal').forEach(el=>{
+    revealObserver.observe(el);
+  });
+}
+
+// ============================================
+// INIT
+// ============================================
+document.addEventListener('DOMContentLoaded', ()=>{
+  renderHouses();
+  renderSigns();
+  renderAspects();
+  renderCases();
+  renderTarot();
+  renderDreamEntries();
+  updateUI();
+  initReveal();
+  // Update sync bar with animation
+  setTimeout(()=>{
+    const bar = document.getElementById('main-sync-bar');
+    if(bar) bar.style.width = state.syncRate + '%';
+  }, 500);
+});
+</script>
+</body>
+</html>

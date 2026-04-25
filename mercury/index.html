@@ -1,0 +1,1008 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>水星 ☿ 解謎駭客 ─ 你的大腦作業系統</title>
+<meta name="description" content="水星進駐十二宮、十二星座、九大行星 × 五相位的解碼任務 — Terminal Cyberpunk 互動星盤">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Major+Mono+Display&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+<style>
+:root{
+  --neon-yellow:#F5FF2B;--cyber-purple:#8A2BE2;--matrix-green:#00FF41;
+  --term-bg:#050310;--term-panel:#0A0820;--term-glass:rgba(138,43,226,.08);
+  --line:#1c1840;--white:#FFFFFF;--dim:#9594c4;--danger:#ff3366;
+  --font-display:'Major Mono Display','VT323',monospace;
+  --font-term:'VT323','Space Mono',monospace;
+  --font-body:'Space Mono','JetBrains Mono',monospace;
+  --shadow-glow:0 0 24px var(--matrix-green),0 0 56px rgba(0,255,65,.35);
+  --shadow-purple:0 0 32px rgba(138,43,226,.55);
+  --ease-pop:cubic-bezier(.34,1.56,.64,1);--ease-out:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);background:var(--term-bg);color:var(--white);line-height:1.6;
+  overflow-x:hidden;cursor:default;
+  background-image:
+    linear-gradient(180deg,var(--term-bg) 0%,#0a0530 60%,var(--term-bg) 100%),
+    repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(0,255,65,.025) 2px,rgba(0,255,65,.025) 3px);
+}
+::selection{background:var(--matrix-green);color:var(--term-bg)}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+img{max-width:100%;display:block}
+a{color:var(--matrix-green);text-decoration:none}
+a:hover{color:var(--neon-yellow)}
+
+/* ───── 矩陣雨背景 canvas ───── */
+#matrix-rain{position:fixed;inset:0;z-index:0;opacity:.32;pointer-events:none}
+
+/* ───── 全局 noise grain ───── */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
+  opacity:.08;mix-blend-mode:overlay;
+}
+
+/* ───── HUD ───── */
+.hud{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;gap:14px;padding:10px 18px;
+  background:linear-gradient(180deg,rgba(5,3,16,.92),rgba(5,3,16,.4));
+  border-bottom:1px solid var(--matrix-green);backdrop-filter:blur(10px);
+  font-family:var(--font-term);font-size:14px;
+}
+.hud .brand{font-family:var(--font-display);color:var(--matrix-green);letter-spacing:.18em;text-shadow:0 0 8px var(--matrix-green)}
+.hud .sep{flex:1}
+.hud .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--cyber-purple);border-radius:2px;color:var(--neon-yellow);background:rgba(138,43,226,.08)}
+.hud .pill .lbl{color:var(--dim);font-size:11px}
+.hud .xp-bar{position:relative;width:160px;height:8px;background:#1a103a;border:1px solid var(--cyber-purple);overflow:hidden}
+.hud .xp-bar::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--xp-pct,0%);background:linear-gradient(90deg,var(--matrix-green),var(--neon-yellow));box-shadow:0 0 12px var(--matrix-green);transition:width .8s var(--ease-out)}
+.hud nav{display:flex;gap:10px}
+.hud nav a{padding:4px 8px;color:var(--dim);font-size:13px;border-bottom:1px dashed transparent}
+.hud nav a:hover{color:var(--neon-yellow);border-color:var(--neon-yellow)}
+@media(max-width:760px){.hud nav{display:none}.hud .xp-bar{width:80px}}
+
+/* ───── section 殼 ───── */
+section{position:relative;z-index:2;padding:96px 22px;min-height:60vh;border-top:1px dashed var(--line)}
+.wrap{max-width:1200px;margin:0 auto;position:relative}
+h1,h2,h3,h4{font-family:var(--font-display);letter-spacing:.04em;line-height:1.15}
+h1{font-size:clamp(2.6rem,8vw,6.5rem);font-weight:400}
+h2{font-size:clamp(1.8rem,4.4vw,3.2rem);margin-bottom:32px}
+h3{font-size:1.2rem;color:var(--neon-yellow);margin-bottom:8px}
+.label{display:inline-block;font-family:var(--font-term);font-size:14px;color:var(--matrix-green);letter-spacing:.4em;margin-bottom:12px;text-shadow:0 0 6px var(--matrix-green)}
+p{color:#cdcde6;margin-bottom:14px}
+.lead{font-size:1.15rem;color:#dadaee}
+
+/* ───── HERO ───── */
+#hero{
+  min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+  padding-top:140px;padding-bottom:80px;
+  background:
+    radial-gradient(ellipse at 20% 30%,rgba(0,255,65,.18) 0%,transparent 55%),
+    radial-gradient(ellipse at 80% 70%,rgba(138,43,226,.28) 0%,transparent 60%),
+    linear-gradient(180deg,#040208 0%,#0d062f 100%);
+}
+#hero::before{
+  content:"";position:absolute;inset:0;
+  background:url("./images/hero.png") center/cover no-repeat;
+  opacity:.5;mix-blend-mode:screen;
+  filter:contrast(1.1) saturate(1.2);
+}
+#hero .wrap{z-index:3}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-term);color:var(--matrix-green);font-size:13px;border:1px solid var(--matrix-green);padding:4px 10px;letter-spacing:.3em;animation:pulse 2.5s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--matrix-green)}50%{box-shadow:0 0 14px var(--matrix-green)}}
+#hero h1{margin:18px 0 22px;color:var(--white);text-shadow:0 0 24px rgba(0,255,65,.6),0 0 6px var(--cyber-purple)}
+#hero h1 .glitch{position:relative;display:inline-block}
+#hero h1 .glitch::before,#hero h1 .glitch::after{content:attr(data-text);position:absolute;left:0;top:0;width:100%;height:100%}
+#hero h1 .glitch::before{color:var(--matrix-green);transform:translate(-2px,1px);mix-blend-mode:screen;animation:gl1 3.5s infinite}
+#hero h1 .glitch::after{color:var(--cyber-purple);transform:translate(2px,-1px);mix-blend-mode:screen;animation:gl2 4s infinite}
+@keyframes gl1{0%,90%,100%{transform:translate(-2px,1px)}45%{transform:translate(-3px,2px) skew(-1deg,0)}}
+@keyframes gl2{0%,90%,100%{transform:translate(2px,-1px)}50%{transform:translate(3px,0) skew(1deg,0)}}
+
+.cube{
+  position:absolute;right:6%;top:50%;transform:translateY(-50%);
+  width:240px;height:240px;perspective:900px;
+}
+.cube .face{position:absolute;inset:0;background:rgba(0,255,65,.05);border:1px solid var(--matrix-green);box-shadow:inset 0 0 24px rgba(0,255,65,.4),0 0 28px var(--matrix-green);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:48px;color:var(--neon-yellow)}
+.cube .f1{transform:translateZ(120px)}
+.cube .f2{transform:rotateY(180deg) translateZ(120px)}
+.cube .f3{transform:rotateY(90deg) translateZ(120px)}
+.cube .f4{transform:rotateY(-90deg) translateZ(120px)}
+.cube .f5{transform:rotateX(90deg) translateZ(120px)}
+.cube .f6{transform:rotateX(-90deg) translateZ(120px)}
+.cube-core{position:absolute;inset:0;transform-style:preserve-3d;animation:spin 16s linear infinite}
+@keyframes spin{from{transform:rotateX(-12deg) rotateY(0)}to{transform:rotateX(-12deg) rotateY(360deg)}}
+@media(max-width:840px){.cube{position:static;margin:32px auto 0;width:180px;height:180px}.cube .f1,.cube .f2,.cube .f3,.cube .f4,.cube .f5,.cube .f6{transform-origin:center}}
+
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;font-family:var(--font-term);font-size:18px;letter-spacing:.18em;border:1px solid var(--matrix-green);background:rgba(0,255,65,.08);color:var(--matrix-green);transition:all .3s var(--ease-pop);text-transform:uppercase}
+.btn:hover{background:var(--matrix-green);color:var(--term-bg);box-shadow:var(--shadow-glow);transform:translateY(-2px)}
+.btn.purple{border-color:var(--cyber-purple);background:rgba(138,43,226,.12);color:var(--neon-yellow)}
+.btn.purple:hover{background:var(--cyber-purple);color:var(--white);box-shadow:var(--shadow-purple)}
+
+/* ───── 神話 ───── */
+#myth{background:linear-gradient(180deg,#0d062f 0%,#04020b 100%)}
+#myth .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:46px;align-items:center}
+#myth img{border:1px solid var(--cyber-purple);box-shadow:var(--shadow-purple);background:linear-gradient(135deg,#1a103a,#0a0820)}
+#myth blockquote{font-family:var(--font-term);font-size:1.4rem;color:var(--neon-yellow);border-left:3px solid var(--matrix-green);padding:6px 0 6px 18px;margin:18px 0}
+@media(max-width:820px){#myth .wrap{grid-template-columns:1fr}}
+
+/* ───── 思維隱喻 + 技能樹 ───── */
+#metaphor{background:radial-gradient(circle at 30% 50%,rgba(0,255,65,.08),transparent 60%),#04020b}
+.skill-tree{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:32px}
+.skill-node{
+  position:relative;padding:22px 16px;border:1px solid var(--cyber-purple);background:var(--term-glass);
+  transition:transform .3s var(--ease-pop),box-shadow .3s;cursor:pointer;text-align:center;
+}
+.skill-node:hover{transform:translateY(-4px);box-shadow:0 0 24px var(--matrix-green);border-color:var(--matrix-green)}
+.skill-node .icon{font-family:var(--font-display);font-size:38px;color:var(--matrix-green);text-shadow:0 0 12px var(--matrix-green)}
+.skill-node h4{font-family:var(--font-term);font-size:1.1rem;margin:8px 0 4px;color:var(--neon-yellow)}
+.skill-node .pts{font-family:var(--font-term);color:var(--matrix-green);font-size:1.3rem;margin-top:6px}
+.skill-node .add{display:block;margin-top:10px;padding:4px;border:1px solid var(--matrix-green);font-family:var(--font-term);font-size:13px;background:rgba(0,255,65,.06);color:var(--matrix-green);cursor:pointer}
+.skill-node .add:hover{background:var(--matrix-green);color:var(--term-bg)}
+.skill-pool{font-family:var(--font-term);color:var(--neon-yellow);text-align:center;margin-top:16px;font-size:1.2rem}
+@media(max-width:760px){.skill-tree{grid-template-columns:repeat(2,1fr)}}
+
+/* ───── 12 宮 / 12 星座網格 ───── */
+.grid-12{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-top:24px}
+.cell{
+  position:relative;background:var(--term-glass);border:1px solid var(--line);
+  padding:18px 16px 16px;transition:all .3s var(--ease-out);overflow:hidden;cursor:pointer;
+}
+.cell::before{content:"";position:absolute;left:0;top:0;width:4px;height:100%;background:var(--cyber-purple);transition:background .3s}
+.cell:hover{border-color:var(--matrix-green);transform:translateY(-2px);box-shadow:0 0 18px rgba(0,255,65,.4)}
+.cell:hover::before{background:var(--matrix-green)}
+.cell.unlocked{border-color:var(--matrix-green);background:rgba(0,255,65,.05)}
+.cell.unlocked::before{background:var(--matrix-green)}
+.cell .num{font-family:var(--font-display);font-size:2.4rem;color:var(--matrix-green);line-height:1;opacity:.7;float:right}
+.cell .ttl{font-family:var(--font-term);font-size:1.25rem;color:var(--neon-yellow);margin-bottom:4px}
+.cell .sub{font-family:var(--font-term);font-size:13px;color:var(--matrix-green);letter-spacing:.15em;margin-bottom:8px}
+.cell p{font-size:14px;color:#dadaee;margin-bottom:6px}
+.cell .case{font-style:italic;color:var(--dim);font-size:13px;border-top:1px dashed var(--line);padding-top:8px;margin-top:10px}
+.cell .badge{position:absolute;top:8px;right:8px;font-family:var(--font-term);font-size:10px;color:var(--term-bg);background:var(--matrix-green);padding:2px 6px;letter-spacing:.2em;display:none}
+.cell.unlocked .badge{display:block}
+
+/* ───── 45 相位矩陣 ───── */
+#aspects{background:linear-gradient(180deg,#04020b,#0d062f)}
+.matrix-wrap{overflow-x:auto;padding-bottom:8px;margin-top:24px}
+.matrix{
+  display:grid;grid-template-columns:160px repeat(5,minmax(150px,1fr));gap:6px;min-width:920px;
+  font-family:var(--font-term);
+}
+.matrix .head{font-family:var(--font-term);background:rgba(138,43,226,.18);color:var(--neon-yellow);padding:10px;text-align:center;letter-spacing:.1em;border:1px solid var(--cyber-purple);font-size:14px}
+.matrix .row-head{background:rgba(0,255,65,.08);color:var(--matrix-green);font-family:var(--font-term);padding:10px;border:1px solid var(--matrix-green);font-size:1.05rem;display:flex;align-items:center;gap:6px}
+.matrix .cellx{
+  background:var(--term-glass);border:1px solid var(--line);padding:10px;font-size:13px;line-height:1.45;
+  cursor:pointer;transition:all .3s;color:#dadaee;position:relative;
+}
+.matrix .cellx:hover{border-color:var(--matrix-green);background:rgba(0,255,65,.08);color:var(--white);transform:translateY(-1px);box-shadow:0 0 12px rgba(0,255,65,.5)}
+.matrix .cellx.read{border-color:var(--cyber-purple)}
+.matrix .cellx .ang{display:block;color:var(--matrix-green);font-size:11px;letter-spacing:.2em}
+
+/* ───── 翻卡記憶遊戲 ───── */
+#flash{background:#04020b}
+.flash-board{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:24px;max-width:720px}
+.flash-card{aspect-ratio:1;background:var(--cyber-purple);position:relative;cursor:pointer;perspective:600px;transition:transform .3s}
+.flash-card .inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .55s var(--ease-pop)}
+.flash-card.flipped .inner,.flash-card.matched .inner{transform:rotateY(180deg)}
+.flash-card .face{position:absolute;inset:0;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.8rem;color:var(--white)}
+.flash-card .front{background:linear-gradient(135deg,var(--cyber-purple) 0%,#3a1969 100%);border:1px solid var(--neon-yellow);color:var(--neon-yellow)}
+.flash-card .back{background:linear-gradient(135deg,#0a0820,#1a103a);transform:rotateY(180deg);border:1px solid var(--matrix-green);color:var(--matrix-green);text-shadow:0 0 8px var(--matrix-green)}
+.flash-card.matched .back{background:linear-gradient(135deg,rgba(0,255,65,.3),rgba(0,255,65,.08));border-color:var(--matrix-green)}
+.flash-status{font-family:var(--font-term);color:var(--neon-yellow);text-align:center;margin-top:18px;font-size:1.1rem}
+@media(max-width:600px){.flash-board{grid-template-columns:repeat(4,1fr)}}
+
+/* ───── Trivia / 每日密語 / 名人案例 / 指引 ───── */
+.contrast-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;margin-top:24px}
+.panel{padding:24px;background:var(--term-glass);border:1px solid var(--cyber-purple);position:relative}
+.panel.green{border-color:var(--matrix-green)}
+.panel h3{margin-bottom:14px}
+.daily-line{font-family:var(--font-term);font-size:1.4rem;color:var(--neon-yellow);padding:14px 18px;border-left:3px solid var(--matrix-green);background:rgba(0,255,65,.05);margin-top:8px}
+@media(max-width:760px){.contrast-grid{grid-template-columns:1fr}}
+
+.trivia-q{font-family:var(--font-term);font-size:1.2rem;color:var(--neon-yellow);margin:14px 0 10px;min-height:60px}
+.trivia-opts{display:flex;flex-direction:column;gap:8px}
+.trivia-opt{padding:10px 14px;border:1px solid var(--cyber-purple);background:rgba(138,43,226,.05);color:#dadaee;text-align:left;cursor:pointer;font-family:var(--font-body);transition:all .25s}
+.trivia-opt:hover{border-color:var(--matrix-green);background:rgba(0,255,65,.06)}
+.trivia-opt.correct{background:rgba(0,255,65,.2);border-color:var(--matrix-green);color:var(--matrix-green)}
+.trivia-opt.wrong{background:rgba(255,51,102,.18);border-color:var(--danger);color:var(--danger)}
+.trivia-meta{font-family:var(--font-term);color:var(--matrix-green);margin-top:14px;display:flex;justify-content:space-between}
+
+/* ───── 案例 / 指引 ───── */
+.cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:24px}
+.case-card{background:linear-gradient(135deg,rgba(0,255,65,.05),rgba(138,43,226,.05));border:1px solid var(--cyber-purple);padding:20px}
+.case-card h4{font-family:var(--font-term);font-size:1.15rem;color:var(--neon-yellow);margin-bottom:6px}
+.case-card .meta{font-family:var(--font-term);color:var(--matrix-green);font-size:13px;letter-spacing:.15em;margin-bottom:10px}
+.case-card p{font-size:14px}
+
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:24px;counter-reset:step}
+.step{padding:18px;background:var(--term-glass);border-top:2px solid var(--matrix-green);position:relative;counter-increment:step}
+.step::before{content:counter(step,decimal-leading-zero);position:absolute;top:-22px;right:14px;font-family:var(--font-display);font-size:48px;color:var(--matrix-green);opacity:.4}
+.step h4{font-family:var(--font-term);color:var(--neon-yellow);margin-bottom:6px;font-size:1.1rem}
+
+/* ───── 結尾 + 分享卡 ───── */
+#outro{background:radial-gradient(circle at 50% 30%,rgba(138,43,226,.2),transparent 60%),#04020b;text-align:center;padding-bottom:140px}
+#outro h2{font-size:clamp(2rem,5vw,3.6rem)}
+#outro .lead{max-width:680px;margin:0 auto 28px}
+
+/* ───── modal ───── */
+.modal{position:fixed;inset:0;background:rgba(2,1,8,.92);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal.show{display:flex;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-card{background:linear-gradient(180deg,#0a0820,#04020b);border:1px solid var(--matrix-green);padding:32px;max-width:720px;width:100%;max-height:90vh;overflow:auto;position:relative;box-shadow:var(--shadow-glow)}
+.modal-card .close{position:absolute;top:12px;right:14px;font-family:var(--font-display);font-size:24px;color:var(--neon-yellow);cursor:pointer}
+.modal-card h2{margin-bottom:18px}
+.modal-card .ang{display:block;color:var(--matrix-green);font-family:var(--font-term);letter-spacing:.3em;margin-bottom:8px}
+
+/* ───── share card ───── */
+.share-card{
+  width:540px;height:960px;background:linear-gradient(180deg,#04020b,#0d062f 50%,#04020b);
+  position:relative;color:var(--white);font-family:var(--font-term);
+  padding:48px 40px;display:flex;flex-direction:column;justify-content:space-between;
+  border:2px solid var(--matrix-green);box-shadow:var(--shadow-glow);
+}
+.share-card::before{content:"";position:absolute;inset:0;background:url("./images/share-bg.png") center/cover no-repeat;opacity:.55;mix-blend-mode:screen}
+.share-card>*{position:relative;z-index:2}
+.share-card .ascii{font-size:11px;line-height:1.1;color:var(--matrix-green);opacity:.4;letter-spacing:0;white-space:pre;font-family:var(--font-term)}
+.share-card .title{font-family:var(--font-display);font-size:42px;color:var(--neon-yellow);text-shadow:0 0 12px var(--matrix-green);margin:24px 0 14px}
+.share-card .stats{display:flex;flex-direction:column;gap:18px;font-size:18px}
+.share-card .stat-row{display:flex;justify-content:space-between;border-bottom:1px dashed var(--matrix-green);padding-bottom:8px}
+.share-card .stat-row .v{color:var(--neon-yellow);font-size:22px}
+.share-card .footer{text-align:center;font-size:14px;color:var(--matrix-green);letter-spacing:.3em}
+
+/* ───── konami achievement ───── */
+.konami-flash{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(0,255,65,.14);backdrop-filter:blur(2px)}
+.konami-flash.show{display:flex;animation:konami-pulse .8s}
+@keyframes konami-pulse{0%,100%{opacity:0;transform:scale(.95)}50%{opacity:1;transform:scale(1)}}
+.konami-flash .msg{font-family:var(--font-display);font-size:8vw;color:var(--matrix-green);text-shadow:0 0 60px var(--matrix-green);letter-spacing:.18em}
+
+/* ───── 反饋 toast ───── */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:250;display:flex;flex-direction:column;gap:10px;max-width:320px;pointer-events:none}
+.toast{background:var(--term-bg);border:1px solid var(--matrix-green);padding:12px 16px;font-family:var(--font-term);color:var(--matrix-green);box-shadow:var(--shadow-glow);animation:toastIn .3s var(--ease-pop)}
+@keyframes toastIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ───── prefers-reduced-motion ───── */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  #matrix-rain{display:none}
+}
+</style>
+</head>
+<body>
+<canvas id="matrix-rain"></canvas>
+
+<div class="hud" role="banner">
+  <span class="brand">☿ MERCURY/OS</span>
+  <nav>
+    <a href="#myth">神話</a><a href="#houses">12 宮</a><a href="#signs">12 星座</a>
+    <a href="#aspects">45 相位</a><a href="#flash">記憶</a><a href="#trivia">競答</a>
+  </nav>
+  <span class="sep"></span>
+  <span class="pill"><span class="lbl">LV</span><span id="hud-level">1</span></span>
+  <div class="xp-bar" aria-label="XP"><span class="sr-only" id="hud-xp">0/300 XP</span></div>
+  <span class="pill"><span class="lbl">XP</span><span id="hud-xp-num">0</span></span>
+</div>
+
+<!-- ───── HERO ───── -->
+<section id="hero">
+  <div class="wrap">
+    <span class="hero-badge">[ROOT@COSMOS:~]$ booting mercury.os ...</span>
+    <h1><span class="glitch" data-text="水星">水星</span><br>你的大腦作業系統</h1>
+    <p class="lead">從靈感放電到語言成形 ─ 解碼你思維底層的編譯原理。<br>
+      9 行星 × 5 相位 × 12 宮 × 12 星座 = 你的大腦韌體版本號。</p>
+    <div class="cta-row">
+      <button class="btn" onclick="document.getElementById('houses').scrollIntoView({behavior:'smooth'})">$ start_decoding</button>
+      <button class="btn purple" onclick="document.getElementById('trivia').scrollIntoView({behavior:'smooth'})">$ run_trivia</button>
+      <button class="btn" onclick="openShare()">$ generate_id_card</button>
+    </div>
+  </div>
+  <div class="cube" aria-hidden="true">
+    <div class="cube-core">
+      <div class="face f1">☿</div><div class="face f2">01</div><div class="face f3">{ }</div>
+      <div class="face f4">→</div><div class="face f5">∞</div><div class="face f6">π</div>
+    </div>
+  </div>
+</section>
+
+<!-- ───── 神話 ───── -->
+<section id="myth">
+  <div class="wrap">
+    <div>
+      <span class="label">// MYTH 01</span>
+      <h2>赫密士 ─ 邊界的破譯者</h2>
+      <p>赫密士（Hermes）是希臘的信使神，腳踩飛行翅膀，手持雙蛇杖（Caduceus）。他能進出冥界與奧林帕斯，做為唯一一個自由穿越邊界的神 ─ 他的工作是把各方的訊息翻譯成另一方聽得懂的語言。</p>
+      <p>羅馬人叫他墨丘利（Mercury），埃及人叫他托特（Thoth）─ 文字、數字、密碼、煉金術的發明者。三個版本的核心一致：<strong>所有讓資訊流動的中介行為</strong>，都是水星。</p>
+      <blockquote>「凡可以用語言表達的，就有可能被翻譯。<br>凡無法翻譯的，水星教你發明新的語言。」</blockquote>
+    </div>
+    <img src="./images/myth.png" alt="Hermes archetype illustration" onerror="this.style.background='linear-gradient(135deg,#1a103a,#0a0820)';this.alt='圖像生成中'">
+  </div>
+</section>
+
+<!-- ───── 思維隱喻 + 技能樹 ───── -->
+<section id="metaphor">
+  <div class="wrap">
+    <span class="label">// COGNITIVE OS</span>
+    <h2>水星 = 你的內建語言模型</h2>
+    <p class="lead">水星不是「你想什麼」─ 是「你怎麼把想到的，編譯成可以發送的封包」。<br>它決定你的輸入頻寬（學習）、處理速度（推理）、輸出協議（表達）、儲存格式（記憶）。</p>
+    <h3 style="margin-top:32px">⊙ 點數分配 ─ 你的水星技能樹</h3>
+    <p>每答對一題 Trivia 或解開一道謎題，你會獲得 1 點未分配技能點。把點數投到四大子系統，調出你的人格 build：</p>
+    <div class="skill-tree" id="skill-tree"></div>
+    <p class="skill-pool">[ 未分配點數: <span id="skill-pool-num">0</span> ]</p>
+  </div>
+</section>
+
+<!-- ───── 12 宮 ───── -->
+<section id="houses">
+  <div class="wrap">
+    <span class="label">// MODULE 02 ─ 12 HOUSES</span>
+    <h2>水星進駐 12 宮 ─ 你大腦的執行領域</h2>
+    <p>水星落入哪一宮，等於你的「思維作業系統」最常被呼叫到哪個生活領域。每點開一宮 +20 XP，解鎖宮位徽章。</p>
+    <div class="grid-12" id="houses-grid"></div>
+  </div>
+</section>
+
+<!-- ───── 12 星座 ───── -->
+<section id="signs">
+  <div class="wrap">
+    <span class="label">// MODULE 03 ─ 12 SIGNS</span>
+    <h2>水星落入 12 星座 ─ 你的編譯器版本</h2>
+    <p>同樣是水星，落在不同星座 = 不同的編譯器。同一段邏輯被編譯成牡羊版本和雙魚版本，輸出的產物完全不一樣。每解鎖一星座 +20 XP。</p>
+    <div class="grid-12" id="signs-grid"></div>
+  </div>
+</section>
+
+<!-- ───── 45 相位矩陣 ───── -->
+<section id="aspects">
+  <div class="wrap">
+    <span class="label">// MODULE 04 ─ ASPECT MATRIX 45</span>
+    <h2>水星 × 9 行星 × 5 相位</h2>
+    <p>水星與其他行星的角度，是你大腦各模組間的「協議格式」。同樣是水星跟火星溝通，合相是合作開發、四分相是 git 衝突。點開每格 +5 XP，解 45 格收齊配置報告。</p>
+    <div class="matrix-wrap"><div class="matrix" id="aspect-matrix"></div></div>
+    <p style="margin-top:16px;color:var(--dim);font-size:13px">※ 受限於水星與太陽 / 金星的最大角距（28° / 76°），部分相位（如水太陽四分）在實際星盤罕見或不存在；本表保留條目以便完整理解相位邏輯，標記為理論值。</p>
+  </div>
+</section>
+
+<!-- ───── 翻卡記憶 ───── -->
+<section id="flash">
+  <div class="wrap">
+    <span class="label">// MINIGAME 01 ─ FLASH MEMORY</span>
+    <h2>速度記憶 ─ 翻卡配對</h2>
+    <p>12 個星座符號隨機洗牌，找出全部 6 對。完成 +80 XP，解鎖「閃卡達人」徽章。</p>
+    <div class="flash-board" id="flash-board"></div>
+    <p class="flash-status" id="flash-status">已配對 0 / 6 ─ 翻牌次數 0</p>
+    <button class="btn" style="margin-top:16px" onclick="restartFlash()">$ shuffle_again</button>
+  </div>
+</section>
+
+<!-- ───── Trivia / 每日密語 ───── -->
+<section id="trivia">
+  <div class="wrap">
+    <span class="label">// MINIGAME 02 ─ KNOWLEDGE QUIZ</span>
+    <h2>知識競答 + 今日密語</h2>
+    <div class="contrast-grid">
+      <div class="panel green">
+        <h3>$ run trivia.exe</h3>
+        <div class="trivia-q" id="trivia-q">載入中...</div>
+        <div class="trivia-opts" id="trivia-opts"></div>
+        <div class="trivia-meta">
+          <span>連對 Combo: <span id="trivia-combo">0</span>×</span>
+          <span>得分: <span id="trivia-score">0</span></span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>$ today's_signal</h3>
+        <p style="color:var(--dim);font-size:13px">由今日日期 hash 出今日水星密語：</p>
+        <div class="daily-line" id="daily-line">─</div>
+        <p style="margin-top:14px;color:var(--dim);font-size:13px">每日 00:00 重新編碼。連續登入 3 天 +50 XP。</p>
+        <p style="font-family:var(--font-term);color:var(--matrix-green);margin-top:8px">連續登入: <span id="visit-streak">1</span> 天</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───── 名人案例 ───── -->
+<section id="cases">
+  <div class="wrap">
+    <span class="label">// CASE STUDY</span>
+    <h2>真實案例 ─ 水星駭客名單</h2>
+    <div class="cases">
+      <div class="case-card">
+        <h4>艾倫·圖靈（Alan Turing）</h4>
+        <div class="meta">水星 / 雙魚 ／ 第 9 宮</div>
+        <p>第 9 宮的水星把抽象思考往哲學跑；雙魚的水星做象徵聯想 ─ 把「機器是否會思考」翻譯成「模仿遊戲」這套可驗證的描述，誕生圖靈測試。</p>
+      </div>
+      <div class="case-card">
+        <h4>JK 羅琳（J.K. Rowling）</h4>
+        <div class="meta">水星 / 獅子 ／ 第 11 宮</div>
+        <p>獅子戲劇化的講故事＋第 11 宮（社群／集體願景）→ 寫一個世代共同的童年。她的水星在金星附近形成合相，文字自帶討喜旋律。</p>
+      </div>
+      <div class="case-card">
+        <h4>馬克·吐溫（Mark Twain）</h4>
+        <div class="meta">水星 / 射手 ／ 第 4 宮 ／ 與火星合相</div>
+        <p>射手水星愛大格局＋火星合相讓筆鋒銳利＝諷刺文學的祖師爺。第 4 宮把家鄉密西西比河變成寫不完的素材庫。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───── 實用指引 ───── -->
+<section id="guide">
+  <div class="wrap">
+    <span class="label">// PROTOCOL</span>
+    <h2>實用指引 ─ 升級你的水星韌體</h2>
+    <div class="steps">
+      <div class="step"><h4>每日輸出 200 字</h4><p>不為了發表，純粹為了讓內在思緒走完從靈感→語言的全鏈路。21 天後你會發現自己變得可以即興表達。</p></div>
+      <div class="step"><h4>學一個新外語句型</h4><p>不需要學整套語言，每週學 1 個句型 + 5 個單字。水星愛「結構」，學新句型直接擴充編譯器指令集。</p></div>
+      <div class="step"><h4>反覆閱讀同一本書 3 次</h4><p>第一次抓劇情，第二次抓邏輯，第三次抓行文節奏。水星的記憶不靠重複量，靠重複的角度差異。</p></div>
+      <div class="step"><h4>每週寫一封長信</h4><p>對象不限。長信強迫你建構連貫的論證結構，比社群短文有用 100 倍。</p></div>
+      <div class="step"><h4>練「換句話說」</h4><p>看到任何金句，用三種版本重寫：給小孩聽 / 給專業人士聽 / 用詩來說。這是水星核心訓練。</p></div>
+      <div class="step"><h4>水逆 ≠ 災難</h4><p>水逆是系統 maintenance window ─ 拿來修舊文件、釐清舊對話、重新整理筆記。逆行走完，輸出力會大幅升級。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ───── 結尾 + 分享 ───── -->
+<section id="outro">
+  <div class="wrap">
+    <span class="label">// END OF TRANSMISSION</span>
+    <h2>你的大腦不是 bug ─ 是 feature</h2>
+    <p class="lead">水星的工作不是讓你「想得對」─ 是讓你的思考可以被翻譯、被傳遞、被別人重新編譯。<br>
+      把你今天的進度生成一張駭客識別卡，丟到任何地方都自帶賽博龐克濾鏡。</p>
+    <button class="btn purple" onclick="openShare()">$ generate_share_card</button>
+  </div>
+</section>
+
+<!-- ───── modal: 相位詳解 ───── -->
+<div class="modal" id="aspect-modal" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <span class="close" onclick="closeAspectModal()">[X]</span>
+    <span class="ang" id="m-ang"></span>
+    <h2 id="m-title"></h2>
+    <p id="m-body" style="font-size:1.05rem"></p>
+    <p style="margin-top:18px;font-family:var(--font-term);color:var(--matrix-green)">+ 5 XP 已記錄到本地</p>
+  </div>
+</div>
+
+<!-- ───── modal: 分享卡 ───── -->
+<div class="modal" id="share-modal" role="dialog" aria-modal="true">
+  <div class="modal-card" style="max-width:600px">
+    <span class="close" onclick="closeShare()">[X]</span>
+    <h2>$ export_id_card</h2>
+    <p style="margin-bottom:14px">即時生成你的水星駭客識別卡（IG 限動 1080×1920 比例）：</p>
+    <div style="overflow:auto;max-height:60vh;display:flex;justify-content:center;background:#000;padding:10px">
+      <div class="share-card" id="share-card">
+        <div>
+          <pre class="ascii">  ▄▄▄▄· ▄• ▄▌▪  ▄▄▌  ·▄▄▄▄
+  ▐█ ▀█▪█▪██▌██ ██•   ██▪ ██
+  ▐█▀▀█▄█▌▐█▌▐█·██▪   ▐█· ▐█▌
+  ██▄▪▐█▐█▄█▌▐█▌▐█▌▐▌ ██. ██
+  ·▀▀▀▀  ▀▀▀ ▀▀▀.▀▀▀  ▀▀▀▀▀•</pre>
+          <div class="title">MERCURY/OS</div>
+          <p style="color:var(--matrix-green);font-size:14px;letter-spacing:.2em">// 大腦配置報告</p>
+        </div>
+        <div class="stats">
+          <div class="stat-row"><span>等級</span><span class="v" id="sc-level">LV.1 / 菜鳥 Coder</span></div>
+          <div class="stat-row"><span>累積 XP</span><span class="v" id="sc-xp">0</span></div>
+          <div class="stat-row"><span>解鎖宮位</span><span class="v" id="sc-houses">0 / 12</span></div>
+          <div class="stat-row"><span>解鎖星座</span><span class="v" id="sc-signs">0 / 12</span></div>
+          <div class="stat-row"><span>相位閱讀</span><span class="v" id="sc-aspects">0 / 45</span></div>
+          <div class="stat-row"><span>連對 Combo</span><span class="v" id="sc-combo">0×</span></div>
+          <div class="stat-row"><span>連續登入</span><span class="v" id="sc-streak">1 天</span></div>
+        </div>
+        <div class="footer">─── ☿ DECODED BY MERCURY ───<br><span id="sc-date"></span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn" onclick="downloadShare()">$ download_png</button>
+      <button class="btn purple" onclick="closeShare()">$ exit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───── konami flash ───── -->
+<div class="konami-flash" id="konami"><div class="msg">DEV_MODE: ON</div></div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+/* ═══════════════════ 資料區 ═══════════════════ */
+const HOUSES = [
+  {n:1,name:'命宮',sub:'I · SELF',body:'心智即外貌的名片，思維敏捷外露。你給人的第一印象常是「聰明、會講話、反應快」。',behavior:'愛問問題、隨身有手機與筆記本、社交時靠口才開場。',caseStr:'像吉米·法倫一樣的脫口秀現場思維。'},
+  {n:2,name:'財帛宮',sub:'II · ASSETS',body:'用腦袋變現 ─ 寫作、教學、買賣資訊、文案、行銷都能成為你的金庫。',behavior:'副業多、靠口才談薪、喜歡研究投資資訊。',caseStr:'JK 羅琳用 12 本書建立財富帝國。'},
+  {n:3,name:'兄弟宮',sub:'III · COMMS',body:'本位舒服位 ─ 學習、短途交流、寫作、社群超活躍。手機訊息永遠最多。',behavior:'家族 / 同學群組 KOL、常跑短期工作坊、騎機車穿梭城市。',caseStr:'歐普拉的脫口秀對談延伸出整個媒體王國。'},
+  {n:4,name:'田宅宮',sub:'IV · ROOTS',body:'家是工作室也是圖書館，寫作 / 思考最佳場所是自己的房間。',behavior:'居家辦公、家裡藏書多、用文字維繫家族情感。',caseStr:'村上春樹寫作於自宅與廚房之間的習慣養成。'},
+  {n:5,name:'子女宮',sub:'V · CREATE',body:'創意輸出靠寫作和教學；談戀愛靠文字勾引；對小孩的愛也透過大量對話表達。',behavior:'寫情書高手、玩文字創意專案、教小孩多話。',caseStr:'泰勒絲用歌詞處理每一段戀情。'},
+  {n:6,name:'奴僕宮',sub:'VI · WORK',body:'文書、編輯、研究、客服、醫療紀錄。神經系統較敏感，容易過勞性焦慮。',behavior:'天生編輯與校對、待辦清單控、健康注意呼吸與焦慮。',caseStr:'《紐約客》資深編輯型大腦。'},
+  {n:7,name:'夫妻宮',sub:'VII · PARTNER',body:'伴侶必須會說話，吵架靠講道理而非情緒。合夥重契約細節。',behavior:'寫情書多、找會聊天的對象、不會跟悶葫蘆在一起。',caseStr:'歐巴馬夫婦對談式婚姻的相處模式。'},
+  {n:8,name:'疾厄宮',sub:'VIII · DEPTH',body:'研究禁忌、心理學、密碼、遺產、陰影 ─ 任何別人不敢碰的領域。',behavior:'心理諮商師 / 偵探 / 密室逃脫高手 / 陰謀論愛好者。',caseStr:'佛洛伊德的心理分析開創。'},
+  {n:9,name:'遷移宮',sub:'IX · BEYOND',body:'渴望但有挑戰位 ─ 跨文化、學外語、出國深造、宗教哲學。',behavior:'學三種語言、留學、寫旅行筆記、研究遠方哲學。',caseStr:'愛因斯坦從德國到瑞士到美國的智識漂流。'},
+  {n:10,name:'官祿宮',sub:'X · CAREER',body:'以言說立業 ─ 發言人、講師、媒體、教師、作家、政治評論員。',behavior:'登台演講多、社會形象與「會表達」綁定。',caseStr:'歐普拉以對談主持成為一個時代的聲音。'},
+  {n:11,name:'福德宮',sub:'XI · TRIBE',body:'朋友圈 = 頭腦俱樂部，社群是核心動力。線上討論串永不停。',behavior:'群組訊息王、線上社群擔任版主、讀書會核心。',caseStr:'伊隆·馬斯克用推特當作官方協議發布管道。'},
+  {n:12,name:'玄祕宮',sub:'XII · HIDDEN',body:'私下構思、夢境靈感、深夜寫作、不自知的天才頭腦。',behavior:'寫日記、半夜靈光乍現、不愛把所有想法都說出口。',caseStr:'卡夫卡白天上班、夜晚寫小說的雙重生活。'},
+];
+
+const SIGNS = [
+  {n:1,name:'牡羊',symbol:'♈',sub:'CARDINAL · FIRE',body:'直球辯論、快狠準、沒耐性聽完整。「重點是什麼？」是口頭禪。',behavior:'打斷別人講話、決策一秒、用驚嘆號結尾。',caseStr:'伊隆·馬斯克的推文結構。'},
+  {n:2,name:'金牛',symbol:'♉',sub:'FIXED · EARTH',body:'慢思但記憶長壽；需要時間消化；話一旦說出來就難改口。',behavior:'回訊息慢、決策久、記住別人講過的所有承諾。',caseStr:'威廉·莎士比亞的劇本反覆推敲。'},
+  {n:3,name:'雙子',symbol:'♊',sub:'MUTABLE · AIR',body:'本位舒服位 ─ 多話多面、跳針重複、可同時想三件事。',behavior:'瀏覽器 30 個分頁、講話常岔題、知識雜食。',caseStr:'JFK 與賴瑞金的快速對話節奏。'},
+  {n:4,name:'巨蟹',symbol:'♋',sub:'CARDINAL · WATER',body:'情緒化思考、用感受記憶事實。「我那時候很...」是經典開場。',behavior:'記得別人講話的氣氛、討論時容易被情緒帶走。',caseStr:'黛安娜王妃的訪談用情緒回應問題。'},
+  {n:5,name:'獅子',symbol:'♌',sub:'FIXED · FIRE',body:'戲劇化表達、需要被聽見、講話帶誇張節奏感。',behavior:'語助詞多、講故事愛加表演、不喜歡被忽略。',caseStr:'歐巴馬演說的節奏與停頓。'},
+  {n:6,name:'處女',symbol:'♍',sub:'MUTABLE · EARTH',body:'本位精準位 ─ 校對狂、挑邏輯漏洞、說話前修三次。',behavior:'文字工作精細、改別人錯字、不放過任何不準確。',caseStr:'碧昂絲歌詞的精雕細琢。'},
+  {n:7,name:'天秤',symbol:'♎',sub:'CARDINAL · AIR',body:'外交辭令、避衝突、總是看見「另一面」。',behavior:'說話圓融、偏好不下斷論、調停爭執。',caseStr:'金·卡戴珊式的公關語言。'},
+  {n:8,name:'天蠍',symbol:'♏',sub:'FIXED · WATER',body:'少話但句句直入，研究黑暗領域，看穿表象。',behavior:'問深層問題、保留秘密、文字有威壓感。',caseStr:'瓦昆·菲尼克斯訪談一句頂十句。'},
+  {n:9,name:'射手',symbol:'♐',sub:'MUTABLE · FIRE',body:'大格局 + 細節翻車。「總而言之」愛掛嘴邊但常記錯小事實。',behavior:'演講有感染力、隨意承諾、忘記小細節。',caseStr:'布萊恩·考克斯的科普演說。'},
+  {n:10,name:'摩羯',symbol:'♑',sub:'CARDINAL · EARTH',body:'保守、結構化、職場用語純熟。「按照流程」是安全感來源。',behavior:'簡報結構嚴謹、很少廢話、用詞正式。',caseStr:'馬克·祖克柏聽證會的工程師發言風格。'},
+  {n:11,name:'水瓶',symbol:'♒',sub:'FIXED · AIR',body:'未來感、反主流、冷門知識。「為什麼不是 X？」是慣性提問。',behavior:'想法跳躍、愛挑戰共識、講話有距離感。',caseStr:'林肯演說的論辯架構。'},
+  {n:12,name:'雙魚',symbol:'♓',sub:'MUTABLE · WATER',body:'詩意聯想、善描述感受、跳出邏輯框架。「就像...」是慣性句型。',behavior:'多比喻、寫感性文、容易被情境感染。',caseStr:'村上春樹「就像穿過森林」式語感。'},
+];
+
+const ASPECT_PLANETS = [
+  {key:'sun',name:'太陽',sym:'☉'},{key:'moon',name:'月亮',sym:'☽'},{key:'venus',name:'金星',sym:'♀'},
+  {key:'mars',name:'火星',sym:'♂'},{key:'jupiter',name:'木星',sym:'♃'},{key:'saturn',name:'土星',sym:'♄'},
+  {key:'uranus',name:'天王星',sym:'♅'},{key:'neptune',name:'海王星',sym:'♆'},{key:'pluto',name:'冥王星',sym:'♇'}
+];
+const ASPECT_TYPES = [
+  {key:'con',name:'合相',ang:'0°'},{key:'opp',name:'對分相',ang:'180°'},{key:'sq',name:'四分相',ang:'90°'},
+  {key:'tr',name:'三分相',ang:'120°'},{key:'sx',name:'六分相',ang:'60°'}
+];
+// 45 條相位解釋 (rows = 9 行星 × 5 相位)
+const ASPECTS = {
+  sun:{
+    con:'思考即自我，邏輯與身分綁定。表達就是存在感，但容易把「我說」當「我是」。',
+    opp:'客觀觀察 vs 主觀感受拉扯，「我認為」和「我覺得」常打架（理論值，太陽水星最大角距 28°）。',
+    sq:'急著證明聰明，意志與表達衝突（理論值，實際罕見）。',
+    tr:'講話即魅力，自然流暢的表達者，思考有自信加持。',
+    sx:'學習有自信，知識能順理成章寫進身分認同。'
+  },
+  moon:{
+    con:'感受用語言處理，講話帶情緒，記憶與情緒交織。寫日記能療癒。',
+    opp:'理智 vs 情緒拉扯，邏輯答非所問。氣頭上講不出話。',
+    sq:'說話容易激起情緒衝突，言語傷感情，吵架後悔。',
+    tr:'感受可言喻，懂安慰人，能把難說的情緒翻譯成詞。',
+    sx:'直覺加邏輯，閱讀氣氛說對話。是天生的諮商者。'
+  },
+  venus:{
+    con:'說話有美感，文字甜，社交辭令好。情書與審美評論天賦。',
+    opp:'愛情語言不對盤，藝術 vs 分析拉扯。誠實 vs 客氣的兩難。',
+    sq:'批評愛人；美感 vs 精確性衝突。挑剔成傷。',
+    tr:'情書高手，藝術評論優雅。社交場合「會講話」的代名詞。',
+    sx:'交際手腕巧妙，幽默機智，調情自然不油。'
+  },
+  mars:{
+    con:'語言銳利直接，辯論快手，但急躁情緒化。罵人句句到肉。',
+    opp:'說話衝突點，吵架贏家但傷人。提案易擦槍走火。',
+    sq:'易說錯話、急躁、口角不斷。打字快但常失言。',
+    tr:'行動力 + 表達力雙強，操作說明寫得清楚。',
+    sx:'有效行動指令，運動評論員型，能把策略講得熱血。'
+  },
+  jupiter:{
+    con:'大格局思考，演說家，但細節脫漏。喜歡用大數字和大概念。',
+    opp:'誇大其詞 vs 精確分析衝突。承諾與兌現不對等。',
+    sq:'知識傲慢，太多話，過度承諾。寫文章愛跑題。',
+    tr:'教學天才，跨文化通達。把複雜知識翻譯給門外漢。',
+    sx:'學習擴張，旅行寫作，能用知識交朋友。'
+  },
+  saturn:{
+    con:'嚴謹深沉的思考，工程師頭腦，言行重。少廢話但每句重。',
+    opp:'自我批評過度，質疑自己思考。反覆推翻自己的草稿。',
+    sq:'說話受阻，學習挫折，溝通延遲。怕說錯而不說。',
+    tr:'結構化思考，紀律寫作，學者型。長文與技術文檔強項。',
+    sx:'穩定學習，長期計畫實踐者。每天寫 200 字撐 10 年。'
+  },
+  uranus:{
+    con:'天才靈光，跳躍思考，發明家頭腦。想法常常別人三年後才懂。',
+    opp:'意見衝突，反叛言論，斷裂溝通。立場切換太快讓人跟不上。',
+    sq:'神經兮兮，言語突兀，叛逆口吻。容易說出讓人傻眼的話。',
+    tr:'創新表達，IT 天才，未來思維。能把新概念落地成口訣。',
+    sx:'靈感閃現，學習捷徑，常找到比正路快的解法。'
+  },
+  neptune:{
+    con:'詩意思考，語言魔法，但事實模糊。說話像在唱詩，但細節不可考。',
+    opp:'誤解頻發，事實 vs 想像拉扯。傳話會走樣。',
+    sq:'謊言、自欺、邏輯被情緒淹。容易說了連自己都不確定的事。',
+    tr:'藝術寫作，靈感豐沛。歌詞、詩、廣告金句的天賦位。',
+    sx:'直覺寫作，敏銳閱讀。能把氛圍講成具體畫面。'
+  },
+  pluto:{
+    con:'穿透思考，研究員頭腦，言語有力。能說出讓人改變一生的話。',
+    opp:'言語權力鬥爭，被誤解的陰謀感。容易激起對立。',
+    sq:'強迫思考，言語暴力，口舌業力。衝動發言留下長期影響。',
+    tr:'心理分析師，挖掘真相。訪談把人挖到自己都不認識的層次。',
+    sx:'洞察人性，研究天賦。能把禁忌話題寫得讓人能讀。'
+  }
+};
+
+const TRIVIA_BANK = [
+  {q:'水星在西洋占星中守護哪兩個星座？',opts:['牡羊與獅子','雙子與處女','金牛與天秤','射手與雙魚'],a:1},
+  {q:'水星與太陽的最大角距約是？',opts:['12°','28°','45°','90°'],a:1},
+  {q:'水星「逆行」一年大約幾次？',opts:['1 次','3-4 次','6 次','10 次'],a:1},
+  {q:'下列哪一個不是水星的傳統議題？',opts:['溝通','學習','商業','深度蛻變'],a:3},
+  {q:'水星合相火星，最常表現為？',opts:['溫和外交','銳利辯論','深沉冥想','藝術直覺'],a:1},
+  {q:'水星落在哪個星座最不擅長精確細節（傾向大格局）？',opts:['處女','摩羯','射手','金牛'],a:2},
+  {q:'第 9 宮的水星最常顯化於？',opts:['出版／高等教育／跨文化','家庭文書','短期社群','秘密研究'],a:0},
+  {q:'下列哪一位以水星雙魚著名？',opts:['艾倫·圖靈','歐巴馬','馬克·祖克柏','瓦昆·菲尼克斯'],a:0},
+  {q:'水星與冥王星合相，最直覺的職業傾向是？',opts:['銀行櫃員','心理分析或研究員','派對主持','建築監工'],a:1},
+  {q:'下列哪一條最像水星型水逆建議？',opts:['辭職重新開始','瘋狂簽合約','回頭整理舊文件與筆記','遠行尋求改變'],a:2},
+];
+
+const DAILY_LINES = [
+  '今天少講 30%、多聽 70%。意外的訊息會出現在你以為已經知道的對話裡。',
+  '把今天讀到最有感的一句話寫在便條上，貼在桌上一週。',
+  '今日練習：把所有「但是」換成「而且」，看看溝通會變什麼樣。',
+  '今天適合重讀一封舊訊息。你會看到當時看不到的東西。',
+  '寫一封不打算寄出的信給某個你還沒原諒的人。寫完就刪。',
+  '今天說話前先在心裡用三個版本講一次，挑最短的版本說出口。',
+  '今天適合學一個全新領域的 5 個術語。種下未來的連結。',
+  '把今日聽到的最強反對意見寫成 200 字筆記，明天再讀一次。',
+  '今天的你 ≠ 你發出的訊息。但別人只看得到後者。慎選用詞。',
+  '今天試著問一個你害怕問的問題。水星最強的時刻是「打破沉默」。',
+  '今天適合更新你的線上自我介紹。三個月前的版本已經過時。',
+  '把今天看到的趣聞分享給三個不同領域的朋友，觀察他們各自的解讀。',
+  '今天禁用「應該」這個詞，改用「想要」或「會」。觀察心情變化。',
+  '寫下今天讓你笑的一個瞬間。水星管的不只是嚴肅論述。',
+];
+
+/* ═══════════════════ 狀態與 localStorage ═══════════════════ */
+const KEY={
+  xp:'astro_mercury_xp',level:'astro_mercury_level',iq:'astro_mercury_iq',
+  skilltree:'astro_mercury_skilltree',skillpool:'astro_mercury_skillpool',
+  triviaScore:'astro_mercury_trivia_score',triviaCombo:'astro_mercury_trivia_combo',
+  dailyCode:'astro_mercury_daily_code_',easter:'astro_mercury_easter_konami',
+  housesU:'astro_mercury_houses_unlocked',signsU:'astro_mercury_signs_unlocked',
+  aspectsU:'astro_mercury_aspects_unlocked',flashBest:'astro_mercury_flash_best',
+  visit:'astro_mercury_last_visit',streak:'astro_mercury_streak',
+};
+const LEVELS=[
+  {min:0,name:'菜鳥 Coder',next:300},
+  {min:300,name:'工程師',next:800},
+  {min:800,name:'駭客',next:1500},
+  {min:1500,name:'資訊之神',next:9999},
+];
+
+const State={
+  xp:0,level:1,
+  skill:{lang:0,logic:0,write:0,comm:0},pool:0,
+  triviaScore:0,triviaCombo:0,triviaIdx:0,
+  housesU:[],signsU:[],aspectsU:[],
+  flashBest:null,streak:1,
+};
+
+function load(){
+  State.xp = +localStorage.getItem(KEY.xp)||0;
+  State.level = +localStorage.getItem(KEY.level)||1;
+  State.skill = JSON.parse(localStorage.getItem(KEY.skilltree))||State.skill;
+  State.pool = +localStorage.getItem(KEY.skillpool)||0;
+  State.triviaScore = +localStorage.getItem(KEY.triviaScore)||0;
+  State.triviaCombo = +localStorage.getItem(KEY.triviaCombo)||0;
+  State.housesU = JSON.parse(localStorage.getItem(KEY.housesU))||[];
+  State.signsU = JSON.parse(localStorage.getItem(KEY.signsU))||[];
+  State.aspectsU = JSON.parse(localStorage.getItem(KEY.aspectsU))||[];
+  State.flashBest = JSON.parse(localStorage.getItem(KEY.flashBest))||null;
+  // 連續登入 streak
+  const last=localStorage.getItem(KEY.visit);
+  const today=new Date().toDateString();
+  if(last!==today){
+    const yesterday=new Date(Date.now()-86400000).toDateString();
+    State.streak = (last===yesterday)?(+localStorage.getItem(KEY.streak)||1)+1:1;
+    localStorage.setItem(KEY.visit,today);
+    localStorage.setItem(KEY.streak,State.streak);
+    if(State.streak%3===0){addXP(50,'連續登入 '+State.streak+' 天 +50 XP')}
+  } else {
+    State.streak=+localStorage.getItem(KEY.streak)||1;
+  }
+}
+function save(){
+  localStorage.setItem(KEY.xp,State.xp);
+  localStorage.setItem(KEY.level,State.level);
+  localStorage.setItem(KEY.skilltree,JSON.stringify(State.skill));
+  localStorage.setItem(KEY.skillpool,State.pool);
+  localStorage.setItem(KEY.triviaScore,State.triviaScore);
+  localStorage.setItem(KEY.triviaCombo,State.triviaCombo);
+  localStorage.setItem(KEY.housesU,JSON.stringify(State.housesU));
+  localStorage.setItem(KEY.signsU,JSON.stringify(State.signsU));
+  localStorage.setItem(KEY.aspectsU,JSON.stringify(State.aspectsU));
+}
+
+function addXP(n,reason){
+  State.xp+=n;
+  const before=State.level;
+  while(State.level<LEVELS.length && State.xp>=LEVELS[State.level-1].next){State.level++;}
+  if(State.level!==before)toast('LEVEL UP → '+LEVELS[State.level-1].name,'level');
+  toast('+'+n+' XP'+(reason?' · '+reason:''));
+  refreshHUD();save();
+}
+function addSkillPt(n){State.pool+=n;refreshSkill();save();}
+
+function refreshHUD(){
+  const tier=LEVELS[State.level-1];
+  const into = State.xp - tier.min;
+  const span = tier.next - tier.min;
+  const pct = Math.min(100,Math.round(into/span*100));
+  document.getElementById('hud-level').textContent=State.level;
+  document.getElementById('hud-xp-num').textContent=State.xp;
+  document.querySelector('.hud .xp-bar').style.setProperty('--xp-pct',pct+'%');
+  document.getElementById('hud-xp').textContent=`${State.xp}/${tier.next} XP`;
+}
+
+function toast(msg,type){
+  const wrap=document.getElementById('toast-wrap');
+  const el=document.createElement('div');
+  el.className='toast';
+  if(type==='level')el.style.borderColor='var(--neon-yellow)',el.style.color='var(--neon-yellow)';
+  el.textContent=msg;wrap.appendChild(el);
+  setTimeout(()=>{el.style.transition='opacity .4s';el.style.opacity=0;setTimeout(()=>el.remove(),400)},2600);
+}
+
+/* ═══════════════════ 渲染 12 宮 / 12 星座 ═══════════════════ */
+function renderHouses(){
+  const grid=document.getElementById('houses-grid');
+  HOUSES.forEach(h=>{
+    const c=document.createElement('div');
+    c.className='cell'+(State.housesU.includes(h.n)?' unlocked':'');
+    c.innerHTML=`
+      <span class="badge">UNLOCKED</span>
+      <span class="num">${String(h.n).padStart(2,'0')}</span>
+      <div class="ttl">第 ${h.n} 宮 · ${h.name}</div>
+      <div class="sub">${h.sub}</div>
+      <p>${h.body}</p>
+      <p style="color:var(--matrix-green);font-size:13px"><strong>$ behavior:</strong> ${h.behavior}</p>
+      <div class="case">${h.caseStr}</div>`;
+    c.addEventListener('click',()=>{
+      if(!State.housesU.includes(h.n)){
+        State.housesU.push(h.n);c.classList.add('unlocked');addXP(20,'解鎖第 '+h.n+' 宮')
+      }
+    });
+    grid.appendChild(c);
+  });
+}
+function renderSigns(){
+  const grid=document.getElementById('signs-grid');
+  SIGNS.forEach(s=>{
+    const c=document.createElement('div');
+    c.className='cell'+(State.signsU.includes(s.n)?' unlocked':'');
+    c.innerHTML=`
+      <span class="badge">UNLOCKED</span>
+      <span class="num">${s.symbol}</span>
+      <div class="ttl">水星 / ${s.name}座</div>
+      <div class="sub">${s.sub}</div>
+      <p>${s.body}</p>
+      <p style="color:var(--matrix-green);font-size:13px"><strong>$ behavior:</strong> ${s.behavior}</p>
+      <div class="case">${s.caseStr}</div>`;
+    c.addEventListener('click',()=>{
+      if(!State.signsU.includes(s.n)){
+        State.signsU.push(s.n);c.classList.add('unlocked');addXP(20,'解鎖水星'+s.name)
+      }
+    });
+    grid.appendChild(c);
+  });
+}
+
+/* ═══════════════════ 45 相位矩陣 ═══════════════════ */
+function renderMatrix(){
+  const m=document.getElementById('aspect-matrix');
+  m.innerHTML='';
+  // header
+  m.appendChild(headDiv(''));
+  ASPECT_TYPES.forEach(t=>m.appendChild(headDiv(t.name+' '+t.ang)));
+  // rows
+  ASPECT_PLANETS.forEach(p=>{
+    const rh=document.createElement('div');rh.className='row-head';
+    rh.innerHTML=`<span style="font-size:1.4rem">${p.sym}</span>${p.name}`;
+    m.appendChild(rh);
+    ASPECT_TYPES.forEach(t=>{
+      const cx=document.createElement('div');
+      cx.className='cellx'+(State.aspectsU.includes(p.key+t.key)?' read':'');
+      cx.innerHTML=`<span class="ang">${t.ang}</span>${ASPECTS[p.key][t.key].slice(0,42)}…`;
+      cx.addEventListener('click',()=>openAspect(p,t));
+      m.appendChild(cx);
+    });
+  });
+}
+function headDiv(text){const d=document.createElement('div');d.className='head';d.textContent=text;return d;}
+function openAspect(p,t){
+  const m=document.getElementById('aspect-modal');
+  document.getElementById('m-ang').textContent=t.name+' '+t.ang+' · 水星 × '+p.name;
+  document.getElementById('m-title').textContent=`☿ × ${p.sym} ${p.name}`;
+  document.getElementById('m-body').textContent=ASPECTS[p.key][t.key];
+  m.classList.add('show');
+  const k=p.key+t.key;
+  if(!State.aspectsU.includes(k)){State.aspectsU.push(k);addXP(5,'閱讀 '+t.name+' '+p.name)}
+  renderMatrix();
+}
+function closeAspectModal(){document.getElementById('aspect-modal').classList.remove('show')}
+
+/* ═══════════════════ 技能樹 ═══════════════════ */
+function renderSkill(){
+  const tree=document.getElementById('skill-tree');tree.innerHTML='';
+  const items=[
+    {k:'lang',ico:'語',name:'語言'},{k:'logic',ico:'邏',name:'邏輯'},
+    {k:'write',ico:'寫',name:'書寫'},{k:'comm',ico:'通',name:'溝通'},
+  ];
+  items.forEach(it=>{
+    const n=document.createElement('div');n.className='skill-node';
+    n.innerHTML=`<div class="icon">${it.ico}</div><h4>${it.name}</h4><div class="pts">+${State.skill[it.k]}</div><button class="add">$ alloc +1</button>`;
+    n.querySelector('.add').addEventListener('click',(e)=>{
+      e.stopPropagation();
+      if(State.pool<=0){toast('沒有可分配點數');return}
+      State.skill[it.k]++;State.pool--;refreshSkill();save();toast(it.name+' +1');
+    });
+    tree.appendChild(n);
+  });
+}
+function refreshSkill(){
+  document.getElementById('skill-pool-num').textContent=State.pool;
+  // re-render node values
+  document.querySelectorAll('#skill-tree .skill-node .pts').forEach((el,i)=>{
+    const k=['lang','logic','write','comm'][i];el.textContent='+'+State.skill[k];
+  });
+}
+
+/* ═══════════════════ 翻卡記憶 ═══════════════════ */
+let flash={cards:[],opened:[],matched:0,moves:0};
+function buildFlash(){
+  const board=document.getElementById('flash-board');board.innerHTML='';
+  flash={cards:[],opened:[],matched:0,moves:0};
+  const symbols=SIGNS.map(s=>s.symbol).slice(0,6);
+  const pool=[...symbols,...symbols].sort(()=>Math.random()-.5);
+  pool.forEach((sym,i)=>{
+    const c=document.createElement('div');c.className='flash-card';c.dataset.sym=sym;c.dataset.idx=i;
+    c.innerHTML=`<div class="inner"><div class="face front">?</div><div class="face back">${sym}</div></div>`;
+    c.addEventListener('click',()=>onFlashClick(c));
+    board.appendChild(c);flash.cards.push(c);
+  });
+  updateFlashStatus();
+}
+function onFlashClick(c){
+  if(c.classList.contains('flipped')||c.classList.contains('matched'))return;
+  if(flash.opened.length>=2)return;
+  c.classList.add('flipped');flash.opened.push(c);
+  if(flash.opened.length===2){
+    flash.moves++;updateFlashStatus();
+    const [a,b]=flash.opened;
+    if(a.dataset.sym===b.dataset.sym){
+      a.classList.add('matched');b.classList.add('matched');
+      flash.matched++;flash.opened=[];
+      updateFlashStatus();
+      if(flash.matched===6){
+        addXP(80,'閃卡達人解鎖');
+        if(!State.flashBest||flash.moves<State.flashBest.moves){State.flashBest={moves:flash.moves,date:new Date().toISOString()}}
+        localStorage.setItem(KEY.flashBest,JSON.stringify(State.flashBest));
+      }
+    } else {
+      setTimeout(()=>{a.classList.remove('flipped');b.classList.remove('flipped');flash.opened=[]},800);
+    }
+  }
+}
+function updateFlashStatus(){
+  const best=State.flashBest?` ─ 最佳紀錄 ${State.flashBest.moves} 步`:'';
+  document.getElementById('flash-status').textContent=`已配對 ${flash.matched} / 6 ─ 翻牌 ${flash.moves} 次${best}`;
+}
+function restartFlash(){buildFlash()}
+
+/* ═══════════════════ Trivia ═══════════════════ */
+function loadTrivia(){
+  State.triviaIdx=Math.floor(Math.random()*TRIVIA_BANK.length);
+  const t=TRIVIA_BANK[State.triviaIdx];
+  document.getElementById('trivia-q').textContent=`Q${State.triviaIdx+1}. ${t.q}`;
+  const opts=document.getElementById('trivia-opts');opts.innerHTML='';
+  t.opts.forEach((o,i)=>{
+    const b=document.createElement('button');b.className='trivia-opt';b.textContent=o;
+    b.addEventListener('click',()=>onTriviaPick(b,i));
+    opts.appendChild(b);
+  });
+  document.getElementById('trivia-combo').textContent=State.triviaCombo;
+  document.getElementById('trivia-score').textContent=State.triviaScore;
+}
+function onTriviaPick(btn,i){
+  const t=TRIVIA_BANK[State.triviaIdx];
+  document.querySelectorAll('.trivia-opt').forEach(o=>o.style.pointerEvents='none');
+  if(i===t.a){
+    btn.classList.add('correct');
+    State.triviaCombo++;
+    const gain=10*Math.max(1,State.triviaCombo);
+    State.triviaScore+=gain;addSkillPt(1);
+    addXP(gain,`Trivia 連對 ×${State.triviaCombo}`);
+  } else {
+    btn.classList.add('wrong');State.triviaCombo=0;toast('答錯了，連擊歸零');
+  }
+  document.getElementById('trivia-combo').textContent=State.triviaCombo;
+  document.getElementById('trivia-score').textContent=State.triviaScore;
+  save();
+  setTimeout(loadTrivia,1300);
+}
+
+/* ═══════════════════ 每日密語 ═══════════════════ */
+function loadDaily(){
+  const today=new Date();
+  const seed=today.getFullYear()*10000+(today.getMonth()+1)*100+today.getDate();
+  const idx=seed%DAILY_LINES.length;
+  document.getElementById('daily-line').textContent=DAILY_LINES[idx];
+  document.getElementById('visit-streak').textContent=State.streak;
+}
+
+/* ═══════════════════ 矩陣雨背景 ═══════════════════ */
+function matrixRain(){
+  const c=document.getElementById('matrix-rain');
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const ctx=c.getContext('2d');
+  let w=c.width=innerWidth,h=c.height=innerHeight;
+  const fontSize=14;const cols=Math.floor(w/fontSize);
+  const drops=Array(cols).fill(1);
+  const chars='☿01アイウエオカキクケコサシスセソタチツテトナニヌネノ{}=>+−*/π∞∆⊙☉☽♀♂♃♄♅♆♇';
+  function draw(){
+    ctx.fillStyle='rgba(2,1,8,.08)';ctx.fillRect(0,0,w,h);
+    ctx.fillStyle='#00FF41';ctx.font=fontSize+'px VT323,monospace';
+    drops.forEach((y,i)=>{
+      const ch=chars[Math.floor(Math.random()*chars.length)];
+      ctx.fillText(ch,i*fontSize,y*fontSize);
+      drops[i]= y*fontSize>h&&Math.random()>.975 ? 0 : y+1;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  addEventListener('resize',()=>{w=c.width=innerWidth;h=c.height=innerHeight});
+}
+
+/* ═══════════════════ Konami Code ═══════════════════ */
+const KONAMI=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let kbuf=[];
+addEventListener('keydown',e=>{
+  kbuf.push(e.key.toLowerCase().length===1?e.key.toLowerCase():e.key);
+  if(kbuf.length>KONAMI.length)kbuf.shift();
+  if(kbuf.join(',')===KONAMI.map(k=>k.toLowerCase()).join(',')){
+    triggerKonami();kbuf=[];
+  }
+});
+function triggerKonami(){
+  const f=document.getElementById('konami');f.classList.add('show');
+  setTimeout(()=>f.classList.remove('show'),900);
+  if(localStorage.getItem(KEY.easter)!=='1'){
+    addXP(150,'★ KONAMI ─ DEV_MODE 解鎖');
+    localStorage.setItem(KEY.easter,'1');
+    document.body.style.filter='hue-rotate(20deg)';
+    setTimeout(()=>document.body.style.filter='',2500);
+  } else {
+    toast('★ 開發者模式已啟用');
+  }
+}
+
+/* ═══════════════════ 分享卡 ═══════════════════ */
+function openShare(){
+  document.getElementById('sc-level').textContent=`LV.${State.level} / ${LEVELS[State.level-1].name}`;
+  document.getElementById('sc-xp').textContent=State.xp;
+  document.getElementById('sc-houses').textContent=`${State.housesU.length} / 12`;
+  document.getElementById('sc-signs').textContent=`${State.signsU.length} / 12`;
+  document.getElementById('sc-aspects').textContent=`${State.aspectsU.length} / 45`;
+  document.getElementById('sc-combo').textContent=`${State.triviaCombo}×`;
+  document.getElementById('sc-streak').textContent=`${State.streak} 天`;
+  document.getElementById('sc-date').textContent=new Date().toISOString().slice(0,10);
+  document.getElementById('share-modal').classList.add('show');
+}
+function closeShare(){document.getElementById('share-modal').classList.remove('show')}
+async function downloadShare(){
+  if(typeof html2canvas==='undefined'){toast('html2canvas 載入中');return}
+  const card=document.getElementById('share-card');
+  const canvas=await html2canvas(card,{scale:2,backgroundColor:'#04020b'});
+  const link=document.createElement('a');
+  link.download='mercury-os-card.png';
+  link.href=canvas.toDataURL('image/png');link.click();
+  addXP(40,'識別卡匯出');
+}
+
+/* ═══════════════════ 啟動 ═══════════════════ */
+addEventListener('DOMContentLoaded',()=>{
+  load();
+  renderHouses();renderSigns();renderMatrix();renderSkill();refreshSkill();
+  buildFlash();loadTrivia();loadDaily();refreshHUD();
+  matrixRain();
+  // 點擊外部關閉 modal
+  document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
+  addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'))});
+  // ESC 也關閉 modal
+});
+</script>
+</body>
+</html>

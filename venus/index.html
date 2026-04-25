@@ -1,0 +1,971 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>金星 ♀ 美學收藏家 ─ 你的吸引力磁場</title>
+<meta name="description" content="金星進駐十二宮、十二星座、九大行星 × 五相位的寶石圖鑑 — Vogue Editorial 互動星盤">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Marcellus&family=Dancing+Script:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+<style>
+:root{
+  --rose-gold:#E8B4B8;--rose-gold-dark:#C49097;--peach:#FFCBA4;
+  --mint:#98D8B3;--cream:#FFF3B0;--blush:#F8D7DA;
+  --champagne:#F5E6D3;--ink:#3D2C2A;--soft-ink:#6B5654;--whisper:#FBF6F0;
+  --line:#E8D8D5;--accent:#D67A8A;
+  --font-display:'Italiana',serif;
+  --font-h:'Playfair Display',Georgia,serif;
+  --font-body:'Marcellus',Georgia,serif;
+  --font-script:'Dancing Script',cursive;
+  --shadow-soft:0 18px 42px -18px rgba(196,144,151,.45),0 4px 12px rgba(196,144,151,.18);
+  --shadow-rose:0 0 38px -8px var(--rose-gold);
+  --ease-pop:cubic-bezier(.34,1.56,.64,1);--ease-out:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);background:var(--whisper);color:var(--ink);line-height:1.7;
+  overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse at 18% 20%,rgba(232,180,184,.45) 0%,transparent 50%),
+    radial-gradient(ellipse at 78% 75%,rgba(255,203,164,.4) 0%,transparent 55%),
+    radial-gradient(ellipse at 50% 100%,rgba(152,216,179,.25) 0%,transparent 60%),
+    linear-gradient(180deg,var(--whisper) 0%,#F8E8E0 100%);
+}
+::selection{background:var(--rose-gold);color:var(--whisper)}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+img{max-width:100%;display:block}
+a{color:var(--accent);text-decoration:none}
+a:hover{color:var(--rose-gold-dark)}
+
+/* 玫瑰花瓣飄落 canvas */
+#petals{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.7}
+
+/* grain */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+  opacity:.06;mix-blend-mode:multiply;
+}
+
+/* HUD */
+.hud{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;gap:14px;padding:12px 22px;
+  background:linear-gradient(180deg,rgba(251,246,240,.92),rgba(251,246,240,.5));
+  border-bottom:1px solid var(--rose-gold);backdrop-filter:blur(14px);
+  font-family:var(--font-body);font-size:14px;color:var(--ink);
+}
+.hud .brand{font-family:var(--font-display);font-size:22px;color:var(--accent);letter-spacing:.18em}
+.hud .sep{flex:1}
+.hud nav{display:flex;gap:14px}
+.hud nav a{padding:4px 6px;color:var(--soft-ink);font-size:13px;letter-spacing:.06em;border-bottom:1px solid transparent;transition:.3s}
+.hud nav a:hover{color:var(--accent);border-color:var(--accent)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--rose-gold);border-radius:999px;color:var(--accent);background:rgba(232,180,184,.14);font-size:12px}
+.pill .lbl{color:var(--soft-ink);font-size:11px}
+.xp-bar{position:relative;width:140px;height:6px;background:var(--blush);border-radius:999px;overflow:hidden}
+.xp-bar::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--xp-pct,0%);background:linear-gradient(90deg,var(--rose-gold),var(--peach));border-radius:999px;transition:width .8s var(--ease-out)}
+.heart-counter{display:inline-flex;align-items:center;gap:4px;color:var(--accent);font-family:var(--font-script);font-size:18px}
+@media(max-width:760px){.hud nav{display:none}.xp-bar{width:80px}}
+
+/* sections */
+section{position:relative;z-index:2;padding:110px 24px}
+.wrap{max-width:1200px;margin:0 auto;position:relative}
+h1{font-family:var(--font-display);font-size:clamp(3rem,9vw,7.5rem);font-weight:400;line-height:1;letter-spacing:.02em}
+h2{font-family:var(--font-display);font-size:clamp(2.2rem,5.4vw,4rem);font-weight:400;letter-spacing:.04em;margin-bottom:32px}
+h3{font-family:var(--font-h);font-size:1.4rem;font-weight:400;color:var(--accent);margin-bottom:10px;font-style:italic}
+h4{font-family:var(--font-h);font-size:1.15rem;font-weight:700;color:var(--ink);margin-bottom:6px}
+.label{display:inline-block;font-family:var(--font-body);font-size:12px;color:var(--accent);letter-spacing:.5em;margin-bottom:14px;text-transform:uppercase}
+p{color:var(--soft-ink);margin-bottom:14px}
+.lead{font-size:1.2rem;color:var(--ink);font-family:var(--font-h);font-style:italic}
+
+/* HERO */
+#hero{
+  min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+  padding-top:160px;text-align:center;
+}
+#hero::before{
+  content:"";position:absolute;inset:0;
+  background:url("./images/hero.png") center/cover no-repeat;
+  opacity:.45;mix-blend-mode:multiply;
+  filter:saturate(1.1);
+}
+#hero .wrap{z-index:3}
+.hero-tag{font-family:var(--font-script);color:var(--accent);font-size:1.6rem;margin-bottom:16px}
+#hero h1{margin-bottom:24px;color:var(--ink);text-shadow:0 4px 24px rgba(232,180,184,.4)}
+#hero h1 span{color:var(--accent);font-style:italic}
+#hero .subtitle{font-family:var(--font-h);font-style:italic;font-size:1.4rem;color:var(--soft-ink);max-width:680px;margin:0 auto 28px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:28px}
+
+/* 玻璃寶石 hero piece */
+.gem-hero{
+  width:200px;height:200px;margin:30px auto;position:relative;
+  filter:drop-shadow(0 12px 28px rgba(232,180,184,.6));
+}
+.gem-hero svg{width:100%;height:100%;animation:gemSpin 18s linear infinite}
+@keyframes gemSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@media(max-width:600px){.gem-hero{width:140px;height:140px}}
+
+.btn{
+  display:inline-flex;align-items:center;gap:8px;padding:14px 28px;
+  font-family:var(--font-h);font-size:1rem;letter-spacing:.1em;
+  background:var(--rose-gold);color:var(--whisper);border:1px solid transparent;
+  transition:all .3s var(--ease-pop);border-radius:999px;
+}
+.btn:hover{background:var(--accent);transform:translateY(-3px);box-shadow:var(--shadow-soft)}
+.btn.ghost{background:transparent;color:var(--accent);border-color:var(--rose-gold)}
+.btn.ghost:hover{background:var(--rose-gold);color:var(--whisper)}
+
+/* 神話 magazine spread */
+#myth{background:linear-gradient(180deg,var(--whisper) 0%,var(--blush) 100%)}
+.spread{display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center}
+.spread img{border-radius:6px;box-shadow:var(--shadow-soft);background:linear-gradient(135deg,var(--rose-gold),var(--peach))}
+.spread .copy h2{margin-bottom:18px}
+.spread blockquote{font-family:var(--font-h);font-style:italic;font-size:1.6rem;line-height:1.5;color:var(--accent);border-left:2px solid var(--rose-gold);padding:8px 0 8px 22px;margin:24px 0}
+@media(max-width:840px){.spread{grid-template-columns:1fr;gap:32px}}
+
+/* 雷達 */
+#radar-section .grid-r{display:grid;grid-template-columns:.9fr 1.1fr;gap:50px;align-items:center}
+.radar-svg{width:100%;max-width:420px;margin:0 auto}
+@media(max-width:760px){#radar-section .grid-r{grid-template-columns:1fr}}
+
+/* 12 宮 / 12 星座 = 寶石網格 */
+#houses{background:linear-gradient(180deg,var(--blush) 0%,var(--whisper) 60%,var(--champagne) 100%)}
+#signs{background:linear-gradient(180deg,var(--champagne) 0%,var(--whisper) 100%)}
+.gem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;margin-top:32px}
+.gem-card{
+  position:relative;background:linear-gradient(160deg,#FFFCFA 0%,var(--whisper) 100%);
+  border:1px solid var(--line);border-radius:14px;padding:24px 22px 22px;
+  transition:all .4s var(--ease-out);cursor:pointer;overflow:hidden;
+}
+.gem-card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--rose-gold),var(--peach),var(--mint),var(--cream));
+  opacity:.5;transition:opacity .4s;
+}
+.gem-card:hover{transform:translateY(-6px) scale(1.02);box-shadow:var(--shadow-rose);border-color:var(--rose-gold)}
+.gem-card:hover::before{opacity:1}
+.gem-card.unlocked{background:linear-gradient(160deg,var(--blush) 0%,var(--whisper) 100%);border-color:var(--rose-gold)}
+.gem-card .gem-svg{width:64px;height:64px;float:right;margin-left:8px;filter:drop-shadow(0 6px 12px rgba(196,144,151,.4))}
+.gem-card .num{font-family:var(--font-display);font-size:2.4rem;color:var(--rose-gold-dark);line-height:1}
+.gem-card h4{font-family:var(--font-h);font-size:1.4rem;font-weight:700;color:var(--ink);margin:6px 0 4px}
+.gem-card .sub{font-family:var(--font-body);color:var(--accent);font-size:11px;letter-spacing:.3em;text-transform:uppercase;margin-bottom:12px}
+.gem-card p{font-size:14.5px;line-height:1.55;color:var(--soft-ink)}
+.gem-card .behavior{color:var(--accent);font-size:13px;margin-top:8px}
+.gem-card .case{font-family:var(--font-h);font-style:italic;color:var(--soft-ink);font-size:13px;border-top:1px solid var(--line);padding-top:10px;margin-top:12px}
+.gem-card .badge{position:absolute;top:14px;right:14px;font-family:var(--font-script);color:var(--accent);font-size:18px;display:none}
+.gem-card.unlocked .badge{display:block}
+
+/* 45 相位矩陣 */
+#aspects{background:linear-gradient(180deg,var(--whisper) 0%,var(--blush) 100%)}
+.matrix-wrap{overflow-x:auto;padding-bottom:8px;margin-top:24px}
+.matrix{display:grid;grid-template-columns:170px repeat(5,minmax(160px,1fr));gap:7px;min-width:1000px;font-family:var(--font-body)}
+.matrix .head{background:var(--rose-gold);color:var(--whisper);padding:14px;text-align:center;letter-spacing:.1em;font-family:var(--font-h);font-style:italic;font-size:14px;border-radius:6px}
+.matrix .row-head{background:linear-gradient(135deg,var(--peach),var(--rose-gold));color:var(--whisper);padding:14px;font-family:var(--font-h);display:flex;align-items:center;gap:8px;font-size:1.05rem;border-radius:6px}
+.matrix .cellx{background:#FFFCFA;border:1px solid var(--line);padding:12px;font-size:13px;line-height:1.5;cursor:pointer;transition:all .3s;color:var(--soft-ink);border-radius:6px;position:relative}
+.matrix .cellx:hover{border-color:var(--rose-gold);background:var(--blush);transform:translateY(-2px);box-shadow:var(--shadow-soft);color:var(--ink)}
+.matrix .cellx.read{border-color:var(--accent);background:linear-gradient(135deg,#FFFCFA,var(--blush))}
+.matrix .cellx .ang{display:block;color:var(--accent);font-family:var(--font-h);font-style:italic;font-size:11px;letter-spacing:.2em;margin-bottom:4px}
+
+/* 配對小遊戲（寶石翻卡） */
+#flash{background:linear-gradient(180deg,var(--blush) 0%,var(--whisper) 100%)}
+.flash-board{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:24px;max-width:780px}
+.flash-card{aspect-ratio:1;perspective:600px;cursor:pointer}
+.flash-card .inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s var(--ease-pop)}
+.flash-card.flipped .inner,.flash-card.matched .inner{transform:rotateY(180deg)}
+.flash-card .face{position:absolute;inset:0;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;border-radius:14px}
+.flash-card .front{background:linear-gradient(135deg,var(--rose-gold),var(--peach));color:var(--whisper);font-family:var(--font-display);font-size:2.5rem;box-shadow:var(--shadow-soft)}
+.flash-card .back{background:linear-gradient(135deg,#FFFCFA,var(--blush));border:1px solid var(--rose-gold);transform:rotateY(180deg)}
+.flash-card.matched .back{background:linear-gradient(135deg,var(--cream),var(--mint));border-color:var(--mint);box-shadow:0 0 24px rgba(152,216,179,.6)}
+.flash-card .back svg{width:55%;height:55%}
+.flash-status{font-family:var(--font-h);font-style:italic;color:var(--accent);text-align:center;margin-top:16px;font-size:1.2rem}
+@media(max-width:600px){.flash-board{grid-template-columns:repeat(4,1fr)}}
+
+/* Trivia + 每日抽卡 */
+#trivia{background:linear-gradient(180deg,var(--whisper) 0%,var(--champagne) 100%)}
+.contrast-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;margin-top:24px}
+.panel{padding:30px;background:#FFFCFA;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-soft);position:relative;overflow:hidden}
+.panel::before{content:"";position:absolute;top:0;left:0;width:100%;height:4px;background:linear-gradient(90deg,var(--rose-gold),var(--peach),var(--mint))}
+.trivia-q{font-family:var(--font-h);font-style:italic;font-size:1.3rem;color:var(--ink);margin:14px 0 14px;min-height:60px}
+.trivia-opts{display:flex;flex-direction:column;gap:8px}
+.trivia-opt{padding:12px 16px;border:1px solid var(--line);background:var(--whisper);color:var(--ink);text-align:left;cursor:pointer;font-family:var(--font-body);transition:all .25s;border-radius:8px}
+.trivia-opt:hover{border-color:var(--rose-gold);background:var(--blush)}
+.trivia-opt.correct{background:linear-gradient(135deg,var(--mint),#C8E8D5);border-color:var(--mint);color:var(--ink)}
+.trivia-opt.wrong{background:#FFE0E5;border-color:#E89DA5;color:#A04050}
+.trivia-meta{font-family:var(--font-script);font-size:18px;color:var(--accent);margin-top:14px;display:flex;justify-content:space-between}
+.daily-card{
+  background:linear-gradient(135deg,var(--cream) 0%,var(--peach) 100%);
+  padding:22px;border-radius:14px;margin-top:14px;
+  font-family:var(--font-h);font-style:italic;color:var(--ink);font-size:1.15rem;line-height:1.7;
+  border:1px solid var(--rose-gold);
+}
+.daily-card .sig{display:block;font-family:var(--font-script);color:var(--accent);font-size:18px;margin-top:8px}
+
+/* 連點花朵彩蛋 */
+.flower-easter{
+  display:inline-flex;align-items:center;justify-content:center;width:80px;height:80px;
+  font-size:48px;cursor:pointer;transition:transform .3s var(--ease-pop);
+  filter:drop-shadow(0 4px 12px rgba(232,180,184,.5));
+}
+.flower-easter:hover{transform:scale(1.15) rotate(15deg)}
+.flower-easter:active{transform:scale(.9)}
+
+/* 名人案例 */
+#cases{background:linear-gradient(180deg,var(--champagne) 0%,var(--whisper) 100%)}
+.cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:24px}
+.case-card{background:#FFFCFA;border:1px solid var(--line);padding:24px;border-radius:14px;box-shadow:var(--shadow-soft);position:relative}
+.case-card::before{content:"♀";position:absolute;top:14px;right:18px;font-family:var(--font-display);font-size:36px;color:var(--rose-gold);opacity:.4}
+.case-card .meta{font-family:var(--font-script);color:var(--accent);font-size:18px;margin-bottom:8px}
+
+/* 指引步驟 */
+#guide{background:linear-gradient(180deg,var(--whisper) 0%,var(--blush) 100%)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:32px;counter-reset:step}
+.step{padding:24px;background:#FFFCFA;border:1px solid var(--line);border-radius:14px;position:relative;counter-increment:step;box-shadow:var(--shadow-soft)}
+.step::before{content:counter(step,decimal-leading-zero);position:absolute;top:-14px;right:18px;font-family:var(--font-display);font-size:48px;color:var(--rose-gold);opacity:.6;line-height:1;background:var(--whisper);padding:0 4px}
+
+/* 結尾 + 分享卡 */
+#outro{background:linear-gradient(180deg,var(--blush) 0%,var(--peach) 100%);text-align:center;padding-bottom:160px}
+#outro h2{font-size:clamp(2.4rem,6vw,4.4rem)}
+#outro .lead{max-width:680px;margin:0 auto 28px}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(60,40,40,.5);backdrop-filter:blur(10px);z-index:200;display:none;align-items:center;justify-content:center;padding:24px}
+.modal.show{display:flex;animation:fadeIn .35s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-card{background:linear-gradient(180deg,#FFFCFA,var(--whisper));border:1px solid var(--rose-gold);padding:36px;max-width:680px;width:100%;max-height:90vh;overflow:auto;position:relative;border-radius:14px;box-shadow:var(--shadow-rose)}
+.modal-card .close{position:absolute;top:14px;right:18px;font-family:var(--font-display);font-size:28px;color:var(--accent);cursor:pointer;line-height:1}
+
+/* share card */
+.share-card{
+  width:540px;height:960px;background:linear-gradient(180deg,#FFFCFA 0%,var(--blush) 50%,var(--peach) 100%);
+  position:relative;color:var(--ink);font-family:var(--font-h);
+  padding:54px 44px;display:flex;flex-direction:column;justify-content:space-between;
+  border:3px solid var(--rose-gold);box-shadow:var(--shadow-rose);
+}
+.share-card::before{content:"";position:absolute;inset:0;background:url("./images/share-bg.png") center/cover no-repeat;opacity:.35;mix-blend-mode:multiply}
+.share-card>*{position:relative;z-index:2}
+.share-card .crest{font-family:var(--font-display);font-size:64px;color:var(--accent);text-align:center}
+.share-card .title{font-family:var(--font-display);font-size:48px;color:var(--ink);text-align:center;letter-spacing:.04em;margin:18px 0 8px}
+.share-card .subtitle{font-family:var(--font-script);color:var(--accent);font-size:24px;text-align:center;margin-bottom:20px}
+.share-card .stats{display:flex;flex-direction:column;gap:18px;font-size:18px}
+.share-card .stat-row{display:flex;justify-content:space-between;border-bottom:1px solid var(--rose-gold);padding-bottom:10px;color:var(--soft-ink)}
+.share-card .stat-row .v{color:var(--accent);font-family:var(--font-h);font-style:italic;font-size:22px}
+.share-card .footer{text-align:center;font-family:var(--font-script);color:var(--accent);font-size:22px}
+
+/* 連點花朵彩蛋全螢幕 */
+.bloom{position:fixed;inset:0;z-index:300;display:none;pointer-events:none}
+.bloom.show{display:block}
+.bloom .petal-burst{position:absolute;font-size:38px;animation:petalFly 2s ease-out forwards;opacity:0}
+@keyframes petalFly{
+  0%{opacity:1;transform:translate(0,0) rotate(0) scale(.4)}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(1.2)}
+}
+
+/* toast */
+.toast-wrap{position:fixed;bottom:28px;right:28px;z-index:250;display:flex;flex-direction:column;gap:10px;max-width:340px;pointer-events:none}
+.toast{background:#FFFCFA;border:1px solid var(--rose-gold);padding:14px 20px;font-family:var(--font-h);color:var(--accent);box-shadow:var(--shadow-soft);border-radius:999px;animation:toastIn .35s var(--ease-pop);font-size:15px}
+@keyframes toastIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* prefers-reduced-motion */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  #petals{display:none}.gem-hero svg{animation:none}
+}
+</style>
+</head>
+<body>
+<canvas id="petals"></canvas>
+
+<div class="hud" role="banner">
+  <span class="brand">♀ VENVS</span>
+  <nav>
+    <a href="#myth">神話</a><a href="#houses">12 宮</a><a href="#signs">12 星座</a>
+    <a href="#aspects">45 相位</a><a href="#flash">配對</a><a href="#trivia">愛情測驗</a>
+  </nav>
+  <span class="sep"></span>
+  <span class="pill"><span class="lbl">LV</span><span id="hud-level">1</span></span>
+  <div class="xp-bar"></div>
+  <span class="pill"><span class="lbl">魅力</span><span id="hud-xp-num">0</span></span>
+  <span class="heart-counter">♡<span id="hud-hearts">0</span></span>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="wrap">
+    <span class="hero-tag">— a love letter to your charisma —</span>
+    <h1>金星 <span>♀</span><br>你的吸引力磁場</h1>
+    <div class="gem-hero" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <defs>
+          <linearGradient id="hg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#FFCBA4"/><stop offset="50%" stop-color="#E8B4B8"/><stop offset="100%" stop-color="#98D8B3"/>
+          </linearGradient>
+        </defs>
+        <polygon points="50,5 80,28 95,55 75,90 25,90 5,55 20,28" fill="url(#hg)" stroke="#C49097" stroke-width="1.2"/>
+        <polygon points="50,5 80,28 50,55 20,28" fill="rgba(255,252,250,.45)"/>
+        <polygon points="80,28 95,55 50,55" fill="rgba(255,252,250,.25)"/>
+        <polygon points="20,28 50,55 5,55" fill="rgba(255,252,250,.25)"/>
+      </svg>
+    </div>
+    <p class="subtitle">你身上那道讓某些人多看你一眼的光，不是運氣 ─ 是金星的座標。<br>從 12 宮的舞台，到 12 星座的口味，到 45 種與其他星體的化學反應。</p>
+    <div class="cta-row">
+      <button class="btn" onclick="document.getElementById('houses').scrollIntoView({behavior:'smooth'})">收集 12 顆寶石</button>
+      <button class="btn ghost" onclick="openShare()">生成名片</button>
+    </div>
+  </div>
+</section>
+
+<!-- 神話 -->
+<section id="myth">
+  <div class="wrap spread">
+    <img src="./images/myth.png" alt="Venus / Aphrodite illustration" onerror="this.style.background='linear-gradient(135deg,#E8B4B8,#FFCBA4)';this.alt='圖像生成中'">
+    <div class="copy">
+      <span class="label">// myth</span>
+      <h2>維納斯 ─ 從泡沫中誕生的女神</h2>
+      <p>阿芙羅黛蒂（Aphrodite）從愛琴海的泡沫中升起 ─ 占星學裡最溫柔卻也最具決定力的原型。她不靠武力、不靠權謀，憑「讓人想要靠近」這件事，就能改變戰爭走向、王朝興衰。</p>
+      <p>金星教給我們的，從來不是「怎麼變美」，而是「怎麼讓自己活成一個別人會想駐足的場域」。</p>
+      <blockquote>「美，不是你擁有的東西，<br>是別人在你身上看到、卻說不出口的那個東西。」</blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- 五感雷達 -->
+<section id="radar-section">
+  <div class="wrap">
+    <span class="label">// charisma radar</span>
+    <h2>金星 = 你的五維吸引力</h2>
+    <p class="lead" style="margin-bottom:32px">藝術 / 美感 / 愛 / 物質 / 社交。把這五個面向當成你的化妝盒，看看哪一面是你的天然優勢。</p>
+    <div class="grid-r">
+      <svg class="radar-svg" viewBox="0 0 200 200" aria-label="charisma radar">
+        <g transform="translate(100,100)">
+          <polygon points="0,-80 76,-25 47,65 -47,65 -76,-25" fill="none" stroke="#E8D8D5" stroke-width="1"/>
+          <polygon points="0,-60 57,-19 35,49 -35,49 -57,-19" fill="none" stroke="#E8D8D5" stroke-width="1"/>
+          <polygon points="0,-40 38,-12 23,32 -23,32 -38,-12" fill="none" stroke="#E8D8D5" stroke-width="1"/>
+          <polygon id="r-poly" points="0,-65 50,-16 28,40 -28,40 -50,-16" fill="rgba(232,180,184,.4)" stroke="#D67A8A" stroke-width="2"/>
+          <line x1="0" y1="0" x2="0" y2="-80" stroke="#E8D8D5"/>
+          <line x1="0" y1="0" x2="76" y2="-25" stroke="#E8D8D5"/>
+          <line x1="0" y1="0" x2="47" y2="65" stroke="#E8D8D5"/>
+          <line x1="0" y1="0" x2="-47" y2="65" stroke="#E8D8D5"/>
+          <line x1="0" y1="0" x2="-76" y2="-25" stroke="#E8D8D5"/>
+          <text x="0" y="-90" text-anchor="middle" font-family="Italiana" font-size="11" fill="#3D2C2A">藝術</text>
+          <text x="86" y="-25" text-anchor="middle" font-family="Italiana" font-size="11" fill="#3D2C2A">美感</text>
+          <text x="55" y="78" text-anchor="middle" font-family="Italiana" font-size="11" fill="#3D2C2A">愛</text>
+          <text x="-55" y="78" text-anchor="middle" font-family="Italiana" font-size="11" fill="#3D2C2A">物質</text>
+          <text x="-90" y="-25" text-anchor="middle" font-family="Italiana" font-size="11" fill="#3D2C2A">社交</text>
+        </g>
+      </svg>
+      <div>
+        <p>每答對一題愛情測驗、解鎖一個宮位、收集到一顆寶石，雷達上的某個維度就會擴張。</p>
+        <p>這不是測「你有多美」，是測你「天然的金星表達哪邊最強」。雷達會跟著你的互動即時重繪。</p>
+        <p style="font-family:var(--font-script);color:var(--accent);font-size:1.2rem;margin-top:18px">慢慢來。金星不喜歡急。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 宮 -->
+<section id="houses">
+  <div class="wrap">
+    <span class="label">// chapter II — 12 houses</span>
+    <h2>金星進駐 12 宮 ─ 你的愛之劇場</h2>
+    <p class="lead">同一個維納斯，落入不同的宮，唱的會是完全不同的調。每解鎖一宮 +20 魅力。</p>
+    <div class="gem-grid" id="houses-grid"></div>
+  </div>
+</section>
+
+<!-- 12 星座 -->
+<section id="signs">
+  <div class="wrap">
+    <span class="label">// chapter III — 12 signs</span>
+    <h2>金星落入 12 星座 ─ 你的愛之口味</h2>
+    <p class="lead">12 顆寶石，12 種風格 ─ 從牡羊的火紅榴石到雙魚的月光石。每解鎖一顆 +20 魅力。</p>
+    <div class="gem-grid" id="signs-grid"></div>
+  </div>
+</section>
+
+<!-- 45 相位 -->
+<section id="aspects">
+  <div class="wrap">
+    <span class="label">// chapter IV — 45 aspects</span>
+    <h2>金星 × 9 行星 × 5 相位</h2>
+    <p class="lead">愛情中的化學反應從來不只兩個人 ─ 是九種能量在你內在的小劇場裡同時演。每格點開 +5 魅力。</p>
+    <div class="matrix-wrap"><div class="matrix" id="aspect-matrix"></div></div>
+    <p style="margin-top:18px;color:var(--soft-ink);font-size:13px;font-style:italic">※ 金星與太陽最大角距 76°，與水星 76°，所以理論上太陽 / 水星與金星形成 90° 以上相位是不可能的；但本表保留所有條目以供完整理解。</p>
+  </div>
+</section>
+
+<!-- 寶石配對 -->
+<section id="flash">
+  <div class="wrap">
+    <span class="label">// minigame I — gem pairing</span>
+    <h2>寶石配對 ─ 找出你的雙生石</h2>
+    <p class="lead">12 顆寶石隨機散開，找出 6 對。配對成功 +80 魅力，解鎖「珠寶鑑定師」徽章。</p>
+    <div class="flash-board" id="flash-board"></div>
+    <p class="flash-status" id="flash-status">已配對 0 / 6 ─ 翻牌 0 次</p>
+    <button class="btn ghost" style="margin-top:16px" onclick="restartFlash()">重新洗牌</button>
+  </div>
+</section>
+
+<!-- 愛情測驗 + 每日抽卡 -->
+<section id="trivia">
+  <div class="wrap">
+    <span class="label">// minigame II — quiz & daily</span>
+    <h2>愛情小測驗 + 今日美感抽卡</h2>
+    <div class="contrast-grid">
+      <div class="panel">
+        <h3>What does your Venus say?</h3>
+        <div class="trivia-q" id="trivia-q">載入中...</div>
+        <div class="trivia-opts" id="trivia-opts"></div>
+        <div class="trivia-meta">
+          <span>愛心 Combo: ♡<span id="trivia-combo">0</span></span>
+          <span>得分: <span id="trivia-score">0</span></span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Today's bouquet</h3>
+        <p style="font-size:13px;color:var(--soft-ink)">由今日日期 hash 出今日美感任務：</p>
+        <div class="daily-card" id="daily-card">─<span class="sig">— Venus</span></div>
+        <p style="margin-top:14px;font-size:13px;color:var(--soft-ink);font-style:italic">連續登入 <span id="visit-streak">1</span> 天</p>
+        <div style="text-align:center;margin-top:18px">
+          <p style="font-family:var(--font-script);color:var(--accent);font-size:1.2rem;margin-bottom:6px">點我綻放</p>
+          <span class="flower-easter" id="flower-easter" role="button" tabindex="0">🌸</span>
+          <p style="font-size:12px;color:var(--soft-ink);margin-top:6px">已點 <span id="flower-count">0</span> / 10 次</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 名人案例 -->
+<section id="cases">
+  <div class="wrap">
+    <span class="label">// case studies</span>
+    <h2>她們的金星 ─ 三個吸引力範例</h2>
+    <div class="cases">
+      <div class="case-card">
+        <h4>瑪麗蓮·夢露</h4>
+        <div class="meta">金星 / 牡羊 ／ 第 7 宮 ／ 與木星合相</div>
+        <p>牡羊金星 = 直接、坦率、像火 ─ 但被木星擴張到「全民幻想」尺度。第 7 宮的金星意味著她的命運場域就是「被觀看／被慾望」。</p>
+      </div>
+      <div class="case-card">
+        <h4>奧黛麗·赫本</h4>
+        <div class="meta">金星 / 雙魚 ／ 第 11 宮 ／ 對分相海王星</div>
+        <p>雙魚金星 = 救贖型浪漫；第 11 宮 = 跨越社群的優雅。海王對分相讓她的優雅有夢幻不可觸的距離感 ─ 這就是「永恆」。</p>
+      </div>
+      <div class="case-card">
+        <h4>蕾哈娜（Rihanna）</h4>
+        <div class="meta">金星 / 雙魚 ／ 第 11 宮 ／ 與火星互容</div>
+        <p>雙魚的浪漫 + 火星的銳利 = Fenty Beauty 的革命性。她讓「美」從一個窄門，變成所有膚色的入口。金星跟商業的最高狀態。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 指引 -->
+<section id="guide">
+  <div class="wrap">
+    <span class="label">// rituals</span>
+    <h2>實用指引 ─ 養你的金星</h2>
+    <div class="steps">
+      <div class="step"><h4>每天看一件美的東西</h4><p>不用買。一朵路邊的花、一張陌生人的臉、一段建築立面。金星用「看見」吃飯。</p></div>
+      <div class="step"><h4>每週一次「無目的」社交</h4><p>不為談業務、不為相親 ─ 純粹為了「在一起的氣氛」。金星在這種時刻才會醒過來。</p></div>
+      <div class="step"><h4>養成一個小儀式感</h4><p>固定時間泡杯茶、用瓷杯喝水、回家先換乾淨衣服。儀式 = 金星的呼吸。</p></div>
+      <div class="step"><h4>每月買一件不實用的東西</h4><p>香氛、藝術品、好看的筆、復古鏡子。金星拒絕「全部物件都要 KPI」。</p></div>
+      <div class="step"><h4>練「讚美 specific」</h4><p>不說「你今天好漂亮」，要說「你今天耳環的角度跟笑容剛好」。具體的讚美 = 金星級表達。</p></div>
+      <div class="step"><h4>金星逆行時整理舊關係</h4><p>金逆是 Venus' Maintenance Window：清舊衣櫥、回未讀訊息、檢視花錢模式。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 結尾 -->
+<section id="outro">
+  <div class="wrap">
+    <span class="label">// fin</span>
+    <h2>願你被自己的金星寵愛</h2>
+    <p class="lead">把今日的進度變成一張優雅的金星名片，分享出去 ─ 或者只是給未來的自己一個提醒。</p>
+    <button class="btn" onclick="openShare()">生成我的金星名片</button>
+  </div>
+</section>
+
+<!-- modal: aspect -->
+<div class="modal" id="aspect-modal">
+  <div class="modal-card">
+    <span class="close" onclick="closeAspectModal()">×</span>
+    <span class="label" id="m-ang"></span>
+    <h2 id="m-title" style="font-size:2.2rem;margin-bottom:12px"></h2>
+    <p id="m-body" style="font-size:1.1rem;color:var(--ink)"></p>
+    <p style="margin-top:18px;font-family:var(--font-script);color:var(--accent);font-size:1.2rem">+5 魅力 已記錄</p>
+  </div>
+</div>
+
+<!-- modal: share -->
+<div class="modal" id="share-modal">
+  <div class="modal-card" style="max-width:620px">
+    <span class="close" onclick="closeShare()">×</span>
+    <h2 style="font-size:2rem;margin-bottom:14px">你的金星名片</h2>
+    <p style="margin-bottom:16px;color:var(--soft-ink)">即時生成 IG 限動 1080×1920 比例：</p>
+    <div style="overflow:auto;max-height:60vh;display:flex;justify-content:center;background:var(--blush);padding:12px;border-radius:8px">
+      <div class="share-card" id="share-card">
+        <div>
+          <div class="crest">♀</div>
+          <div class="title">VENVS CARD</div>
+          <div class="subtitle">— a charisma report —</div>
+        </div>
+        <div class="stats">
+          <div class="stat-row"><span>等級</span><span class="v" id="sc-level">LV.1 / 新手</span></div>
+          <div class="stat-row"><span>累積魅力</span><span class="v" id="sc-xp">0</span></div>
+          <div class="stat-row"><span>解鎖宮位</span><span class="v" id="sc-houses">0 / 12</span></div>
+          <div class="stat-row"><span>收集寶石</span><span class="v" id="sc-signs">0 / 12</span></div>
+          <div class="stat-row"><span>相位閱讀</span><span class="v" id="sc-aspects">0 / 45</span></div>
+          <div class="stat-row"><span>愛心</span><span class="v" id="sc-hearts">♡ 0</span></div>
+          <div class="stat-row"><span>連續登入</span><span class="v" id="sc-streak">1 天</span></div>
+        </div>
+        <div class="footer">— with love, Venus —<br><span id="sc-date" style="font-size:14px;font-family:var(--font-h)"></span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:18px">
+      <button class="btn" onclick="downloadShare()">下載 PNG</button>
+      <button class="btn ghost" onclick="closeShare()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- 連點花朵彩蛋 -->
+<div class="bloom" id="bloom"></div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+/* 12 宮資料 */
+const HOUSES = [
+  {n:1,name:'命宮',sub:'Self · Persona',body:'吸引力外露，第一眼就被認出「這人有魅力」。穿搭、語調、姿態自帶美感。',behavior:'重視打扮、對鏡子說話、愛拍照、社交禮儀好。',caseStr:'葛麗絲·凱莉式的天然優雅。'},
+  {n:2,name:'財帛宮',sub:'Pleasure · Wealth',body:'透過美學變現 ─ 設計、時尚、藝術、化妝、珠寶、餐飲都能賺。對「值得花錢的東西」嗅覺準。',behavior:'消費考慮質感、收藏者、副業是審美變現。',caseStr:'JK·西蒙斯創 Fenty 的金星嗅覺。'},
+  {n:3,name:'兄弟宮',sub:'Charm · Communication',body:'與兄弟姐妹／鄰居關係溫和，溝通自帶魅力，講話讓人想靠近。',behavior:'簡訊風格優雅、簡報好看、是人緣最好的家族成員。',caseStr:'家族群裡的協調者。'},
+  {n:4,name:'田宅宮',sub:'Home · Aesthetic',body:'家就是美學殿堂，連住處的空氣都是被精心設計的。把家當作主要創作地。',behavior:'喜歡擺盤、收藏家具、家裡像雜誌封面。',caseStr:'Anna Wintour 把家當第二編輯部。'},
+  {n:5,name:'子女宮',sub:'Romance · Creativity',body:'本位舒服位 ─ 戀愛、創作、玩樂、子女四件事齊發。寫作 / 表演的天賦位。',behavior:'戀愛經驗多采、社團活躍、是公認的浪漫者。',caseStr:'泰勒絲在愛情中誕生的歌詞創作。'},
+  {n:6,name:'奴僕宮',sub:'Service · Routine',body:'工作環境必須美。對同事溫和。把美感融入日常瑣事。',behavior:'桌面整齊、辦公文具講究、跟下屬／服務生關係好。',caseStr:'米其林餐廳那位永遠笑著的內外場主管。'},
+  {n:7,name:'夫妻宮',sub:'Partnership · Mirror',body:'本位舒服位 ─ 婚姻是人生主軸，需要伴侶才覺得完整。合夥能力強。',behavior:'有對象就升級、喜歡 1v1 深度互動、合約直覺準。',caseStr:'歐巴馬夫婦的並肩政治哲學。'},
+  {n:8,name:'疾厄宮',sub:'Intimacy · Taboo',body:'愛情有強迫性與禁忌感。性與愛糾纏。容易吸引到「複雜對象」。',behavior:'喜歡深層對話、容易陷入命定感、愛情經驗濃烈。',caseStr:'亞當·朗特的禁忌愛情書寫。'},
+  {n:9,name:'遷移宮',sub:'Foreign Love · Philosophy',body:'跨文化戀愛、異國藝術、遠方的人。透過旅行與學習擴張自己的審美版圖。',behavior:'交往外國人、留學戀情、收藏異國設計。',caseStr:'梅格·萊恩跨國婚姻的金星浪漫。'},
+  {n:10,name:'官祿宮',sub:'Career · Public Image',body:'以美感／關係立業 ─ 公關、藝術、時尚、外交、品牌主理人。',behavior:'公開場合自帶光環、媒體形象優雅、職業就是魅力。',caseStr:'凱特·王妃職業性的優雅。'},
+  {n:11,name:'福德宮',sub:'Friends · Community',body:'朋友是愛人，社群是審美俱樂部。透過群體獲得幸福感。',behavior:'朋友多、社群圈優雅、愛辦聚會、跟前任也能當朋友。',caseStr:'安迪·沃荷工廠的社交網絡。'},
+  {n:12,name:'玄祕宮',sub:'Hidden Love · Spirit',body:'秘密戀情、私下藝術創作、單戀體質。幕後最有金星能量。',behavior:'私下寫詩／畫畫、有不為人知的暗戀史、愛獨自看展。',caseStr:'艾蜜莉·狄金生的秘密詩作生涯。'},
+];
+
+/* 12 星座 = 12 顆寶石 */
+const SIGNS = [
+  {n:1,name:'牡羊',symbol:'♈',gem:'紅榴石',sub:'Cardinal · Fire',body:'直接熱情，追求迅速。談戀愛像衝鋒陷陣 ─ 表白快、心動快、降溫也快。',behavior:'追求主動、訊息回快、不愛曖昧。',caseStr:'瑪麗蓮·夢露式的火熱直白。'},
+  {n:2,name:'金牛',symbol:'♉',gem:'祖母綠',sub:'Fixed · Earth',body:'本位 ─ 五感享受，物質與肉體的安全感。「會料理 / 會穿搭」是必需的條件。',behavior:'戀愛慢熱、看重摸得到的關懷、迷戀美食與好香氛。',caseStr:'奧黛麗·赫本的優雅可觸。'},
+  {n:3,name:'雙子',symbol:'♊',gem:'藍尖晶石',sub:'Mutable · Air',body:'多彩戀愛，要有頭腦對話。喜新厭舊但不絕情 ─ 一段一段地新鮮。',behavior:'交友圈多、戀愛多面向、訊息有趣是必要條件。',caseStr:'安潔莉娜·裘莉的多面戀愛史。'},
+  {n:4,name:'巨蟹',symbol:'♋',gem:'月光石',sub:'Cardinal · Water',body:'照顧型愛 ─ 做飯、記得紀念日、抱著療傷。母性／家庭性的浪漫。',behavior:'記得交往細節、會做菜、愛家人愛伴侶界線模糊。',caseStr:'梅根·馬克爾的家庭優先愛情。'},
+  {n:5,name:'獅子',symbol:'♌',gem:'柑橘黃水晶',sub:'Fixed · Fire',body:'戲劇化求愛 ─ 要有面子的關係。喜歡被當成主角寵愛。',behavior:'愛大手筆驚喜、愛大方派對、愛被人羨慕。',caseStr:'珍妮佛·洛佩茲奢華戀愛美學。'},
+  {n:6,name:'處女',symbol:'♍',gem:'橄欖石',sub:'Mutable · Earth',body:'愛挑剔但全心服務。透過「做事」表達愛 ─ 修東西、整理生活、貼心備忘錄。',behavior:'愛在細節裡、會嫌但會做、難說「我愛你」三個字。',caseStr:'碧昂絲對家人事業細節的全包式照顧。'},
+  {n:7,name:'天秤',symbol:'♎',gem:'粉紅石英',sub:'Cardinal · Air',body:'本位 ─ 平衡優雅的關係，痛恨衝突。最會「協商感情」。',behavior:'不主動分手、討好、為了和諧妥協、約會儀式感強。',caseStr:'金·卡戴珊式的公開優雅關係經營。'},
+  {n:8,name:'天蠍',symbol:'♏',gem:'黑曜石',sub:'Fixed · Water',body:'濃烈占有，sex 與深度。要嘛全有要嘛全無，沒有中間。',behavior:'交往直接深刻、嫉妒明顯、迷戀心理分析。',caseStr:'卡薩諾瓦戀愛強度的當代版本。'},
+  {n:9,name:'射手',symbol:'♐',gem:'藍色拓帕石',sub:'Mutable · Fire',body:'自由戀愛，跨文化戀人。承諾用「我們一起去某個地方」的形式表達。',behavior:'外國對象多、不愛被綁、愛情伴隨旅行。',caseStr:'布萊德·彼特跨國婚姻的旅人愛情。'},
+  {n:10,name:'摩羯',symbol:'♑',gem:'煙水晶',sub:'Cardinal · Earth',body:'保守實際，看 status 與長期可行性。愛情是長期工程，不是激情瞬間。',behavior:'晚熟、選擇條件好的、不外露感情、紀念日卻記得。',caseStr:'凱特·密道頓選擇式的長期婚姻策略。'},
+  {n:11,name:'水瓶',symbol:'♒',gem:'紫水晶',sub:'Fixed · Air',body:'友情式戀愛，反主流關係。重視「我們可以一起做什麼」勝過「我們有多熱戀」。',behavior:'前任變朋友、開放式關係、不遵循傳統。',caseStr:'珍妮佛·安妮斯頓不婚不子的選擇。'},
+  {n:12,name:'雙魚',symbol:'♓',gem:'海藍寶石',sub:'Mutable · Water',body:'浪漫救贖型，無條件愛。容易把伴侶理想化／想救／想融合。',behavior:'戀愛即奉獻、容易心碎、愛詩與電影。',caseStr:'蕾哈娜與抒情敘事相互糾纏的愛情。'},
+];
+
+const ASPECT_PLANETS = [
+  {key:'sun',name:'太陽',sym:'☉'},{key:'moon',name:'月亮',sym:'☽'},{key:'mercury',name:'水星',sym:'☿'},
+  {key:'mars',name:'火星',sym:'♂'},{key:'jupiter',name:'木星',sym:'♃'},{key:'saturn',name:'土星',sym:'♄'},
+  {key:'uranus',name:'天王星',sym:'♅'},{key:'neptune',name:'海王星',sym:'♆'},{key:'pluto',name:'冥王星',sym:'♇'}
+];
+const ASPECT_TYPES = [
+  {key:'con',name:'合相',ang:'0°'},{key:'opp',name:'對分相',ang:'180°'},{key:'sq',name:'四分相',ang:'90°'},
+  {key:'tr',name:'三分相',ang:'120°'},{key:'sx',name:'六分相',ang:'60°'}
+];
+const ASPECTS = {
+  sun:{con:'身分認同就是吸引力，活著就是發光。「自我」的呈現本身就有美感。',
+    opp:'自我表達 vs 取悅他人拉扯（理論值，最大角距 76°）。',
+    sq:'自我中心 vs 取悅；難取捨（理論值）。',
+    tr:'天生討喜，魅力即天賦。藝術才華是身分核心。',
+    sx:'藝術才華能換成事業；社交場順理成章。'},
+  moon:{con:'愛與感受同步，是完整的情感人；情緒就是吸引力。',
+    opp:'愛情需求 vs 安全感拉扯，難在熱愛和家庭安頓間平衡。',
+    sq:'母親 / 伴侶情結衝突 ─ 在愛人身上找母親的影子。',
+    tr:'感性流暢，照顧型情人；婚姻自然順暢。',
+    sx:'直覺懂得對方需要什麼，是天生的關係調節者。'},
+  mercury:{con:'說話有魅力，文字甜美，迷人是用「會講話」呈現的。',
+    opp:'思考 vs 感受拉扯（理論值，水金最大角距 76°）。',
+    sq:'批評愛人，邏輯傷感情（理論值）。',
+    tr:'情書高手，藝術評論優雅，社交辭令巧妙。',
+    sx:'機智幽默，調情自然不油，能用文字勾引人。'},
+  mars:{con:'愛與性慾同步，激情人。性吸引力和情感濃度同時爆發。',
+    opp:'愛 vs 慾望拉扯，吵架中迷戀，極端化的愛情。',
+    sq:'愛恨交織，激情型衝突。會在愛裡打架，也會在打架裡相愛。',
+    tr:'性吸引力與美感並存。追求時直接、熱情又有質感。',
+    sx:'和諧的性與愛；熱情有節奏不過火。'},
+  jupiter:{con:'愛擴張到極致，幸運在愛情，常遇到「對的人在對的時候」。',
+    opp:'愛太多 vs 自由空間 ─ 容易把愛談成壓力。',
+    sq:'過度承諾，貪心愛，腳踏多船難收場。',
+    tr:'富裕的愛，跨國戀情，戀愛中財運也好。',
+    sx:'愛情中持續成長，一段感情打開人生新格局。'},
+  saturn:{con:'嚴肅承諾，真愛但壓抑，年齡差大或時間考驗。',
+    opp:'傳統 vs 浪漫拉扯，現實感與夢幻拉扯。',
+    sq:'愛情有阻礙，不被認可的關係，自我價值低。',
+    tr:'穩定承諾，能走長遠；婚姻堅實。',
+    sx:'踏實的愛；長期經營的回報穩定。'},
+  uranus:{con:'自由戀愛，反傳統，閃婚閃離都有可能。',
+    opp:'愛 vs 獨立拉扯，難給對方完整承諾。',
+    sq:'愛情突發變化，難穩定，常以分手告終。',
+    tr:'開放關係容易適應，遠距戀情自然順暢。',
+    sx:'朋友式愛情，從友誼自然發展成戀人。'},
+  neptune:{con:'浪漫到極致，神聖之愛，藝術靈感豐沛。',
+    opp:'理想 vs 現實的愛，看清對方時迷戀就消失。',
+    sq:'愛被欺騙，迷失自我，救贖型悲劇。',
+    tr:'藝術天賦，神聖直覺，是天生的詩人或樂人。',
+    sx:'詩意的愛；能把日常生活過成電影。'},
+  pluto:{con:'愛恨交織，靈魂伴侶，極致的依附與占有。',
+    opp:'權力 vs 愛拉扯，控制與被控制的戲碼。',
+    sq:'強迫性吸引，毀滅式愛，重複糟糕模式。',
+    tr:'深度轉化的愛，每段戀愛都讓你脫胎換骨。',
+    sx:'性能量與療癒，能在親密中療傷。'}
+};
+
+const TRIVIA_BANK = [
+  {q:'金星在西洋占星中守護哪兩個星座？',opts:['牡羊與獅子','金牛與天秤','雙子與處女','射手與雙魚'],a:1},
+  {q:'金星與太陽的最大角距約為？',opts:['28°','48°','76°','120°'],a:2},
+  {q:'金星逆行週期是？',opts:['每年 3 次','約每 18 個月一次','每月一次','每 2 年一次'],a:1},
+  {q:'下列哪一項不是金星的傳統議題？',opts:['美感與藝術','愛情與婚姻','深度蛻變','金錢與物質'],a:2},
+  {q:'金星合相火星，最常表現為？',opts:['冷靜分析','激情衝突的吸引力','長期承諾','宗教情感'],a:1},
+  {q:'金星落第 7 宮的人最可能？',opts:['獨身主義','以伴侶關係為人生主軸','秘密戀情','跨國戀情'],a:1},
+  {q:'瑪麗蓮·夢露的金星落在哪個星座？',opts:['牡羊','金牛','獅子','雙魚'],a:0},
+  {q:'金星雙魚的愛情風格傾向？',opts:['理性務實','浪漫救贖','直接衝撞','友情式'],a:1},
+  {q:'金星與冥王星合相，最直覺的愛情模式是？',opts:['輕鬆自由','靈魂伴侶式的占有與蛻變','友誼為主','長期承諾'],a:1},
+  {q:'下列哪個不是金星管轄的領域？',opts:['珠寶','時尚','戰爭','料理'],a:2},
+];
+const DAILY_LINES = [
+  '今天為自己泡一杯好茶，慢慢喝完。金星在你品嚐的過程裡長出來。',
+  '挑一件你最喜歡的舊衣服穿出門。讓喜歡的東西陪你過日常。',
+  '今天看一個藝術作品，不分析，純粹被美打到。',
+  '為某個你重視的人寫一段話，用比平常多 30% 的具體。',
+  '走一條漂亮的路回家。即使繞遠也值得。',
+  '今天買一束花。不為紀念日，只為你自己。',
+  '練習對自己說一個讚美。不是「你做得好」─ 是「你今天哪裡好看」。',
+  '清掉一樣不再喜歡的物件。讓位子給更喜歡的東西。',
+  '今天吃一頓「慢一點」的餐。不滑手機，只感受味道。',
+  '寫下三個你覺得「美」的瞬間。具體到讓人能想像那個畫面。',
+  '把今天最喜歡的歌循環播放兩次。讓某個感覺真的進到身體裡。',
+  '今天讚美一個陌生人。一個具體的細節，不是空泛的客氣。',
+  '拍一張你覺得世界很好的照片。不發出去，只給未來的自己看。',
+  '為某個你想念的人，做一件他不知道的小事。',
+];
+
+/* State */
+const KEY={
+  xp:'astro_venus_xp',level:'astro_venus_level',
+  housesU:'astro_venus_houses',signsU:'astro_venus_signs',
+  aspectsU:'astro_venus_aspects',gems:'astro_venus_gems',
+  hearts:'astro_venus_hearts',triviaScore:'astro_venus_trivia_score',
+  triviaCombo:'astro_venus_trivia_combo',easter:'astro_venus_easter_bloom',
+  flowerCount:'astro_venus_flower_count',
+  visit:'astro_venus_last_visit',streak:'astro_venus_streak',flashBest:'astro_venus_flash_best'
+};
+const LEVELS=[
+  {min:0,name:'新手',next:300},{min:300,name:'時尚達人',next:800},
+  {min:800,name:'美學大師',next:1500},{min:1500,name:'繆思女神',next:9999}
+];
+const State={
+  xp:0,level:1,hearts:0,housesU:[],signsU:[],aspectsU:[],
+  triviaScore:0,triviaCombo:0,triviaIdx:0,
+  flowerCount:0,streak:1,flashBest:null
+};
+function load(){
+  State.xp=+localStorage.getItem(KEY.xp)||0;
+  State.level=+localStorage.getItem(KEY.level)||1;
+  State.hearts=+localStorage.getItem(KEY.hearts)||0;
+  State.housesU=JSON.parse(localStorage.getItem(KEY.housesU))||[];
+  State.signsU=JSON.parse(localStorage.getItem(KEY.signsU))||[];
+  State.aspectsU=JSON.parse(localStorage.getItem(KEY.aspectsU))||[];
+  State.triviaScore=+localStorage.getItem(KEY.triviaScore)||0;
+  State.triviaCombo=+localStorage.getItem(KEY.triviaCombo)||0;
+  State.flowerCount=+localStorage.getItem(KEY.flowerCount)||0;
+  State.flashBest=JSON.parse(localStorage.getItem(KEY.flashBest))||null;
+  const last=localStorage.getItem(KEY.visit);const today=new Date().toDateString();
+  if(last!==today){
+    const yesterday=new Date(Date.now()-86400000).toDateString();
+    State.streak=(last===yesterday)?(+localStorage.getItem(KEY.streak)||1)+1:1;
+    localStorage.setItem(KEY.visit,today);localStorage.setItem(KEY.streak,State.streak);
+    if(State.streak%3===0)addXP(50,'連續登入 '+State.streak+' 天');
+  } else State.streak=+localStorage.getItem(KEY.streak)||1;
+}
+function save(){
+  localStorage.setItem(KEY.xp,State.xp);localStorage.setItem(KEY.level,State.level);
+  localStorage.setItem(KEY.hearts,State.hearts);
+  localStorage.setItem(KEY.housesU,JSON.stringify(State.housesU));
+  localStorage.setItem(KEY.signsU,JSON.stringify(State.signsU));
+  localStorage.setItem(KEY.aspectsU,JSON.stringify(State.aspectsU));
+  localStorage.setItem(KEY.triviaScore,State.triviaScore);
+  localStorage.setItem(KEY.triviaCombo,State.triviaCombo);
+  localStorage.setItem(KEY.flowerCount,State.flowerCount);
+}
+function addXP(n,reason){
+  State.xp+=n;
+  const before=State.level;
+  while(State.level<LEVELS.length&&State.xp>=LEVELS[State.level-1].next)State.level++;
+  if(State.level!==before)toast('Level Up → '+LEVELS[State.level-1].name,'lv');
+  toast('+'+n+' 魅力'+(reason?' · '+reason:''));refreshHUD();save();
+}
+function addHearts(n){State.hearts+=n;document.getElementById('hud-hearts').textContent=State.hearts;save()}
+function refreshHUD(){
+  const tier=LEVELS[State.level-1];const pct=Math.min(100,Math.round((State.xp-tier.min)/(tier.next-tier.min)*100));
+  document.getElementById('hud-level').textContent=State.level;
+  document.getElementById('hud-xp-num').textContent=State.xp;
+  document.querySelector('.xp-bar').style.setProperty('--xp-pct',pct+'%');
+  document.getElementById('hud-hearts').textContent=State.hearts;
+  // 更新雷達 SVG（依解鎖數量擴張）
+  const r1=Math.min(80,40+State.signsU.length*3);
+  const r2=Math.min(80,40+State.housesU.length*3);
+  const r3=Math.min(80,40+State.aspectsU.length);
+  const r4=Math.min(80,40+State.hearts*2);
+  const r5=Math.min(80,40+State.triviaScore/10);
+  const pts=[
+    [0,-r1],[Math.round(r2*.95),-Math.round(r2*.31)],
+    [Math.round(r3*.59),Math.round(r3*.81)],[-Math.round(r4*.59),Math.round(r4*.81)],
+    [-Math.round(r5*.95),-Math.round(r5*.31)]
+  ];
+  document.getElementById('r-poly').setAttribute('points',pts.map(p=>p.join(',')).join(' '));
+}
+function toast(msg,t){
+  const w=document.getElementById('toast-wrap');const el=document.createElement('div');el.className='toast';
+  if(t==='lv')el.style.borderColor='var(--cream)',el.style.color='var(--rose-gold-dark)',el.style.background='linear-gradient(135deg,#FFFCFA,var(--cream))';
+  el.textContent=msg;w.appendChild(el);
+  setTimeout(()=>{el.style.transition='opacity .4s';el.style.opacity=0;setTimeout(()=>el.remove(),400)},2600);
+}
+
+/* SVG 寶石生成器 */
+const GEM_COLORS=['#C2384C','#3F8E5A','#3D6CB6','#7A9CC9','#E8B341','#7AA84B','#E89DC5','#1E1E1E','#5BA9D6','#A88E6E','#9C7BC9','#7DC4E8'];
+function gemSVG(idx){
+  const c=GEM_COLORS[idx%12];
+  return `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="gg${idx}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFFCFA"/><stop offset="60%" stop-color="${c}"/></linearGradient></defs>
+    <polygon points="30,4 50,20 56,36 45,54 15,54 4,36 10,20" fill="url(#gg${idx})" stroke="${c}" stroke-width="1.5"/>
+    <polygon points="30,4 50,20 30,32 10,20" fill="rgba(255,252,250,.55)"/>
+    <polygon points="50,20 56,36 30,32" fill="rgba(255,252,250,.25)"/>
+    <polygon points="10,20 30,32 4,36" fill="rgba(255,252,250,.25)"/>
+  </svg>`;
+}
+
+/* 渲染 */
+function renderHouses(){
+  const grid=document.getElementById('houses-grid');
+  HOUSES.forEach(h=>{
+    const c=document.createElement('div');c.className='gem-card'+(State.housesU.includes(h.n)?' unlocked':'');
+    c.innerHTML=`<span class="badge">♡ unlocked</span>
+      <div class="gem-svg">${gemSVG(h.n-1)}</div>
+      <span class="num">${String(h.n).padStart(2,'0')}</span>
+      <h4>第 ${h.n} 宮 · ${h.name}</h4>
+      <div class="sub">${h.sub}</div>
+      <p>${h.body}</p>
+      <p class="behavior">表現：${h.behavior}</p>
+      <div class="case">— ${h.caseStr}</div>`;
+    c.addEventListener('click',()=>{
+      if(!State.housesU.includes(h.n)){State.housesU.push(h.n);c.classList.add('unlocked');addXP(20,'解鎖第'+h.n+'宮');addHearts(1);}
+    });
+    grid.appendChild(c);
+  });
+}
+function renderSigns(){
+  const grid=document.getElementById('signs-grid');
+  SIGNS.forEach(s=>{
+    const c=document.createElement('div');c.className='gem-card'+(State.signsU.includes(s.n)?' unlocked':'');
+    c.innerHTML=`<span class="badge">♡ collected</span>
+      <div class="gem-svg">${gemSVG(s.n+5)}</div>
+      <span class="num">${s.symbol}</span>
+      <h4>金星 / ${s.name}座 · ${s.gem}</h4>
+      <div class="sub">${s.sub}</div>
+      <p>${s.body}</p>
+      <p class="behavior">表現：${s.behavior}</p>
+      <div class="case">— ${s.caseStr}</div>`;
+    c.addEventListener('click',()=>{
+      if(!State.signsU.includes(s.n)){State.signsU.push(s.n);c.classList.add('unlocked');addXP(20,'收集 '+s.gem);addHearts(1);}
+    });
+    grid.appendChild(c);
+  });
+}
+function renderMatrix(){
+  const m=document.getElementById('aspect-matrix');m.innerHTML='';
+  m.appendChild(headDiv(''));
+  ASPECT_TYPES.forEach(t=>m.appendChild(headDiv(t.name+' '+t.ang)));
+  ASPECT_PLANETS.forEach(p=>{
+    const rh=document.createElement('div');rh.className='row-head';
+    rh.innerHTML=`<span style="font-size:1.4rem">${p.sym}</span>${p.name}`;m.appendChild(rh);
+    ASPECT_TYPES.forEach(t=>{
+      const cx=document.createElement('div');
+      cx.className='cellx'+(State.aspectsU.includes(p.key+t.key)?' read':'');
+      cx.innerHTML=`<span class="ang">${t.name} ${t.ang}</span>${ASPECTS[p.key][t.key].slice(0,52)}…`;
+      cx.addEventListener('click',()=>openAspect(p,t));m.appendChild(cx);
+    });
+  });
+}
+function headDiv(text){const d=document.createElement('div');d.className='head';d.textContent=text;return d;}
+function openAspect(p,t){
+  document.getElementById('m-ang').textContent=`${t.name} ${t.ang} · 金星 × ${p.name}`;
+  document.getElementById('m-title').textContent=`♀ × ${p.sym} ${p.name}`;
+  document.getElementById('m-body').textContent=ASPECTS[p.key][t.key];
+  document.getElementById('aspect-modal').classList.add('show');
+  const k=p.key+t.key;
+  if(!State.aspectsU.includes(k)){State.aspectsU.push(k);addXP(5,'閱讀 '+t.name);addHearts(1);renderMatrix();}
+}
+function closeAspectModal(){document.getElementById('aspect-modal').classList.remove('show')}
+
+/* 寶石配對遊戲 */
+let flash={cards:[],opened:[],matched:0,moves:0};
+function buildFlash(){
+  const board=document.getElementById('flash-board');board.innerHTML='';
+  flash={cards:[],opened:[],matched:0,moves:0};
+  const ids=[0,1,2,3,4,5,0,1,2,3,4,5].sort(()=>Math.random()-.5);
+  ids.forEach(id=>{
+    const c=document.createElement('div');c.className='flash-card';c.dataset.id=id;
+    c.innerHTML=`<div class="inner"><div class="face front">♀</div><div class="face back">${gemSVG(id+5)}</div></div>`;
+    c.addEventListener('click',()=>onFlashClick(c));
+    board.appendChild(c);flash.cards.push(c);
+  });
+  updateFlashStatus();
+}
+function onFlashClick(c){
+  if(c.classList.contains('flipped')||c.classList.contains('matched'))return;
+  if(flash.opened.length>=2)return;
+  c.classList.add('flipped');flash.opened.push(c);
+  if(flash.opened.length===2){
+    flash.moves++;updateFlashStatus();
+    const [a,b]=flash.opened;
+    if(a.dataset.id===b.dataset.id){
+      a.classList.add('matched');b.classList.add('matched');flash.matched++;flash.opened=[];updateFlashStatus();
+      if(flash.matched===6){
+        addXP(80,'珠寶鑑定師');addHearts(6);
+        if(!State.flashBest||flash.moves<State.flashBest.moves){State.flashBest={moves:flash.moves,date:new Date().toISOString()};localStorage.setItem(KEY.flashBest,JSON.stringify(State.flashBest));}
+      }
+    } else setTimeout(()=>{a.classList.remove('flipped');b.classList.remove('flipped');flash.opened=[]},800);
+  }
+}
+function updateFlashStatus(){
+  const best=State.flashBest?` ─ 最佳 ${State.flashBest.moves} 步`:'';
+  document.getElementById('flash-status').textContent=`已配對 ${flash.matched} / 6 ─ 翻牌 ${flash.moves} 次${best}`;
+}
+function restartFlash(){buildFlash()}
+
+/* Trivia */
+function loadTrivia(){
+  State.triviaIdx=Math.floor(Math.random()*TRIVIA_BANK.length);
+  const t=TRIVIA_BANK[State.triviaIdx];
+  document.getElementById('trivia-q').textContent=t.q;
+  const opts=document.getElementById('trivia-opts');opts.innerHTML='';
+  t.opts.forEach((o,i)=>{
+    const b=document.createElement('button');b.className='trivia-opt';b.textContent=o;
+    b.addEventListener('click',()=>onTriviaPick(b,i));opts.appendChild(b);
+  });
+  document.getElementById('trivia-combo').textContent=State.triviaCombo;
+  document.getElementById('trivia-score').textContent=State.triviaScore;
+}
+function onTriviaPick(btn,i){
+  const t=TRIVIA_BANK[State.triviaIdx];
+  document.querySelectorAll('.trivia-opt').forEach(o=>o.style.pointerEvents='none');
+  if(i===t.a){
+    btn.classList.add('correct');State.triviaCombo++;addHearts(1);
+    const gain=10*Math.max(1,State.triviaCombo);State.triviaScore+=gain;addXP(gain,'答對 ×'+State.triviaCombo);
+  } else {btn.classList.add('wrong');State.triviaCombo=0;toast('愛心 combo 歸零')}
+  document.getElementById('trivia-combo').textContent=State.triviaCombo;
+  document.getElementById('trivia-score').textContent=State.triviaScore;save();
+  setTimeout(loadTrivia,1300);
+}
+
+/* 每日抽卡 */
+function loadDaily(){
+  const today=new Date();
+  const seed=today.getFullYear()*10000+(today.getMonth()+1)*100+today.getDate();
+  const idx=seed%DAILY_LINES.length;
+  document.getElementById('daily-card').innerHTML=DAILY_LINES[idx]+'<span class="sig">— Venus, '+today.toISOString().slice(0,10)+'</span>';
+  document.getElementById('visit-streak').textContent=State.streak;
+}
+
+/* 連點花朵 */
+function setupFlower(){
+  const f=document.getElementById('flower-easter');
+  const handler=()=>{
+    State.flowerCount++;localStorage.setItem(KEY.flowerCount,State.flowerCount);
+    document.getElementById('flower-count').textContent=State.flowerCount;
+    f.style.transform='scale(1.3) rotate('+(State.flowerCount*36)+'deg)';
+    setTimeout(()=>f.style.transform='',300);
+    if(State.flowerCount>=10){
+      State.flowerCount=0;localStorage.setItem(KEY.flowerCount,0);
+      document.getElementById('flower-count').textContent=0;
+      bloomBurst();
+      if(localStorage.getItem(KEY.easter)!=='1'){addXP(120,'★ 花瓣彩蛋');localStorage.setItem(KEY.easter,'1')}
+      else toast('★ 滿園花雨已開過');
+    }
+  };
+  f.addEventListener('click',handler);
+  f.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')handler()});
+}
+function bloomBurst(){
+  const b=document.getElementById('bloom');b.innerHTML='';b.classList.add('show');
+  const flowers=['🌸','🌺','🌷','💐','🌹','🌻'];
+  for(let i=0;i<60;i++){
+    const p=document.createElement('div');p.className='petal-burst';p.textContent=flowers[i%flowers.length];
+    p.style.left=(Math.random()*100)+'vw';p.style.top=(Math.random()*40+30)+'vh';
+    p.style.setProperty('--dx',(Math.random()*600-300)+'px');
+    p.style.setProperty('--dy',(Math.random()*600-300)+'px');
+    p.style.setProperty('--rot',(Math.random()*720-360)+'deg');
+    p.style.animationDelay=(Math.random()*.4)+'s';
+    b.appendChild(p);
+  }
+  setTimeout(()=>b.classList.remove('show'),2400);
+}
+
+/* 花瓣 canvas 飄落 */
+function petalsFall(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const c=document.getElementById('petals'),ctx=c.getContext('2d');
+  let w=c.width=innerWidth,h=c.height=innerHeight;
+  const colors=['rgba(232,180,184,.7)','rgba(255,203,164,.6)','rgba(248,215,218,.7)','rgba(255,243,176,.5)'];
+  const arr=Array.from({length:30},()=>({x:Math.random()*w,y:Math.random()*h,r:6+Math.random()*8,vy:.3+Math.random()*.7,vx:Math.sin(Math.random()*6.28)*.3,rot:Math.random()*6.28,vr:.005+Math.random()*.01,c:colors[Math.floor(Math.random()*colors.length)]}));
+  function frame(){
+    ctx.clearRect(0,0,w,h);
+    arr.forEach(p=>{
+      p.y+=p.vy;p.x+=p.vx+Math.sin(p.y/40)*.4;p.rot+=p.vr;
+      if(p.y>h+10){p.y=-10;p.x=Math.random()*w}
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.c;
+      ctx.beginPath();ctx.ellipse(0,0,p.r,p.r*.6,0,0,6.28);ctx.fill();
+      ctx.restore();
+    });
+    requestAnimationFrame(frame);
+  }frame();
+  addEventListener('resize',()=>{w=c.width=innerWidth;h=c.height=innerHeight});
+}
+
+/* 分享 */
+function openShare(){
+  document.getElementById('sc-level').textContent=`LV.${State.level} / ${LEVELS[State.level-1].name}`;
+  document.getElementById('sc-xp').textContent=State.xp;
+  document.getElementById('sc-houses').textContent=`${State.housesU.length} / 12`;
+  document.getElementById('sc-signs').textContent=`${State.signsU.length} / 12`;
+  document.getElementById('sc-aspects').textContent=`${State.aspectsU.length} / 45`;
+  document.getElementById('sc-hearts').textContent=`♡ ${State.hearts}`;
+  document.getElementById('sc-streak').textContent=`${State.streak} 天`;
+  document.getElementById('sc-date').textContent=new Date().toISOString().slice(0,10);
+  document.getElementById('share-modal').classList.add('show');
+}
+function closeShare(){document.getElementById('share-modal').classList.remove('show')}
+async function downloadShare(){
+  if(typeof html2canvas==='undefined'){toast('html2canvas 載入中');return}
+  const card=document.getElementById('share-card');
+  const canvas=await html2canvas(card,{scale:2,backgroundColor:'#FFFCFA'});
+  const link=document.createElement('a');link.download='venus-card.png';link.href=canvas.toDataURL();link.click();
+  addXP(40,'名片匯出');
+}
+
+/* 啟動 */
+addEventListener('DOMContentLoaded',()=>{
+  load();renderHouses();renderSigns();renderMatrix();buildFlash();loadTrivia();loadDaily();setupFlower();refreshHUD();petalsFall();
+  document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('show')}));
+  addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'))});
+});
+</script>
+</body>
+</html>

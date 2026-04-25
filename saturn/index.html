@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>土星｜修行試煉打卡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0a0a0a;
+  --bone:#f0ece4;
+  --concrete:#1a1a1a;
+  --mid:#2e2e2e;
+  --warm:#3a3530;
+  --gold:#c9a84c;
+  --gold-dim:#7a6530;
+  --ash:#8a8480;
+  --light-ash:#c5c0b8;
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+  --serif:'EB Garamond',serif;
+  --display:'Cinzel',serif;
+  --accent:'Oswald',sans-serif;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{
+  background-color:var(--concrete);
+  color:var(--bone);
+  font-family:var(--serif);
+  line-height:1.7;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:var(--grain);
+  pointer-events:none;z-index:9999;opacity:.4;
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1,h2,h3,h4{font-family:var(--display);letter-spacing:.08em;line-height:1.2}
+h1{font-size:clamp(2.4rem,6vw,5rem);font-weight:900}
+h2{font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:600}
+h3{font-size:clamp(1.1rem,2vw,1.6rem);font-weight:400}
+h4{font-size:1rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase}
+p{font-size:clamp(.95rem,1.5vw,1.1rem);color:var(--light-ash)}
+strong{color:var(--bone);font-weight:600}
+.accent-text{font-family:var(--accent);letter-spacing:.12em;text-transform:uppercase}
+.gold{color:var(--gold)}
+.gold-dim{color:var(--gold-dim)}
+
+/* ===== LAYOUT ===== */
+.container{max-width:1100px;margin:0 auto;padding:0 2rem}
+section{padding:6rem 0;border-bottom:1px solid #2a2a2a}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}
+@media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+/* ===== SECTION LABELS ===== */
+.section-label{
+  font-family:var(--accent);
+  font-size:.75rem;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--gold-dim);
+  margin-bottom:1rem;display:block;
+}
+.section-divider{
+  width:60px;height:2px;background:var(--gold);
+  margin:1.5rem 0;
+}
+
+/* ===== CARDS ===== */
+.card{
+  background:#111;
+  border:1px solid #2e2e2e;
+  padding:2rem;
+  position:relative;
+  transition:border-color .3s,transform .3s,box-shadow .3s;
+}
+.card:hover{
+  border-color:var(--gold-dim);
+  transform:translateY(-3px);
+  box-shadow:0 12px 40px rgba(0,0,0,.6);
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;
+  width:3px;height:0;background:var(--gold);
+  transition:height .4s ease;
+}
+.card:hover::before{height:100%}
+
+/* ===== BUTTONS ===== */
+.btn{
+  font-family:var(--accent);
+  font-size:.85rem;letter-spacing:.2em;
+  text-transform:uppercase;
+  padding:.8rem 2rem;
+  border:1px solid var(--gold);
+  background:transparent;
+  color:var(--gold);
+  cursor:pointer;
+  transition:background .3s,color .3s;
+  display:inline-block;
+}
+.btn:hover{background:var(--gold);color:var(--ink)}
+.btn-solid{background:var(--gold);color:var(--ink)}
+.btn-solid:hover{background:transparent;color:var(--gold)}
+
+/* ===== NAV ===== */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(10,10,10,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid #222;
+  padding:.8rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo{font-family:var(--display);font-size:1.1rem;letter-spacing:.2em;color:var(--gold)}
+.nav-links{display:flex;gap:1.5rem;list-style:none}
+.nav-links a{
+  font-family:var(--accent);font-size:.7rem;
+  letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ash);text-decoration:none;
+  transition:color .2s;
+}
+.nav-links a:hover{color:var(--bone)}
+.nav-xp{
+  font-family:var(--accent);font-size:.75rem;
+  color:var(--gold);letter-spacing:.1em;
+}
+@media(max-width:768px){.nav-links{display:none}}
+
+/* ===== HERO ===== */
+#hero{
+  min-height:100vh;padding:0;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+  background:#080808;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(135deg,#0a0a0a 0%,#111 40%,#0d0d0d 100%);
+}
+.hero-light{
+  position:absolute;top:-20%;right:-10%;
+  width:60vw;height:80vh;
+  background:radial-gradient(ellipse,rgba(201,168,76,.04) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-light-2{
+  position:absolute;bottom:-20%;left:-10%;
+  width:50vw;height:60vh;
+  background:radial-gradient(ellipse,rgba(201,168,76,.03) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-content{
+  position:relative;z-index:2;
+  text-align:center;padding:2rem;
+}
+.hero-symbol{
+  font-size:clamp(4rem,10vw,8rem);
+  display:block;margin-bottom:1.5rem;
+  animation:symbolFloat 8s ease-in-out infinite;
+  filter:drop-shadow(0 0 30px rgba(201,168,76,.3));
+  color:var(--gold);
+  font-family:var(--display);
+}
+@keyframes symbolFloat{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  25%{transform:translateY(-12px) rotate(1deg)}
+  75%{transform:translateY(-6px) rotate(-1deg)}
+}
+.hero-eyebrow{
+  font-family:var(--accent);
+  font-size:.8rem;letter-spacing:.4em;
+  color:var(--gold-dim);margin-bottom:1.5rem;
+}
+.hero-title{
+  font-size:clamp(3rem,8vw,7rem);
+  font-weight:900;line-height:1;
+  margin-bottom:1rem;
+}
+.hero-subtitle{
+  font-family:var(--accent);
+  font-size:clamp(1rem,2.5vw,1.5rem);
+  letter-spacing:.25em;color:var(--ash);
+  margin-bottom:3rem;
+}
+.hero-glass{
+  display:inline-block;
+  background:rgba(255,255,255,.02);
+  border:1px solid rgba(201,168,76,.2);
+  backdrop-filter:blur(20px);
+  padding:1.5rem 3rem;
+  margin-bottom:3rem;
+  position:relative;
+  animation:glassPulse 4s ease-in-out infinite;
+}
+@keyframes glassPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,.1)}
+  50%{box-shadow:0 0 40px 10px rgba(201,168,76,.08)}
+}
+.hero-glass p{
+  font-family:var(--display);
+  font-size:1rem;letter-spacing:.2em;
+  color:var(--light-ash);
+}
+.hero-scroll{
+  position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);
+  font-family:var(--accent);font-size:.65rem;
+  letter-spacing:.3em;color:var(--ash);
+  animation:scrollPulse 2s ease-in-out infinite;
+}
+@keyframes scrollPulse{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* ===== MYTH SECTION ===== */
+#myth{background:#0d0d0d}
+.myth-inner{
+  display:grid;grid-template-columns:1fr 2fr;gap:4rem;
+  align-items:center;
+}
+.myth-portrait{
+  aspect-ratio:3/4;background:#111;
+  border:1px solid #2a2a2a;
+  display:flex;align-items:center;justify-content:center;
+  font-size:6rem;position:relative;overflow:hidden;
+}
+.myth-portrait img{
+  width:100%;height:100%;object-fit:cover;
+  filter:grayscale(1) contrast(1.2);
+}
+.myth-portrait::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(10,10,10,.6) 0%,transparent 60%);
+}
+@media(max-width:768px){.myth-inner{grid-template-columns:1fr}}
+
+/* ===== DISCIPLINE CORE ===== */
+#discipline{background:#0a0a0a}
+.progress-bar-wrap{margin:1rem 0}
+.progress-label{
+  display:flex;justify-content:space-between;
+  font-family:var(--accent);font-size:.7rem;
+  letter-spacing:.2em;color:var(--ash);
+  margin-bottom:.4rem;
+}
+.progress-track{
+  height:4px;background:#1e1e1e;
+  position:relative;overflow:hidden;
+}
+.progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));
+  transition:width 1.5s cubic-bezier(.25,.46,.45,.94);
+  position:relative;
+}
+.progress-fill::after{
+  content:'';position:absolute;right:0;top:50%;
+  transform:translateY(-50%);
+  width:8px;height:8px;border-radius:50%;
+  background:var(--gold);
+  box-shadow:0 0 8px var(--gold);
+}
+.discipline-traits{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;
+  margin-top:2.5rem;
+}
+@media(max-width:768px){.discipline-traits{grid-template-columns:1fr 1fr}}
+.trait-block{
+  background:#111;border:1px solid #222;
+  padding:1.5rem 1rem;text-align:center;
+}
+.trait-num{
+  font-family:var(--display);font-size:2.5rem;
+  font-weight:900;color:var(--gold);
+  display:block;line-height:1;
+}
+.trait-label{
+  font-family:var(--accent);font-size:.65rem;
+  letter-spacing:.2em;color:var(--ash);
+  margin-top:.3rem;display:block;
+}
+
+/* ===== HOUSES GRID ===== */
+#houses{background:#0d0d0d}
+.houses-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:1.5rem;margin-top:2rem;
+}
+.house-card{
+  background:#111;border:1px solid #252525;
+  padding:1.8rem;position:relative;
+  transition:all .3s;cursor:default;
+}
+.house-card:hover{
+  border-color:var(--gold-dim);
+  box-shadow:inset 0 0 40px rgba(201,168,76,.04);
+}
+.house-num{
+  font-family:var(--display);font-size:3rem;
+  font-weight:900;
+  color:#1e1e1e;
+  position:absolute;top:1rem;right:1.2rem;
+  line-height:1;user-select:none;
+  transition:color .3s;
+}
+.house-card:hover .house-num{color:#2a2a2a}
+.house-tag{
+  font-family:var(--accent);font-size:.65rem;
+  letter-spacing:.25em;color:var(--gold-dim);
+  margin-bottom:.4rem;display:block;
+}
+.house-card h3{
+  font-size:1.05rem;margin-bottom:.6rem;
+  color:var(--bone);
+}
+.house-card p{font-size:.9rem;line-height:1.65;color:var(--light-ash)}
+.house-example{
+  margin-top:.8rem;padding-top:.8rem;
+  border-top:1px solid #222;
+  font-size:.82rem;color:var(--ash);
+  font-style:italic;
+}
+
+/* ===== SIGNS GRID ===== */
+#signs{background:#0a0a0a}
+.signs-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1.5rem;margin-top:2rem;
+}
+.sign-card{
+  background:#111;border:1px solid #252525;
+  padding:1.8rem;position:relative;
+  transition:all .3s;
+}
+.sign-card:hover{border-color:var(--gold-dim)}
+.sign-symbol{
+  font-size:2.2rem;display:block;
+  margin-bottom:.5rem;
+  filter:grayscale(1);
+  transition:filter .3s;
+}
+.sign-card:hover .sign-symbol{filter:none}
+.sign-card h3{font-size:1.05rem;margin-bottom:.5rem;color:var(--bone)}
+.sign-card p{font-size:.88rem;color:var(--light-ash);line-height:1.65}
+.sign-celeb{
+  margin-top:.8rem;padding-top:.8rem;
+  border-top:1px solid #1e1e1e;
+  font-family:var(--accent);font-size:.65rem;
+  letter-spacing:.15em;color:var(--gold-dim);
+}
+
+/* ===== ASPECTS MATRIX ===== */
+#aspects{background:#0d0d0d}
+.aspect-matrix{
+  overflow-x:auto;margin-top:2rem;
+}
+.matrix-table{
+  width:100%;min-width:700px;
+  border-collapse:collapse;
+}
+.matrix-table th{
+  font-family:var(--accent);font-size:.65rem;
+  letter-spacing:.2em;color:var(--gold-dim);
+  padding:.6rem .8rem;
+  border:1px solid #222;
+  background:#0d0d0d;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.matrix-table td{
+  padding:.7rem .8rem;
+  border:1px solid #1e1e1e;
+  font-size:.78rem;line-height:1.5;
+  color:var(--light-ash);
+  vertical-align:top;
+  transition:background .2s;
+}
+.matrix-table tr:hover td{background:#141414}
+.matrix-table td:first-child{
+  font-family:var(--accent);font-size:.7rem;
+  letter-spacing:.15em;color:var(--gold);
+  font-weight:700;background:#111;
+  white-space:nowrap;
+}
+.aspect-conj{color:#e8d5a0}
+.aspect-opp{color:#c5a0a0}
+.aspect-tri{color:#a0c5a8}
+.aspect-sq{color:#c5b0a0}
+.aspect-sex{color:#a0b5c5}
+
+/* ===== CASES ===== */
+#cases{background:#0a0a0a}
+.case-block{
+  background:#111;border:1px solid #222;
+  padding:2.5rem;margin-bottom:1.5rem;
+  position:relative;
+}
+.case-block::before{
+  content:'';position:absolute;
+  top:0;left:0;width:100%;height:3px;
+  background:linear-gradient(90deg,var(--gold-dim),transparent);
+}
+.case-name{
+  font-family:var(--display);font-size:1.6rem;
+  font-weight:600;margin-bottom:.3rem;
+}
+.case-meta{
+  font-family:var(--accent);font-size:.7rem;
+  letter-spacing:.2em;color:var(--gold-dim);
+  margin-bottom:1rem;
+}
+.case-body{font-size:.95rem;color:var(--light-ash);line-height:1.75}
+
+/* ===== GUIDE ===== */
+#guide{background:#0d0d0d}
+.timeline{position:relative;padding-left:3rem}
+.timeline::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:1px;background:linear-gradient(to bottom,var(--gold),transparent);
+}
+.timeline-item{
+  position:relative;margin-bottom:2.5rem;
+}
+.timeline-dot{
+  position:absolute;left:-3.35rem;top:.3rem;
+  width:12px;height:12px;border-radius:50%;
+  background:var(--gold);
+  box-shadow:0 0 12px rgba(201,168,76,.5);
+}
+.timeline-age{
+  font-family:var(--display);font-size:1.1rem;
+  color:var(--gold);font-weight:600;
+  margin-bottom:.3rem;
+}
+.timeline-body{font-size:.95rem;color:var(--light-ash);line-height:1.7}
+
+/* ===== GAMIFICATION ===== */
+#gamification{background:#080808}
+.xp-display{
+  background:#111;border:1px solid #252525;
+  padding:2.5rem;margin-bottom:2rem;
+  display:grid;grid-template-columns:1fr auto;
+  gap:2rem;align-items:center;
+}
+@media(max-width:600px){.xp-display{grid-template-columns:1fr}}
+.level-badge{
+  width:120px;height:120px;border-radius:50%;
+  border:3px solid var(--gold);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:#0a0a0a;
+  box-shadow:0 0 30px rgba(201,168,76,.2);
+  flex-shrink:0;
+}
+.level-badge .lv-num{
+  font-family:var(--display);font-size:2rem;
+  font-weight:900;color:var(--gold);line-height:1;
+}
+.level-badge .lv-label{
+  font-family:var(--accent);font-size:.6rem;
+  letter-spacing:.15em;color:var(--ash);
+}
+.xp-bar-wrap{margin-top:1rem}
+.xp-bar-track{height:6px;background:#1a1a1a;position:relative}
+.xp-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--gold-dim),var(--gold));
+  transition:width 1s ease;
+  position:relative;
+}
+
+/* ===== CHECKIN CALENDAR ===== */
+.checkin-section{
+  background:#111;border:1px solid #222;padding:2rem;
+  margin-bottom:2rem;
+}
+.checkin-title{
+  font-family:var(--accent);font-size:.8rem;
+  letter-spacing:.25em;color:var(--gold);
+  margin-bottom:1.2rem;text-transform:uppercase;
+}
+.calendar-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  gap:4px;margin-bottom:1rem;
+}
+.cal-day{
+  aspect-ratio:1;background:#1a1a1a;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--accent);font-size:.6rem;
+  color:#333;cursor:pointer;transition:all .2s;
+  position:relative;
+}
+.cal-day.checked{
+  background:rgba(201,168,76,.15);
+  color:var(--gold);
+  border:1px solid rgba(201,168,76,.3);
+}
+.cal-day.today{border:1px solid var(--gold)}
+.cal-day.checked::after{
+  content:'♄';position:absolute;
+  font-size:.5rem;bottom:1px;right:1px;
+  color:var(--gold-dim);
+}
+
+/* ===== STREAK ===== */
+.streak-row{
+  display:flex;gap:1rem;align-items:center;
+  margin-bottom:1.5rem;flex-wrap:wrap;
+}
+.streak-box{
+  background:#0d0d0d;border:1px solid #222;
+  padding:1rem 1.5rem;text-align:center;min-width:100px;
+}
+.streak-num{
+  font-family:var(--display);font-size:2rem;
+  font-weight:900;color:var(--bone);display:block;
+}
+.streak-lbl{
+  font-family:var(--accent);font-size:.6rem;
+  letter-spacing:.15em;color:var(--ash);
+}
+
+/* ===== BADGES ===== */
+.badges-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
+  gap:1rem;margin-bottom:2rem;
+}
+.badge{
+  background:#111;border:1px solid #1e1e1e;
+  padding:1.2rem;text-align:center;
+  position:relative;transition:all .3s;
+}
+.badge.unlocked{
+  border-color:var(--gold-dim);
+  background:rgba(201,168,76,.05);
+}
+.badge.locked{opacity:.3;filter:grayscale(1)}
+.badge-icon{font-size:2rem;display:block;margin-bottom:.4rem}
+.badge-name{
+  font-family:var(--accent);font-size:.6rem;
+  letter-spacing:.15em;color:var(--ash);
+  text-transform:uppercase;
+}
+.badge.unlocked .badge-name{color:var(--gold)}
+.badge-ring{
+  position:absolute;inset:-3px;
+  border:2px solid var(--gold);border-radius:50%;
+  display:none;
+  animation:ringPulse 2s ease-in-out infinite;
+}
+.badge.master-ring .badge-ring{display:block}
+@keyframes ringPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,.4);opacity:1}
+  50%{box-shadow:0 0 20px 5px rgba(201,168,76,.2);opacity:.8}
+}
+
+/* ===== WEEKLY CHALLENGE ===== */
+.challenge-block{
+  background:#111;border:1px solid #252525;
+  padding:2rem;margin-bottom:2rem;
+}
+.challenge-header{
+  display:flex;justify-content:space-between;
+  align-items:flex-start;margin-bottom:1rem;
+  flex-wrap:wrap;gap:1rem;
+}
+.challenge-status{
+  font-family:var(--accent);font-size:.65rem;
+  letter-spacing:.2em;padding:.3rem .8rem;
+  border:1px solid currentColor;
+}
+.status-active{color:var(--gold)}
+.status-done{color:#a0c5a8}
+
+/* ===== STELE WALL ===== */
+.stele-wall{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:1rem;margin-bottom:2rem;
+  min-height:100px;
+}
+.stele-item{
+  background:#111;border:1px solid #252525;
+  padding:1.2rem;position:relative;
+  overflow:hidden;
+}
+.stele-item::before{
+  content:'';position:absolute;
+  top:0;left:0;width:100%;height:2px;
+  background:linear-gradient(90deg,var(--gold-dim),transparent);
+}
+.stele-text{font-size:.85rem;color:var(--light-ash);line-height:1.6}
+.stele-date{
+  font-family:var(--accent);font-size:.6rem;
+  letter-spacing:.15em;color:var(--ash);
+  margin-top:.5rem;display:block;
+}
+.stele-empty{
+  font-family:var(--accent);font-size:.7rem;
+  letter-spacing:.2em;color:#2a2a2a;
+  display:flex;align-items:center;justify-content:center;
+  border:1px dashed #1e1e1e;padding:2rem;
+  grid-column:1/-1;
+}
+
+/* ===== CHECKIN BTN ===== */
+.checkin-btn{
+  font-family:var(--accent);font-size:.9rem;
+  letter-spacing:.25em;text-transform:uppercase;
+  padding:1.2rem 3rem;
+  background:var(--gold);color:var(--ink);
+  border:none;cursor:pointer;
+  transition:all .3s;width:100%;
+  position:relative;overflow:hidden;
+}
+.checkin-btn:hover{background:var(--bone)}
+.checkin-btn:active{transform:scale(.98)}
+.checkin-btn.done{
+  background:#1a1a1a;color:var(--gold-dim);
+  border:1px solid var(--gold-dim);
+  cursor:not-allowed;
+}
+.checkin-btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.1) 50%,transparent 100%);
+  transform:translateX(-100%);
+  transition:transform .6s;
+}
+.checkin-btn:not(.done):hover::after{transform:translateX(100%)}
+
+/* ===== ADD STELE ===== */
+.stele-form{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem}
+.stele-input{
+  flex:1;min-width:200px;
+  background:#0d0d0d;border:1px solid #2a2a2a;
+  color:var(--bone);font-family:var(--serif);font-size:.9rem;
+  padding:.8rem 1rem;outline:none;
+  transition:border-color .2s;
+}
+.stele-input:focus{border-color:var(--gold-dim)}
+.stele-input::placeholder{color:#333}
+
+/* ===== SHARE CARD ===== */
+#share{background:#080808}
+.share-card-wrap{
+  max-width:500px;margin:0 auto;
+}
+.share-card{
+  background:#0d0d0d;
+  border:2px solid var(--gold-dim);
+  padding:3rem 2.5rem;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.share-card::before,
+.share-card::after{
+  content:'';position:absolute;
+  width:100px;height:100px;
+  border:1px solid rgba(201,168,76,.15);
+}
+.share-card::before{top:-20px;left:-20px}
+.share-card::after{bottom:-20px;right:-20px}
+.share-symbol{
+  font-size:4rem;color:var(--gold);
+  display:block;margin-bottom:.5rem;
+  font-family:var(--display);
+}
+.share-title{
+  font-family:var(--display);
+  font-size:1.4rem;font-weight:900;
+  margin-bottom:.3rem;letter-spacing:.1em;
+}
+.share-sub{
+  font-family:var(--accent);font-size:.7rem;
+  letter-spacing:.3em;color:var(--gold-dim);
+  margin-bottom:1.5rem;text-transform:uppercase;
+}
+.share-stats{
+  display:grid;grid-template-columns:1fr 1fr;gap:1px;
+  background:#222;margin:1.5rem 0;
+}
+.share-stat{
+  background:#0d0d0d;padding:1rem;
+}
+.share-stat-num{
+  font-family:var(--display);font-size:1.8rem;
+  font-weight:900;color:var(--gold);display:block;
+}
+.share-stat-lbl{
+  font-family:var(--accent);font-size:.6rem;
+  letter-spacing:.15em;color:var(--ash);
+}
+.share-cert-text{
+  font-size:.8rem;color:var(--ash);margin-top:1rem;
+  line-height:1.6;
+}
+
+/* ===== FOOTER ===== */
+footer{
+  background:#050505;
+  padding:4rem 2rem 2rem;
+  text-align:center;border-top:1px solid #1a1a1a;
+}
+footer .footer-symbol{
+  font-size:3rem;color:var(--gold-dim);
+  display:block;margin-bottom:1rem;
+  font-family:var(--display);
+}
+footer p{font-size:.8rem;color:#444;letter-spacing:.1em}
+
+/* ===== SCROLL ANIMATIONS ===== */
+.fade-in{
+  opacity:0;transform:translateY(24px);
+  transition:opacity .8s ease,transform .8s ease;
+}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+/* ===== NOTIFICATION ===== */
+.notif{
+  position:fixed;bottom:2rem;right:2rem;z-index:1000;
+  background:#111;border:1px solid var(--gold);
+  padding:1rem 1.5rem;
+  font-family:var(--accent);font-size:.75rem;
+  letter-spacing:.15em;color:var(--gold);
+  transform:translateX(120%);
+  transition:transform .4s cubic-bezier(.25,.46,.45,.94);
+  max-width:300px;
+}
+.notif.show{transform:translateX(0)}
+
+/* ===== AUDIO TOGGLE ===== */
+.audio-toggle{
+  position:fixed;bottom:2rem;left:2rem;z-index:200;
+  background:#111;border:1px solid #333;
+  width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:1.1rem;
+  transition:border-color .2s;
+}
+.audio-toggle:hover{border-color:var(--gold-dim)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">♄ SATURN</span>
+  <ul class="nav-links">
+    <li><a href="#myth">神話</a></li>
+    <li><a href="#houses">十二宮</a></li>
+    <li><a href="#signs">十二星座</a></li>
+    <li><a href="#aspects">相位</a></li>
+    <li><a href="#gamification">打卡</a></li>
+  </ul>
+  <span class="nav-xp" id="nav-xp">Lv.1 學徒</span>
+</nav>
+
+<!-- AUDIO -->
+<div class="audio-toggle" id="audioToggle" title="切換鐘聲">🔔</div>
+
+<!-- ① HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-light"></div>
+  <div class="hero-light-2"></div>
+  <div class="hero-content fade-in">
+    <span class="hero-eyebrow">第七行星 · 克洛諾斯之星</span>
+    <span class="hero-symbol">♄</span>
+    <h1 class="hero-title">土 星</h1>
+    <p class="hero-subtitle">你的成年禮教練</p>
+    <div class="hero-glass">
+      <p>結構 · 紀律 · 時間 · 試煉 · 成熟</p>
+    </div>
+    <div>
+      <a href="#myth" class="btn">探索神話起源</a>
+      &nbsp;&nbsp;
+      <a href="#gamification" class="btn btn-solid">開始修行打卡</a>
+    </div>
+  </div>
+  <span class="hero-scroll">↓ SCROLL</span>
+</section>
+
+<!-- ② MYTH -->
+<section id="myth">
+  <div class="container">
+    <span class="section-label">Section 02</span>
+    <div class="myth-inner">
+      <div class="myth-portrait">
+        <img src="./images/myth.png" alt="克洛諾斯" onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'font-size:5rem;color:#2a2a2a;font-family:var(--display)\'>♄</span>'">
+      </div>
+      <div>
+        <h2>克洛諾斯 &amp; 薩圖恩</h2>
+        <div class="section-divider"></div>
+        <p style="margin-bottom:1.2rem">在希臘神話中，克洛諾斯（Kronos）是泰坦之王，以鐮刀閹割父親烏拉諾斯奪取統治權。然而，預言告訴他：他的子嗣終將推翻他。於是他逐一吞下妻子瑞亞所生的每一個孩子——赫斯提亞、黛美特、赫拉、哈得斯、波賽頓——直到宙斯被藏於克里特島，最終反殺，迫使他吐出所有兄姐。</p>
+        <p style="margin-bottom:1.2rem"><strong>薩圖恩（Saturn）</strong>是羅馬農業之神，統管收穫、秩序與時間循環。他的節日 Saturnalia 是古羅馬最盛大的狂歡，等級顛倒，主人服侍奴隸——象徵土星的另一面：在嚴格秩序崩解前，讓自由暫時閃現。</p>
+        <p><strong>占星原型：</strong>土星是時間本身的具體化。他吞噬子嗣，是「執行後果」的冷酷父親；他的農業面向，則提醒我們：紀律的最終目的是收穫，而非懲罰。在你的星盤中，土星所在的位置，就是你必須通過試煉才能獲得成熟果實的領域。</p>
+        <div class="section-divider"></div>
+        <div class="grid-3" style="margin-top:1.5rem">
+          <div>
+            <span class="accent-text gold" style="font-size:.7rem;display:block;margin-bottom:.3rem">公轉週期</span>
+            <span style="font-family:var(--display);font-size:1.8rem;color:var(--bone)">29.5年</span>
+          </div>
+          <div>
+            <span class="accent-text gold" style="font-size:.7rem;display:block;margin-bottom:.3rem">統治星座</span>
+            <span style="font-family:var(--display);font-size:1.8rem;color:var(--bone)">摩羯 · 水瓶</span>
+          </div>
+          <div>
+            <span class="accent-text gold" style="font-size:.7rem;display:block;margin-bottom:.3rem">入廟強勢</span>
+            <span style="font-family:var(--display);font-size:1.8rem;color:var(--bone)">天秤座</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ③ DISCIPLINE CORE -->
+<section id="discipline">
+  <div class="container">
+    <span class="section-label">Section 03</span>
+    <h2>紀律核心隱喻</h2>
+    <div class="section-divider"></div>
+    <div class="grid-2" style="gap:4rem;align-items:start">
+      <div>
+        <p style="margin-bottom:1.5rem">土星不是懲罰你，它是<strong>教練</strong>——那種你當下最討厭、日後最感激的那種。它的語言是：延遲、邊界、責任、後果。它測試你的結構是否真實，還是只是表面的自律。</p>
+        <p style="margin-bottom:2rem">你在土星宮位上的「失敗」，不是詛咒，而是課綱。每一次撞牆，都是考題在提高難度。土星的邏輯是：<strong>你越逃，牆越高；你越接受，牆才開始變門。</strong></p>
+        <div class="progress-bar-wrap">
+          <div class="progress-label"><span>基礎建構期（0–29歲）</span><span>第一土星回歸前</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:33%" data-target="33"></div></div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-label"><span>深化責任期（29–58歲）</span><span>兩次土星回歸之間</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:0" data-target="66"></div></div>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-label"><span>智慧傳承期（58歲後）</span><span>第二土星回歸後</span></div>
+          <div class="progress-track"><div class="progress-fill" style="width:0" data-target="88"></div></div>
+        </div>
+      </div>
+      <div>
+        <div class="discipline-traits">
+          <div class="trait-block">
+            <span class="trait-num">♄</span>
+            <span class="trait-label">結構</span>
+          </div>
+          <div class="trait-block">
+            <span class="trait-num">⏳</span>
+            <span class="trait-label">時間</span>
+          </div>
+          <div class="trait-block">
+            <span class="trait-num">⚖</span>
+            <span class="trait-label">後果</span>
+          </div>
+          <div class="trait-block">
+            <span class="trait-num">🏛</span>
+            <span class="trait-label">成熟</span>
+          </div>
+        </div>
+        <div class="card" style="margin-top:1.5rem">
+          <h4 style="color:var(--gold);margin-bottom:.8rem">土星的三個悖論</h4>
+          <p style="font-size:.88rem;margin-bottom:.6rem">① <strong>越抗拒，越受困</strong>——土星的課題不接受繞道，只能直面。</p>
+          <p style="font-size:.88rem;margin-bottom:.6rem">② <strong>越延遲，越扎實</strong>——土星給的獎賞來得慢，但結構堅固。</p>
+          <p style="font-size:.88rem">③ <strong>越老，越自由</strong>——通過土星試煉的人，晚年往往比早年更自由。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ④–⑮ TWELVE HOUSES -->
+<section id="houses">
+  <div class="container">
+    <span class="section-label">Section 04 – 15</span>
+    <h2>土星在十二宮</h2>
+    <div class="section-divider"></div>
+    <p style="margin-bottom:2rem">土星所落的宮位，是你這輩子必須透過持續努力才能建立穩固基礎的生命領域。它會先讓你感到匱乏、恐懼或限制，但在不斷修煉後，最終會成為你最堅實的優勢。</p>
+    <div class="houses-grid">
+
+      <div class="house-card fade-in">
+        <span class="house-num">I</span>
+        <span class="house-tag">第一宮 · 上升點</span>
+        <h3>自我呈現的重量</h3>
+        <p>對自身外表、個性與第一印象極度自我批判。早年常感到自己「格格不入」或顯得過於嚴肅。這批人天生帶有一種莊嚴感，容易讓人感覺有距離，卻也讓人敬重。土星在一宮的人往往年輕時顯老成，晚年反而越活越年輕——因為他們終於卸下了自我施加的盔甲。</p>
+        <div class="house-example">✦ 課題：建立真實自我認同，而非依賴外在評價。童年可能早熟被迫承擔責任。</div>
+      </div>
+
+      <div class="house-card fade-in">
+        <span class="house-num">II</span>
+        <span class="house-tag">第二宮 · 財富價值</span>
+        <h3>物質安全的試煉場</h3>
+        <p>對金錢、資源有深層焦慮，即使已相當富裕仍持續擔憂「不夠用」。這種恐懼源自對「匱乏」的根本恐懼，往往與童年資源匱乏或家庭財務壓力有關。修煉後，他們成為最懂得延遲享受、穩健理財的人——土星二宮型是長期財務計畫的天才。</p>
+        <div class="house-example">✦ 課題：重新定義「財富安全感」的來源，從内在自我價值感建立，而非帳戶數字。</div>
+      </div>
+
+      <div class="house-card fade-in">
+        <span class="house-num">III</span>
+        <span class="house-tag">第三宮 · 溝通思維</span>
+        <h3>語言與思維的雕琢</h3>
+        <p>說話、寫作、學習可能在早年充滿阻礙——口吃、學習障礙、被認為「說話太慢」。但土星在三宮的人說話經過深思，每個字有重量，不輕易開口，開口必有意義。手足關係複雜，或早早承擔兄弟姐妹的照顧責任。</p>
+        <div class="house-example">✦ 案例類型：克服表達困難後成為精準寫作者或公眾演說家。</div>
+      </div>
+
+      <div class="house-card fade-in">
+        <span class="house-num">IV</span>
+        <span class="house-tag">第四宮 · 家庭根源</span>
+        <h3>根的重建</h3>
+        <p>家庭背景沉重——嚴厲父母、家庭責任早早落肩、情感壓抑的原生家庭。「家」這個概念充滿複雜情感：既渴望安全感，又對根的匱乏感到悲傷。土星四宮的深層功課是：建立屬於自己定義的「家」，而非複製或反抗原生家庭。</p>
+        <div class="house-example">✦ 課題：療癒父母課題，讓自己成為自己真正的「家」。</div>
+      </div>
+
+      <div class="house-card fade-in">
+        <span class="house-num">V</span>
+        <span class="house-tag">第五宮 · 創造玩樂</span>
+        <h3>被壓縮的創造力</h3>
+        <p>玩耍、創作、戀愛在早年被嚴重壓抑——可能是「學業第一，娛樂禁止」的成長環境，也可能是童年太快被迫「大人化」。子女關係複雜，或對當父母有深層恐懼。創意需要被「允許」，才能真正開花。修煉後，這型人能以最嚴謹的方式打造最耐久的藝術作品。</p>
+        <div class="house-example">✦ 課題：讓自己「有資格」享樂與創作，不需每次都先「值得」。</div>
+      </div>
+
+      <div class="house-card fade-in">
+        <span class="house-num">VI</span>
+        <span class="house-tag">第六宮 · 日常健康</span>
+        <h3>工作紀律的極致</h3>
+        <p>對日常工作流程、健康管理有近乎強迫性的嚴格要求，或反過來因為「太難達到自己的標準」而完全崩潰。慢性健康問題往往源自長期壓力堆積。這型人有成為最佳執行者的潛力——但前提是先學會不用「完美」懲罰自己。</p>
+        <div class="house-example">✦ 課題：將紀律用於服務健康，而非用完美主義摧毀身心。</div>
+      </div>
+
+      <div class="house-card fade-in">
+        <span class="house-num">VII</span>
+        <span class="house-tag">第七宮 · 伴侶關係</span>
+        <h3>關係中的成年禮</h3>
+        <p>對親密關係有深層恐懼或拖延——晚婚、選擇年長/嚴肅的伴侶，或進入承諾關係時感受到莫名的重量。伴侶可能帶有土星特質（嚴格、可靠但冷漠）。關係本身成為土星的教室：他們學習什麼是真實的承諾，而非浪漫幻想。</p>
+        <div class="house-example">✦ 課題：在脆弱中建立真實連結，不用「獨立」作為迴避親密的藉口。</div>
+      </div>
+
+      <div class="house-card fade-in">
+        <span class="house-num">VIII</span>
+        <span class="house-tag">第八宮 · 轉化深度</span>
+        <h3>深淵與重生的學徒</h3>
+        <p>對死亡、性、他人資源、深層心理有深刻的恐懼或迷戀。可能在早年經歷重大失去，迫使他們過早面對「終結」與「轉化」。土星八宮的人往往是心理治療師、研究者、危機管理者——他們在最幽暗的地方找到最堅固的結構。</p>
+        <div class="house-example">✦ 課題：學習放手，接受「失控」本身也是一種結構。</div>
+      </div>
+
+      <div class="house-card fade-in">
+        <span class="house-num">IX</span>
+        <span class="house-tag">第九宮 · 信仰哲學</span>
+        <h3>信仰的嚴格考官</h3>
+        <p>對高等教育、宗教、哲學有強烈的嚴肅態度——或者對「信仰」本身充滿懷疑。出國留學、長途旅行可能充滿障礙。這型人不接受膚淺的世界觀，他們的信念系統必須經得起自我審問。修煉後，他們是最深刻的哲學家與精神導師。</p>
+        <div class="house-example">✦ 課題：允許信仰是一個過程，不強迫自己「馬上就要確定」。</div>
+      </div>
+
+      <div class="house-card fade-in">
+        <span class="house-num">X</span>
+        <span class="house-tag">第十宮 · 事業名聲</span>
+        <h3>事業巔峰的磨刀石</h3>
+        <p>這是土星最強大的宮位之一（天頂）。對成就、社會地位有極高的自我要求，害怕失敗的程度往往阻礙實際行動。父親形象複雜，可能是嚴格監督者或缺席者。但土星十宮的人一旦建立起事業根基，那個基礎比任何人都要堅實——因為他們從不走捷徑。</p>
+        <div class="house-example">✦ 案例：許多自我奮鬥型企業家、政治家有此配置。</div>
+      </div>
+
+      <div class="house-card fade-in">
+        <span class="house-num">XI</span>
+        <span class="house-tag">第十一宮 · 社群理想</span>
+        <h3>人際連結的冷眼旁觀者</h3>
+        <p>在群體中感到格格不入，朋友圈小而深，不擅長輕鬆社交。對「夢想」與「未來目標」有嚴格的現實主義——不願意說還沒落地的宏大計畫。這型人往往在社群中扮演「結構者」——讓集體夢想能夠真正實現，而非只停留在口號。</p>
+        <div class="house-example">✦ 課題：允許自己不必「賺到」友誼，關係可以是自然發生的。</div>
+      </div>
+
+      <div class="house-card fade-in">
+        <span class="house-num">XII</span>
+        <span class="house-tag">第十二宮 · 隱藏潛意識</span>
+        <h3>靜默中的修行</h3>
+        <p>土星藏在最幽微的宮位：恐懼本身也是隱藏的，不輕易表達，甚至連自己都不清楚。可能有慢性的、難以定名的焦慮感，或對「失控」有深層恐懼。獨處、冥想、與潛意識工作是他們真正的修煉場。這型人往往在外表輕鬆，內心卻承受著巨大的無形結構壓力。</p>
+        <div class="house-example">✦ 課題：讓恐懼浮出水面，命名它，才能從它的掌控中獲釋。</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ⑯–㉗ TWELVE SIGNS -->
+<section id="signs">
+  <div class="container">
+    <span class="section-label">Section 16 – 27</span>
+    <h2>土星在十二星座</h2>
+    <div class="section-divider"></div>
+    <p style="margin-bottom:2rem">土星所在的星座，決定了你如何執行紀律、面對限制的<em>風格</em>與<em>形態</em>。同一個「努力」，在不同星座中有截然不同的質地。</p>
+    <div class="signs-grid">
+
+      <div class="sign-card fade-in">
+        <span class="sign-symbol">♈</span>
+        <h3>土星在牡羊座</h3>
+        <p>行動力被土星管控，常在「想衝」與「必須三思」之間拉扯。衝動型錯誤是最主要的課題。這批人的紀律需要建立在「策略性勇氣」上——知道何時衝、何時停。</p>
+        <div class="sign-celeb">✦ 名人：列農（John Lennon，土星牡羊）— 用衝撞體制的方式建立持久文化遺產</div>
+      </div>
+
+      <div class="sign-card fade-in">
+        <span class="sign-symbol">♉</span>
+        <h3>土星在金牛座</h3>
+        <p>對物質安全的執著達到極致，或者完全反向——對擁有物質產生心理抗拒。紀律體現在財務規劃、身體健康的長期維護。入廟強勢，土星的紀律在此最易落地成形。</p>
+        <div class="sign-celeb">✦ 名人：巴菲特（Warren Buffett，土星金牛）— 延遲享受、複利思維的最佳體現</div>
+      </div>
+
+      <div class="sign-card fade-in">
+        <span class="sign-symbol">♊</span>
+        <h3>土星在雙子座</h3>
+        <p>思維被土星收緊，容易陷入「分析癱瘓」——想太多、怕說錯。寫作與表達需要大量練習才能自然流露。一旦突破，成為最能將複雜思想清晰表達的人。</p>
+        <div class="sign-celeb">✦ 名人：達文西（Leonardo da Vinci）類型 — 博學者需要紀律才能從廣博走向深度</div>
+      </div>
+
+      <div class="sign-card fade-in">
+        <span class="sign-symbol">♋</span>
+        <h3>土星在巨蟹座</h3>
+        <p>土星弱勢於此。情感結構僵化——用「不需要」掩蓋「很需要」。家庭責任沉重，母親形象複雜。功課是允許自己有需求，並建立真實的情感邊界，而非情感牆壁。</p>
+        <div class="sign-celeb">✦ 名人：默克爾（Angela Merkel）— 在情感保守中建立長期穩定的領導結構</div>
+      </div>
+
+      <div class="sign-card fade-in">
+        <span class="sign-symbol">♌</span>
+        <h3>土星在獅子座</h3>
+        <p>對自我表達、獲得認可有深層焦慮。創意被「值不值得被看見」的自我審查壓制。這型人的紀律體現在：不依賴掌聲仍持續創作的能力。通過考驗後，成為最有份量的舞台存在。</p>
+        <div class="sign-celeb">✦ 名人：奧巴馬（Barack Obama，土星獅子）— 在嚴格自我要求中建立歷史性的公眾形象</div>
+      </div>
+
+      <div class="sign-card fade-in">
+        <span class="sign-symbol">♍</span>
+        <h3>土星在處女座</h3>
+        <p>完美主義到病態的程度——細節、錯誤、缺陷無限放大。健康焦慮、對工作品質的嚴苛。一旦學會「夠好就是夠好」，成為品質控制與系統優化的頂尖人才。</p>
+        <div class="sign-celeb">✦ 名人：賈伯斯（Steve Jobs）配置類型 — 對細節的偏執最終成為傳奇產品的根基</div>
+      </div>
+
+      <div class="sign-card fade-in">
+        <span class="sign-symbol">♎</span>
+        <h3>土星在天秤座（入廟）</h3>
+        <p>土星最強勢位置。公平、正義、關係中的責任感達到頂峰。對不公正高度敏感，在關係中設立嚴格但公平的邊界。天生適合法律、仲裁、長期夥伴關係的締建者。</p>
+        <div class="sign-celeb">✦ 名人：甘地（Mahatma Gandhi，土星天秤）— 以紀律性的非暴力原則重塑正義的邊界</div>
+      </div>
+
+      <div class="sign-card fade-in">
+        <span class="sign-symbol">♏</span>
+        <h3>土星在天蠍座</h3>
+        <p>對深層心理、權力、性、死亡的恐懼與迷戀共存。控制慾是防禦機制。修煉方向是學習在脆弱中信任，在深層轉化中不用「控制」保護自己。成熟後成為最能陪伴他人穿越黑暗的人。</p>
+        <div class="sign-celeb">✦ 名人：弗洛伊德（Sigmund Freud）類型 — 以結構性方式深掘人類無意識</div>
+      </div>
+
+      <div class="sign-card fade-in">
+        <span class="sign-symbol">♐</span>
+        <h3>土星在射手座</h3>
+        <p>信仰與哲學被過度嚴格化——容易成為「知識警察」，對不夠嚴謹的想法高度不耐。或者反向：完全逃避高等學習，因為害怕不夠好。課題是讓精神自由與知識紀律共存。</p>
+        <div class="sign-celeb">✦ 名人：達爾文（Charles Darwin，土星射手）— 嚴謹的科學方法配上對自然的哲學式探索</div>
+      </div>
+
+      <div class="sign-card fade-in">
+        <span class="sign-symbol">♑</span>
+        <h3>土星在摩羯座（入廟）</h3>
+        <p>土星主場。野心、結構、長期目標的終極體現。極度重視社會地位與成就，可能為事業犧牲一切。課題是：在達到山頂後，問自己「這是我真正想要的嗎？」不讓成就定義人生全部。</p>
+        <div class="sign-celeb">✦ 名人：馬克思（Karl Marx，土星摩羯）— 用嚴格的結構性思維重塑人類社會理論</div>
+      </div>
+
+      <div class="sign-card fade-in">
+        <span class="sign-symbol">♒</span>
+        <h3>土星在水瓶座（入廟）</h3>
+        <p>對集體、社會結構、科技的責任感。可能在「個人自由」與「對群體的責任」間拉扯。這型人被呼召建立新的社會結構，但必須先承認：真正的改革需要時間與系統性工作。</p>
+        <div class="sign-celeb">✦ 名人：馬丁路德金（Martin Luther King Jr.）— 以紀律性的系統運動推動結構性社會變革</div>
+      </div>
+
+      <div class="sign-card fade-in">
+        <span class="sign-symbol">♓</span>
+        <h3>土星在雙魚座</h3>
+        <p>邊界感薄弱——可能因難以拒絕他人而耗竭自己，或反向建起冷漠的防禦牆。靈性與務實之間的整合是終生課題。冥想、藝術創作、服務是他們最有效的紀律修煉路徑。</p>
+        <div class="sign-celeb">✦ 名人：達賴喇嘛（Dalai Lama）類型 — 在靈性柔軟中建立嚴格的修行紀律</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ㉘ ASPECTS MATRIX -->
+<section id="aspects">
+  <div class="container">
+    <span class="section-label">Section 28</span>
+    <h2>土星 45 相位矩陣</h2>
+    <div class="section-divider"></div>
+    <p style="margin-bottom:1rem">土星與其他行星形成的相位，決定紀律能量的<em>流向</em>與<em>摩擦類型</em>。合相（0°）= 融合；對分（180°）= 張力；三分（120°）= 流暢；四分（90°）= 壓力；六分（60°）= 機會。</p>
+    <div class="aspect-matrix">
+      <table class="matrix-table">
+        <thead>
+          <tr>
+            <th>土星 ×</th>
+            <th class="aspect-conj">合相 0°</th>
+            <th class="aspect-opp">對分 180°</th>
+            <th class="aspect-tri">三分 120°</th>
+            <th class="aspect-sq">四分 90°</th>
+            <th class="aspect-sex">六分 60°</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>☉ 太陽</td>
+            <td class="aspect-conj">自我認同與紀律完全融合，責任感成為身份核心；過度嚴苛時壓制活力。1940/1953/1967/1982/1996/2011年世代。</td>
+            <td class="aspect-opp">自我表達（太陽宮）vs 責任結構（土星宮）持續拉扯；關係中的權威衝突；需在「我是誰」與「我必須做什麼」間取得平衡。</td>
+            <td class="aspect-tri">自律成為自然習慣，不費力建立長期成就；父親關係相對和諧，能從傳統中汲取力量而不被壓垮。</td>
+            <td class="aspect-sq">自我意志vs外部結構的硬碰硬；成就欲強但障礙多，容易在權威關係中受挫；磨練後成為意志力超強的實踐者。</td>
+            <td class="aspect-sex">有意識地將自律融入日常，紀律成為助力而非枷鎖；適合從事需要長期規劃的創意工作。</td>
+          </tr>
+          <tr>
+            <td>☽ 月亮</td>
+            <td class="aspect-conj">情感結構化——壓抑感受或將情緒管理到近乎冷漠；安全感需要透過「有所成就」才能獲得。母親形象嚴格或缺席。</td>
+            <td class="aspect-opp">情感需求（月亮）vs 現實責任（土星）永恆衝突；照顧者角色沉重，情感連結難以放鬆；需學習「脆弱不等於失控」。</td>
+            <td class="aspect-tri">情感成熟、穩定，不輕易被情緒波動淹沒；能在壓力中保持冷靜，是危機時刻最可靠的支柱。</td>
+            <td class="aspect-sq">情感表達受壓抑，安全感脆弱；可能用「強硬」掩蓋深層的孤獨感；童年可能情感匱乏，功課是重建內在的安全感基礎。</td>
+            <td class="aspect-sex">能有意識地管理情緒，建立健康的情感邊界；不因情緒衝動做出後悔的決定。</td>
+          </tr>
+          <tr>
+            <td>☿ 水星</td>
+            <td class="aspect-conj">思維縝密、論述嚴謹，說話有重量；但可能過於謹慎、說話速度慢，或對自己的智識能力極度自我批判。</td>
+            <td class="aspect-opp">思想方式（水星）vs 現實約束（土星）的緊張；溝通中容易被誤解為冷漠或過於批判；教學與學習關係複雜。</td>
+            <td class="aspect-tri">嚴謹的思考架構，邏輯清晰；擅長複雜系統的分析，記憶力強，適合學術研究、法律、工程。</td>
+            <td class="aspect-sq">思維焦慮、自我懷疑；擔心說錯話導致沉默，或反向成為「語言強迫症」。需學習「說出來才能被修正，不說只會在腦中累積」。</td>
+            <td class="aspect-sex">思考組織能力強，能將抽象概念轉化為可執行步驟；是優秀的策略規劃者與技術寫作者。</td>
+          </tr>
+          <tr>
+            <td>♀ 金星</td>
+            <td class="aspect-conj">愛需要被「賺到」——對關係有高度責任感但也高度防衛；美感嚴肅、品味精緻；財務與情感常糾纏在一起。</td>
+            <td class="aspect-opp">愛與美（金星）vs 責任與限制（土星）的核心矛盾；渴望親密但畏懼依賴；伴侶關係中常有年齡差或權力差。</td>
+            <td class="aspect-tri">在關係中建立穩定持久的承諾，不輕易進入但一旦進入就非常忠誠；藝術品味經典、有耐久性。</td>
+            <td class="aspect-sq">情感壓抑，覺得自己「不值得被愛」；可能在關係中承擔過多責任，或選擇不可得的對象來逃避真實的親密。核心功課：愛無需先「賺到」。</td>
+            <td class="aspect-sex">能在關係中設立健康邊界，不因情感依賴而失去自我；財務管理謹慎，善於長期投資。</td>
+          </tr>
+          <tr>
+            <td>♂ 火星</td>
+            <td class="aspect-conj">行動力被土星約束——要麼極度壓抑憤怒（慢熱型爆發），要麼將衝動轉化為驚人的執行力。1/1988、2/2026世代。</td>
+            <td class="aspect-opp">衝動行動（火星）vs 謹慎結構（土星）；在「馬上做」與「等等再說」之間反覆；在競爭環境中感到受阻，挫敗感強。</td>
+            <td class="aspect-tri">紀律性的行動力，能持續穩定地推進目標；不浮躁，在需要長期執行的領域表現卓越；運動員、工匠型才能。</td>
+            <td class="aspect-sq">「想衝但被攔」的持續挫敗感；容易將憤怒內化為自我攻擊；或將自律轉化為對他人的嚴苛。學習將火星的衝勁「定時釋放」而非壓制。</td>
+            <td class="aspect-sex">能有策略地運用精力，知道何時行動、何時停止；在競爭中有冷靜的優勢。</td>
+          </tr>
+          <tr>
+            <td>♃ 木星</td>
+            <td class="aspect-conj">擴張與收縮的複雜融合；有時表現為「謹慎的樂觀主義者」，有時是「悲觀的擴張者」。1981/2020世代重要集體相位。</td>
+            <td class="aspect-opp">信仰與擴張（木星）vs 限制與結構（土星）的永恆辯論；在「應該更大膽」與「應該更保守」之間搖擺；需找到適合自己的「有機會也有根基」。</td>
+            <td class="aspect-tri">成長的時機感精準，能在對的時機擴張；在機會到來時有足夠的結構承接；長期事業規劃能力強。</td>
+            <td class="aspect-sq">過度擴張後的崩塌，或過度收縮錯失機會；在信仰與現實之間難以取得平衡；需練習「評估風險後再行動，而非憑感覺或憑恐懼」。</td>
+            <td class="aspect-sex">能在穩健基礎上適度冒險；懂得在成長機會出現時建立可持續的擴張路徑。</td>
+          </tr>
+          <tr>
+            <td>♅ 天王星</td>
+            <td class="aspect-conj">結構性的革命——以系統的方式推動顛覆；不是衝動的反叛，而是深思熟慮的改革。1942/1988世代的核心驅動力。</td>
+            <td class="aspect-opp">傳統結構（土星）vs 突破解放（天王星）的世代張力；在自由與責任、創新與穩定之間找到個人化的整合路徑。</td>
+            <td class="aspect-tri">能在創新與穩定間取得完美平衡；既有打破舊框架的勇氣，也有建立新結構的能力；是最有效的改革者。</td>
+            <td class="aspect-sq">舊結構崩塌時的震盪——可能是職業中斷、生活翻轉；功課是學習讓舊的崩塌，並在廢墟上建立更真實的結構。</td>
+            <td class="aspect-sex">能有意識地在生活中引入漸進式創新；不需要大破才能大立，細水長流的革新更能持久。</td>
+          </tr>
+          <tr>
+            <td>♆ 海王星</td>
+            <td class="aspect-conj">靈性結構化，或結構靈性化；可能表現為「宗教紀律者」或「制度化的夢想家」。1952/1989世代。</td>
+            <td class="aspect-opp">現實結構（土星）vs 夢幻溶解（海王星）；在務實與理想、清醒與幻覺之間搖擺；需警覺「用靈性逃避現實」的陷阱。</td>
+            <td class="aspect-tri">能將直覺與實際操作結合；藝術家、療癒師中有此相位者，能將無形的靈感轉化為有形的作品。</td>
+            <td class="aspect-sq">結構被溶解——計畫受到不明干擾，現實感模糊；可能面對欺騙、幻滅、或對「什麼是真實的」感到困惑。功課是辨認哪些「結構」本就需要放手。</td>
+            <td class="aspect-sex">能有意識地在日常中保留靈性空間；不讓夢幻替代行動，也不讓務實壓垮詩意。</td>
+          </tr>
+          <tr>
+            <td>♇ 冥王星</td>
+            <td class="aspect-conj">深層權威焦慮，對結構崩塌有恐懼，同時有重建廢墟的強大驅動力。1947/1982/2020世代性議題——每一次都伴隨舊系統的根本性瓦解。</td>
+            <td class="aspect-opp">現有結構（土星）vs 根本轉化力量（冥王星）；在掌控與放手之間的終極對決；通常伴隨人生中某個結構（職業、關係、身份）的死亡與重生。</td>
+            <td class="aspect-tri">深刻的結構轉化能力；能以平靜的姿態面對系統性崩潰，並在其中找到新的秩序；天生的危機管理者。</td>
+            <td class="aspect-sq">權力鬥爭——在組織或關係中捲入控制vs被控制的動態；舊結構的強制性瓦解，往往無法選擇時機。功課是在失控中尋找更深的結構原則。</td>
+            <td class="aspect-sex">能有意識地讓自己在人生的不同階段進行深層蛻變；不等到被迫才改變，主動選擇放下過時的結構。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ㉙ CASES -->
+<section id="cases">
+  <div class="container">
+    <span class="section-label">Section 29</span>
+    <h2>真實案例</h2>
+    <div class="section-divider"></div>
+
+    <div class="case-block fade-in">
+      <div class="case-name">奧巴馬 Barack Obama</div>
+      <div class="case-meta">土星在獅子座 · 第十二宮 · 合相上升軸</div>
+      <div class="case-body">
+        <p style="margin-bottom:1rem">土星獅子對「值得被看見的自我」有深層焦慮。奧巴馬的土星落在十二宮（隱藏面），意味著他的政治重量有一部分來自內心深處未曾完全公開的掙扎——身份認同、種族、孤立感。他的第一次土星回歸（29歲，1990年）發生在哈佛法學院擔任評論雜誌編輯長時：結構性的自我建構開始奠基。2008年選上總統（47歲，接近第二次土星回歸前期），是土星紀律長達20年積累的爆發性收穫。</p>
+        <p><strong>土星週期啟示：</strong>他的政治生涯從未「早發」——而是以令人窒息的緩慢、卻堅不可摧的方式累積。這是土星最典型的運作邏輯。</p>
+      </div>
+    </div>
+
+    <div class="case-block fade-in">
+      <div class="case-name">弗里達·卡羅 Frida Kahlo</div>
+      <div class="case-meta">土星在摩羯座 · 第三宮</div>
+      <div class="case-body">
+        <p style="margin-bottom:1rem">土星摩羯是本命強勢：嚴格的成就驅動，但落在三宮，表達本身成為最大的考場。她在6歲罹患小兒麻痺，18歲遭遇幾乎致命的車禍——肉體本身成為土星最殘酷的試煉場。她開始作畫，不是因為有閒情，而是因為除此之外無法承受那份靜止。</p>
+        <p><strong>土星啟示：</strong>土星不保證不痛。它保證的是：如果你通過了試煉，你會擁有一種別人無法複製的深度。卡羅的作品之所以永恆，正是因為每一幅畫都承載了真實的結構性重量。</p>
+      </div>
+    </div>
+
+    <div class="case-block fade-in">
+      <div class="case-name">伊隆·馬斯克 Elon Musk</div>
+      <div class="case-meta">土星在雙子座 · 第十宮附近</div>
+      <div class="case-body">
+        <p style="margin-bottom:1rem">土星雙子：表達與溝通的試煉——馬斯克在公眾演講上並非天才，早年採訪屢屢被評為笨拙。但土星雙子一旦突破，擁有將複雜技術概念用最精煉語言傳達的能力（SpaceX演示、Tesla Reveal的文本精準度）。他的第一次土星回歸（29歲）發生在PayPal出售後：巨大的資本收穫，隨即將所有賭注投入SpaceX與Tesla，兩家公司在創立初期都幾乎破產。這正是土星邏輯：在最脆弱的結構中，放入最重的賭注，然後用紀律撐過。</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ㉚ GUIDE -->
+<section id="guide">
+  <div class="container">
+    <span class="section-label">Section 30</span>
+    <h2>土星回歸週期指引</h2>
+    <div class="section-divider"></div>
+    <p style="margin-bottom:2.5rem">土星每 <strong>29.5 年</strong>回到出生星盤的位置，觸發一次深層生命清算。這不是懲罰，而是<strong>期末考</strong>——測試你在這個週期中建立了什麼真實的結構。</p>
+
+    <div class="timeline">
+      <div class="timeline-item fade-in">
+        <div class="timeline-dot"></div>
+        <div class="timeline-age">0 – 7歲｜土星建立期</div>
+        <div class="timeline-body">土星宮位與星座的主題開始顯現。最早的「不被允許」與「必須負責」的印記形成。這個階段的限制，往往在日後的占星解讀中成為最重要的根源材料。</div>
+      </div>
+      <div class="timeline-item fade-in">
+        <div class="timeline-dot"></div>
+        <div class="timeline-age">14歲｜土星對分相</div>
+        <div class="timeline-body">青春期的第一次「結構測試」。身份認同、社群位置、父母關係——土星開始要求你在混亂的青春中找到自己的軸線。許多人在此時開始感受到「某種責任感我無法逃開」。</div>
+      </div>
+      <div class="timeline-item fade-in">
+        <div class="timeline-dot"></div>
+        <div class="timeline-age">21歲｜土星三分相</div>
+        <div class="timeline-body">第一個「小整合期」。你開始能夠有意識地使用土星的紀律，而不只是被它壓制。許多人在此時確認了人生方向，或開始第一個真正的長期承諾。</div>
+      </div>
+      <div class="timeline-item fade-in">
+        <div class="timeline-dot"></div>
+        <div class="timeline-age">28 – 30歲｜第一次土星回歸</div>
+        <div class="timeline-body"><strong>成年禮的核心時刻。</strong>這是你20多歲所有「只是試試看」終結的時刻。關係、職業、生活方式——所有沒有真實基礎的結構都開始崩塌，有真實基礎的才能留下。這通常是人生中感覺最沉重、最有轉折力的階段。許多人在此離婚、換職業、離開家鄉、或第一次真正面對自己。</div>
+      </div>
+      <div class="timeline-item fade-in">
+        <div class="timeline-dot"></div>
+        <div class="timeline-age">36 – 38歲｜土星對分相（中點）</div>
+        <div class="timeline-body">第一與第二次土星回歸的中間點。一次「中期報告」——你是否真的活在29歲整合後的承諾中？或者又開始逃避？許多人在此時面臨「我已經夠努力了，但為什麼還是感覺空洞？」的深層問題。</div>
+      </div>
+      <div class="timeline-item fade-in">
+        <div class="timeline-dot"></div>
+        <div class="timeline-age">57 – 60歲｜第二次土星回歸</div>
+        <div class="timeline-body"><strong>智慧期的入口。</strong>這次回歸比第一次更深、更寬。它問的不是「你建立了什麼」，而是「你建立的這一切，是你真正想要的嗎？」許多人在此重新定義成功、退休、遺產——不是因為被迫，而是因為終於有足夠的深度問這個問題。</div>
+      </div>
+      <div class="timeline-item fade-in">
+        <div class="timeline-dot"></div>
+        <div class="timeline-age">87 – 89歲｜第三次土星回歸</div>
+        <div class="timeline-body">少數人到達的境界。在此，土星的功課已不是「建立」，而是「傳承」與「完成」。一生中通過土星試煉所積累的智慧，在此成為給後代的禮物。</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:3rem;max-width:700px">
+      <h4 style="color:var(--gold);margin-bottom:1rem">如何計算你的土星回歸</h4>
+      <p style="font-size:.9rem;margin-bottom:.8rem">1. 找出你出生時土星在哪個星座（需要查詢出生星盤）</p>
+      <p style="font-size:.9rem;margin-bottom:.8rem">2. 查詢土星下一次行運回到該星座的年份（約每29.5年一次）</p>
+      <p style="font-size:.9rem;margin-bottom:.8rem">3. 第一次回歸：出生年 + 29.5 = 大約年份（前後2年都算影響期）</p>
+      <p style="font-size:.9rem">4. 土星回歸不是「壞事」——是你準備好接受真正考驗的時機。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ㉛ GAMIFICATION -->
+<section id="gamification">
+  <div class="container">
+    <span class="section-label">Section 31 · 遊戲化</span>
+    <h2>土星修行打卡系統</h2>
+    <div class="section-divider"></div>
+
+    <!-- XP Display -->
+    <div class="xp-display">
+      <div>
+        <div class="checkin-title">修行等級</div>
+        <div id="level-name" style="font-family:var(--display);font-size:2rem;color:var(--bone);margin-bottom:.5rem">學徒</div>
+        <p style="font-size:.85rem;margin-bottom:1rem" id="level-desc">剛踏上修行之路。土星的試煉尚未開始。</p>
+        <div class="xp-bar-wrap">
+          <div class="progress-label">
+            <span id="xp-label" style="font-family:var(--accent);font-size:.65rem;letter-spacing:.15em;color:var(--ash)">XP 0 / 100</span>
+            <span id="xp-pct" style="font-family:var(--accent);font-size:.65rem;color:var(--gold-dim)">0%</span>
+          </div>
+          <div class="xp-bar-track"><div class="xp-bar-fill" id="xp-bar" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="level-badge" id="level-badge">
+        <span class="lv-num" id="lv-num">1</span>
+        <span class="lv-label">LEVEL</span>
+      </div>
+    </div>
+
+    <!-- Streak -->
+    <div class="streak-row">
+      <div class="streak-box">
+        <span class="streak-num" id="streak-num">0</span>
+        <span class="streak-lbl">連續天數</span>
+      </div>
+      <div class="streak-box">
+        <span class="streak-num" id="total-checkins">0</span>
+        <span class="streak-lbl">總簽到</span>
+      </div>
+      <div class="streak-box">
+        <span class="streak-num" id="max-streak">0</span>
+        <span class="streak-lbl">最高連擊</span>
+      </div>
+      <div class="streak-box">
+        <span class="streak-num" id="xp-total">0</span>
+        <span class="streak-lbl">總 XP</span>
+      </div>
+    </div>
+
+    <!-- Daily Checkin -->
+    <div class="checkin-section">
+      <div class="checkin-title">每日土星修行簽到</div>
+      <div class="calendar-grid" id="calendar-grid"></div>
+      <button class="checkin-btn" id="checkin-btn" onclick="doCheckIn()">♄ 今日修行打卡</button>
+    </div>
+
+    <!-- Weekly Challenge -->
+    <div class="challenge-block">
+      <div class="challenge-header">
+        <div>
+          <div class="checkin-title">本週磨練任務</div>
+          <h3 id="challenge-title" style="color:var(--bone);margin-bottom:.5rem">靜默一小時</h3>
+          <p id="challenge-desc" style="font-size:.88rem">今日選擇一個小時，不碰手機、不說話、不聽音樂。只是靜坐，感受土星的重量。記錄你在靜默中浮現的三個念頭。</p>
+        </div>
+        <button class="challenge-status status-active" id="challenge-btn" onclick="completeChallenge()" style="background:transparent;border:1px solid var(--gold);cursor:pointer;font-family:var(--accent);font-size:.65rem;letter-spacing:.2em;padding:.5rem 1rem;color:var(--gold);transition:all .2s">完成任務 +50 XP</button>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="weekly-bar" style="width:0%" data-target="0"></div>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="checkin-title" style="margin-bottom:1rem">成就徽章</div>
+    <div class="badges-grid" id="badges-grid">
+      <div class="badge" id="badge-7" data-days="7">
+        <div class="badge-ring"></div>
+        <span class="badge-icon">🌙</span>
+        <span class="badge-name">新月學徒<br>7天</span>
+      </div>
+      <div class="badge" id="badge-21" data-days="21">
+        <div class="badge-ring"></div>
+        <span class="badge-icon">⚡</span>
+        <span class="badge-name">習慣突破<br>21天</span>
+      </div>
+      <div class="badge" id="badge-40" data-days="40">
+        <div class="badge-ring"></div>
+        <span class="badge-icon">🗿</span>
+        <span class="badge-name">石碑刻印<br>40天</span>
+      </div>
+      <div class="badge" id="badge-100" data-days="100">
+        <div class="badge-ring"></div>
+        <span class="badge-icon">🪐</span>
+        <span class="badge-name">土星之環<br>100天</span>
+      </div>
+      <div class="badge" id="badge-200" data-days="200">
+        <div class="badge-ring"></div>
+        <span class="badge-icon">🏛</span>
+        <span class="badge-name">大師殿堂<br>200天</span>
+      </div>
+      <div class="badge" id="badge-365" data-days="365">
+        <div class="badge-ring"></div>
+        <span class="badge-icon">👁</span>
+        <span class="badge-name">周天圓滿<br>365天</span>
+      </div>
+    </div>
+
+    <!-- Stele Wall -->
+    <div class="checkin-title" style="margin-bottom:1rem;margin-top:2rem">石碑成就牆｜永久刻印突破</div>
+    <div class="stele-wall" id="stele-wall"></div>
+    <div class="stele-form">
+      <input type="text" class="stele-input" id="stele-input" placeholder="記錄今日的突破或洞見...（Enter 刻入石碑）" maxlength="80">
+      <button class="btn" onclick="addStele()">刻入石碑 ♄</button>
+    </div>
+  </div>
+</section>
+
+<!-- ㉜ SHARE CARD -->
+<section id="share">
+  <div class="container">
+    <span class="section-label">Section 32</span>
+    <h2>土星修行證書</h2>
+    <div class="section-divider"></div>
+    <div class="share-card-wrap">
+      <div class="share-card" id="share-card">
+        <span class="share-symbol">♄</span>
+        <div class="share-title">土星修行證書</div>
+        <div class="share-sub">Saturn Discipline Certificate</div>
+        <div style="font-family:var(--accent);font-size:.65rem;letter-spacing:.2em;color:var(--ash);margin-bottom:1rem">THIS CERTIFIES THAT THE BEARER HAS ENDURED</div>
+        <div class="share-stats">
+          <div class="share-stat">
+            <span class="share-stat-num" id="cert-days">0</span>
+            <span class="share-stat-lbl">修行天數</span>
+          </div>
+          <div class="share-stat">
+            <span class="share-stat-num" id="cert-streak">0</span>
+            <span class="share-stat-lbl">最高連擊</span>
+          </div>
+          <div class="share-stat">
+            <span class="share-stat-num" id="cert-xp">0</span>
+            <span class="share-stat-lbl">總 XP</span>
+          </div>
+          <div class="share-stat">
+            <span class="share-stat-num" id="cert-level">學徒</span>
+            <span class="share-stat-lbl">修行等級</span>
+          </div>
+        </div>
+        <div class="share-cert-text">「土星不給速成，只給扎實。<br>每一天的修行，都是刻在石碑上的一道痕。」</div>
+        <div style="margin-top:1.5rem;font-family:var(--accent);font-size:.55rem;letter-spacing:.3em;color:#333">SATURN · KRONOS · TEMPUS · DISCIPLINA</div>
+      </div>
+      <div style="margin-top:1.5rem;text-align:center">
+        <button class="btn" onclick="downloadCert()">下載修行證書</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <span class="footer-symbol">♄</span>
+    <p style="margin-bottom:.5rem;color:var(--ash);font-family:var(--display);letter-spacing:.2em">SATURN · 土星修行系統</p>
+    <p>時間是最公平的導師。你給它多少，它還你多少。</p>
+    <p style="margin-top:1rem;font-size:.7rem;color:#333">♄ 克洛諾斯系列 · 十二行星深度占星</p>
+  </div>
+</footer>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif"></div>
+
+<script>
+// ===== CONSTANTS =====
+const LS = {
+  XP: 'astro_saturn_xp',
+  LEVEL: 'astro_saturn_level',
+  CHECKINS: 'astro_saturn_checkins',
+  STREAK: 'astro_saturn_streak',
+  WEEKLY: 'astro_saturn_weekly_challenge',
+  STELE: 'astro_saturn_stele_records',
+  RING: 'astro_saturn_easter_ring',
+  MAX_STREAK: 'astro_saturn_max_streak',
+  LAST_CHECKIN: 'astro_saturn_last_checkin',
+  CHALLENGE_DONE: 'astro_saturn_challenge_done'
+};
+
+const LEVELS = [
+  {name:'學徒', min:0, max:100, desc:'剛踏上修行之路。土星的試煉尚未開始。'},
+  {name:'修行者', min:100, max:300, desc:'已感受到土星的重量。結構開始在你身上留下印記。'},
+  {name:'師父', min:300, max:700, desc:'你已通過第一次試煉。紀律成為你的第二天性。'},
+  {name:'大師', min:700, max:Infinity, desc:'土星的智慧已融入你的存在。你成為了結構本身。'}
+];
+
+const WEEKLY_CHALLENGES = [
+  {title:'靜默一小時', desc:'今日選擇一個小時，不碰手機、不說話、不聽音樂。只是靜坐，感受土星的重量。記錄你在靜默中浮現的三個念頭。'},
+  {title:'延遲一個慾望', desc:'今天當你想立刻滿足某個慾望時（購買、滑手機、吃零食），等待30分鐘再決定。記錄這30分鐘你的感受。'},
+  {title:'清理一個未完成', desc:'找出一件你一直「明天再說」的事情，今天完成它。不需要是大事，可以是回一封信、整理一個抽屜。'},
+  {title:'給自己一個邊界', desc:'今天練習說一次「不」——對別人的要求、對自己的拖延、或對消耗你能量的習慣。'},
+  {title:'寫下三個真實承諾', desc:'不是願望，是承諾。寫下三件你願意為之負責的具體行動，並設定完成日期。土星見證。'},
+  {title:'與最困難的事面對面', desc:'想想你最逃避的一件事。今天，只是面對它——不需要解決，只需要看清楚它的真實面貌。'},
+  {title:'身體紀律日', desc:'今天的修行在身體：早起、運動、不暴飲暴食。身體是最誠實的土星試煉場。'}
+];
+
+// ===== STATE =====
+function getState() {
+  return {
+    xp: parseInt(localStorage.getItem(LS.XP) || '0'),
+    level: parseInt(localStorage.getItem(LS.LEVEL) || '1'),
+    checkins: JSON.parse(localStorage.getItem(LS.CHECKINS) || '[]'),
+    streak: parseInt(localStorage.getItem(LS.STREAK) || '0'),
+    maxStreak: parseInt(localStorage.getItem(LS.MAX_STREAK) || '0'),
+    lastCheckin: localStorage.getItem(LS.LAST_CHECKIN) || '',
+    weeklyDone: localStorage.getItem(LS.CHALLENGE_DONE) === getWeekKey(),
+    stele: JSON.parse(localStorage.getItem(LS.STELE) || '[]'),
+    ring: localStorage.getItem(LS.RING) === '1'
+  };
+}
+
+function getWeekKey() {
+  const now = new Date();
+  const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return `${d.getUTCFullYear()}-W${Math.ceil((((d - yearStart) / 86400000) + 1) / 7)}`;
+}
+
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+
+// ===== XP & LEVEL =====
+function addXP(amount) {
+  const s = getState();
+  const newXP = s.xp + amount;
+  localStorage.setItem(LS.XP, newXP);
+
+  let newLevel = 1;
+  LEVELS.forEach((l, i) => { if (newXP >= l.min) newLevel = i + 1; });
+  const oldLevel = s.level;
+  localStorage.setItem(LS.LEVEL, newLevel);
+
+  if (newLevel > oldLevel) {
+    showNotif(`🏛 升級！你已成為「${LEVELS[newLevel-1].name}」`);
+    playBell(true);
+  }
+
+  updateUI();
+  return newXP;
+}
+
+function updateUI() {
+  const s = getState();
+  const levelData = LEVELS[s.level - 1] || LEVELS[0];
+  const nextLevel = LEVELS[s.level] || LEVELS[LEVELS.length-1];
+
+  const xpInLevel = s.xp - levelData.min;
+  const xpForNext = nextLevel.min - levelData.min;
+  const pct = Math.min(100, Math.round((xpInLevel / xpForNext) * 100));
+
+  document.getElementById('level-name').textContent = levelData.name;
+  document.getElementById('level-desc').textContent = levelData.desc;
+  document.getElementById('xp-label').textContent = `XP ${s.xp} / ${nextLevel.min === Infinity ? '∞' : nextLevel.min}`;
+  document.getElementById('xp-pct').textContent = pct + '%';
+  document.getElementById('xp-bar').style.width = pct + '%';
+  document.getElementById('lv-num').textContent = s.level;
+  document.getElementById('streak-num').textContent = s.streak;
+  document.getElementById('total-checkins').textContent = s.checkins.length;
+  document.getElementById('max-streak').textContent = s.maxStreak;
+  document.getElementById('xp-total').textContent = s.xp;
+  document.getElementById('nav-xp').textContent = `Lv.${s.level} ${levelData.name}`;
+
+  // Cert
+  document.getElementById('cert-days').textContent = s.checkins.length;
+  document.getElementById('cert-streak').textContent = s.maxStreak;
+  document.getElementById('cert-xp').textContent = s.xp;
+  document.getElementById('cert-level').textContent = levelData.name;
+
+  // Checkin btn
+  const btn = document.getElementById('checkin-btn');
+  const alreadyDone = s.lastCheckin === today();
+  btn.textContent = alreadyDone ? '♄ 今日已修行完成' : '♄ 今日修行打卡';
+  btn.className = 'checkin-btn' + (alreadyDone ? ' done' : '');
+
+  // Challenge btn
+  const wBtn = document.getElementById('challenge-btn');
+  if (s.weeklyDone) {
+    wBtn.textContent = '✓ 本週已完成';
+    wBtn.style.color = '#a0c5a8';
+    wBtn.style.borderColor = '#a0c5a8';
+    wBtn.disabled = true;
+    document.getElementById('weekly-bar').style.width = '100%';
+  }
+
+  updateBadges(s);
+  renderCalendar(s);
+  renderStele(s);
+}
+
+// ===== CHECK IN =====
+function doCheckIn() {
+  const s = getState();
+  const t = today();
+  if (s.lastCheckin === t) return;
+
+  // Update streak
+  let newStreak = s.streak;
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yStr = yesterday.toISOString().split('T')[0];
+
+  if (s.lastCheckin === yStr) {
+    newStreak += 1;
+  } else if (s.lastCheckin !== t) {
+    newStreak = 1;
+  }
+
+  const newMaxStreak = Math.max(newStreak, s.maxStreak);
+  const newCheckins = [...s.checkins, t];
+
+  localStorage.setItem(LS.STREAK, newStreak);
+  localStorage.setItem(LS.MAX_STREAK, newMaxStreak);
+  localStorage.setItem(LS.CHECKINS, JSON.stringify(newCheckins));
+  localStorage.setItem(LS.LAST_CHECKIN, t);
+
+  let xpGain = 10;
+  if (newStreak >= 7) xpGain = 15;
+  if (newStreak >= 21) xpGain = 20;
+  if (newStreak >= 100) xpGain = 30;
+
+  addXP(xpGain);
+  playBell();
+
+  // Check ring easter egg
+  if (newStreak >= 100 && !s.ring) {
+    localStorage.setItem(LS.RING, '1');
+    setTimeout(() => showNotif('🪐 彩蛋解鎖！「土星之環」大師徽章 — 連續修行100天，你已成為土星的見證者'), 1500);
+  }
+
+  showNotif(`♄ 修行打卡完成！+${xpGain} XP · 第 ${newStreak} 天連擊`);
+  updateUI();
+}
+
+// ===== WEEKLY CHALLENGE =====
+function completeChallenge() {
+  const s = getState();
+  if (s.weeklyDone) return;
+  localStorage.setItem(LS.CHALLENGE_DONE, getWeekKey());
+  addXP(50);
+  showNotif('⚡ 本週磨練任務完成！+50 XP · 智慧結晶獲得');
+}
+
+// ===== BADGES =====
+function updateBadges(s) {
+  const thresholds = [7, 21, 40, 100, 200, 365];
+  thresholds.forEach(d => {
+    const el = document.getElementById('badge-' + d);
+    if (!el) return;
+    const unlocked = s.maxStreak >= d || s.checkins.length >= d;
+    el.classList.toggle('unlocked', unlocked);
+    el.classList.toggle('locked', !unlocked);
+    if (d === 100 && s.ring) el.classList.add('master-ring');
+  });
+}
+
+// ===== CALENDAR =====
+function renderCalendar(s) {
+  const grid = document.getElementById('calendar-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const todayStr = today();
+
+  // Day labels
+  ['日','一','二','三','四','五','六'].forEach(d => {
+    const label = document.createElement('div');
+    label.style.cssText = 'font-family:var(--accent);font-size:.55rem;letter-spacing:.1em;color:var(--ash);display:flex;align-items:center;justify-content:center;padding:.3rem 0;';
+    label.textContent = d;
+    grid.appendChild(label);
+  });
+
+  // Empty cells
+  for (let i = 0; i < firstDay; i++) {
+    const empty = document.createElement('div');
+    empty.className = 'cal-day';
+    empty.style.background = 'transparent';
+    grid.appendChild(empty);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const cell = document.createElement('div');
+    cell.className = 'cal-day' + (s.checkins.includes(dateStr) ? ' checked' : '') + (dateStr === todayStr ? ' today' : '');
+    cell.textContent = d;
+    grid.appendChild(cell);
+  }
+}
+
+// ===== STELE WALL =====
+function renderStele(s) {
+  const wall = document.getElementById('stele-wall');
+  if (!wall) return;
+  wall.innerHTML = '';
+
+  if (s.stele.length === 0) {
+    wall.innerHTML = '<div class="stele-empty">尚未刻入任何突破 · 石碑等待你的第一道痕</div>';
+    return;
+  }
+
+  s.stele.slice().reverse().forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'stele-item';
+    el.innerHTML = `<div class="stele-text">${escapeHtml(item.text)}</div><span class="stele-date">♄ ${item.date}</span>`;
+    wall.appendChild(el);
+  });
+}
+
+function addStele() {
+  const input = document.getElementById('stele-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const s = getState();
+  const newRecord = {text, date: today()};
+  const newStele = [...s.stele, newRecord];
+  localStorage.setItem(LS.STELE, JSON.stringify(newStele));
+  input.value = '';
+  addXP(5);
+  showNotif('🗿 突破已刻入石碑 +5 XP');
+  renderStele(getState());
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('stele-input');
+  if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') addStele(); });
+});
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ===== NOTIFICATION =====
+function showNotif(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// ===== BELL AUDIO =====
+let audioEnabled = false;
+let audioCtx = null;
+
+document.getElementById('audioToggle').addEventListener('click', () => {
+  audioEnabled = !audioEnabled;
+  document.getElementById('audioToggle').textContent = audioEnabled ? '🔔' : '🔕';
+  document.getElementById('audioToggle').style.borderColor = audioEnabled ? 'var(--gold-dim)' : '#333';
+  if (audioEnabled) showNotif('鐘聲已開啟');
+});
+
+function playBell(major = false) {
+  if (!audioEnabled) return;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const freqs = major ? [220, 277.18, 329.63, 440] : [329.63, 440];
+    freqs.forEach((freq, i) => {
+      setTimeout(() => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.5);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 2.5);
+      }, i * 300);
+    });
+  } catch(e) {}
+}
+
+// ===== SHARE =====
+function downloadCert() {
+  if (typeof html2canvas === 'undefined') {
+    showNotif('載入中，請稍候再試');
+    return;
+  }
+  const card = document.getElementById('share-card');
+  html2canvas(card, {
+    backgroundColor: '#0d0d0d',
+    scale: 2,
+    useCORS: true
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = '土星修行證書.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showNotif('✓ 修行證書已下載');
+  }).catch(() => showNotif('下載失敗，請截圖儲存'));
+}
+
+// ===== WEEKLY CHALLENGE INIT =====
+function initWeeklyChallenge() {
+  const weekNum = parseInt(getWeekKey().split('-W')[1]) || 0;
+  const challenge = WEEKLY_CHALLENGES[weekNum % WEEKLY_CHALLENGES.length];
+  document.getElementById('challenge-title').textContent = challenge.title;
+  document.getElementById('challenge-desc').textContent = challenge.desc;
+}
+
+// ===== PROGRESS BARS ANIMATION =====
+function animateProgressBars() {
+  document.querySelectorAll('.progress-fill[data-target]').forEach(el => {
+    const target = parseInt(el.dataset.target);
+    if (target && el.style.width === '0%') {
+      setTimeout(() => { el.style.width = target + '%'; }, 300);
+    }
+  });
+}
+
+// ===== SCROLL FADE IN =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, {threshold: 0.1, rootMargin: '0px 0px -50px 0px'});
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// ===== DISCIPLINE PROGRESS BARS =====
+const disciplineObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      animateProgressBars();
+      disciplineObserver.unobserve(entry.target);
+    }
+  });
+}, {threshold: 0.3});
+
+const disciplineSection = document.getElementById('discipline');
+if (disciplineSection) disciplineObserver.observe(disciplineSection);
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  initWeeklyChallenge();
+  updateUI();
+});
+</script>
+</body>
+</html>

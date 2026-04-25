@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>太陽｜你的主角光環 — 西洋星盤 RPG</title>
+<meta name="description" content="西洋占星完整指南：太陽落十二宮、十二星座、45種行星相位，RPG遊戲化互動體驗。">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
+<style>
+/* fade-out keyframe for toasts */
+@keyframes fade-out { to { opacity: 0; transform: translateY(-12px); } }
+</style>
+</head>
+<body>
+
+<!-- Skip Nav -->
+<a href="#hero" id="skip-nav">跳至主要內容</a>
+
+<!-- ============================================================
+     CUBE INTRO OVERLAY
+     ============================================================ -->
+<div id="cube-overlay" role="presentation" aria-hidden="true">
+  <div class="cube-scene">
+    <div class="cube">
+      <div class="cube-face front"><span>☀️</span></div>
+      <div class="cube-face back"><span>✨</span></div>
+      <div class="cube-face left">太</div>
+      <div class="cube-face right">陽</div>
+      <div class="cube-face top">英</div>
+      <div class="cube-face bottom">雄</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     HUD BAR
+     ============================================================ -->
+<header id="hud" role="banner">
+  <div class="hud-sun" id="hud-sun" title="點擊7次解鎖神諭" tabindex="0" aria-label="太陽圖示，點擊七次解鎖彩蛋"></div>
+  <div class="hud-level-label" id="hud-level-label">🌱 見習太陽</div>
+  <div class="hud-xp-wrap">
+    <div class="hud-xp-track"><div class="hud-xp-fill" id="hud-xp-fill" style="width:0%"></div></div>
+    <div class="hud-xp-text" id="hud-xp-text">0 / 300 XP</div>
+  </div>
+  <div class="hud-streak" id="hud-streak">🔥 1天</div>
+  <div class="hud-badges-mini" id="hud-badges-mini">🏅 0/69</div>
+  <div class="hud-studytime" id="hud-studytime">⏱ 0:00</div>
+</header>
+
+<!-- Daily Quest Banner -->
+<div id="daily-quest-banner" role="complementary" aria-label="每日任務">
+  <div class="quest-label">DAILY QUEST</div>
+  <div class="quest-text" id="quest-text">載入中…</div>
+  <button class="quest-btn" id="quest-btn">完成任務 +50 XP</button>
+</div>
+
+<!-- Nav Dots -->
+<nav id="nav-dots" aria-label="頁面導覽">
+  <div class="nav-dot active" data-target="hero"         title="英雄開場"></div>
+  <div class="nav-dot" data-target="myth"                title="神話原型"></div>
+  <div class="nav-dot" data-target="core-energy"         title="核心能量"></div>
+  <div class="nav-dot" data-target="house-1"             title="第一宮"></div>
+  <div class="nav-dot" data-target="house-7"             title="第七宮"></div>
+  <div class="nav-dot" data-target="sign-aries"          title="12星座"></div>
+  <div class="nav-dot" data-target="aspects"             title="相位矩陣"></div>
+  <div class="nav-dot" data-target="celebs"              title="名人案例"></div>
+  <div class="nav-dot" data-target="guide"               title="實用指引"></div>
+  <div class="nav-dot" data-target="badges-section"      title="成就徽章"></div>
+  <div class="nav-dot" data-target="gacha-section"       title="技能抽卡"></div>
+  <div class="nav-dot" data-target="leaderboard"         title="排行榜"></div>
+  <div class="nav-dot" data-target="share-section"       title="分享卡"></div>
+</nav>
+
+<!-- ============================================================
+     SECTION 1: HERO
+     ============================================================ -->
+<section id="hero">
+  <div class="hero-bg">
+    <img src="./images/hero.png" class="hero-img" alt="太陽英雄背景"
+         onerror="this.style.display='none'">
+    <div class="hero-bg-gradient"></div>
+  </div>
+  <div class="particles" id="hero-particles"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">西洋占星 × RPG 英雄之旅</div>
+    <h1><span class="sun-word">太陽</span><br>你的主角光環</h1>
+    <p class="hero-sub">你的太陽星座不是性格標籤——它是你這輩子要刻意活出的英雄方向。十二宮位、十二星座、四十五種相位，全在這裡。</p>
+    <a href="#myth" class="hero-cta">開始英雄之旅 ↓</a>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 2: MYTH — Apollo / Helios
+     ============================================================ -->
+<section id="myth">
+  <div class="container">
+    <div class="myth-inner reveal">
+      <div class="myth-img-wrap">
+        <img src="./images/myth.png" alt="阿波羅神話圖像"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+        <div class="myth-img-fallback" style="display:none">🌞</div>
+      </div>
+      <div class="myth-text">
+        <div class="section-tag">Section 02 — 神話原型</div>
+        <h2 class="section-heading">阿波羅與赫利俄斯</h2>
+        <blockquote>「我是那道光——在黑暗不存在之前，我就在了。」</blockquote>
+        <p>古希臘世界裡，太陽有兩張臉：赫利俄斯（Helios）是每日駕馬車橫渡天空的原始日神，代表物理意義上的光與時間；阿波羅（Apollo）是藝術、預言、療癒的神，代表人類意識層面的光。</p>
+        <br>
+        <p>占星學中的「太陽」繼承了兩者——它既是你最原始的生命力（活下去的驅動），也是你意識上想要成為的自我理想。當你問「我是誰？」，你在問的就是你的太陽。</p>
+        <br>
+        <p>太陽是你星盤的主角光環。其他行星圍繞它轉，而它決定了你的英雄劇本：你要在哪個舞台發光（宮位），以及你的英雄特質是什麼（星座）。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 3: CORE ENERGY — Radar
+     ============================================================ -->
+<section id="core-energy">
+  <div class="container">
+    <div class="reveal" style="text-align:center">
+      <div class="section-tag">Section 03 — 核心能量</div>
+      <h2 class="section-heading">太陽 = 你的內建 RPG 主角</h2>
+      <p class="section-sub" style="margin: 0 auto 0">太陽能量不是單一的——它包含五大能量軸線，你的星座與宮位決定了哪條軸最強。</p>
+    </div>
+    <div id="radar-canvas-wrap">
+      <canvas id="radarChart" width="500" height="500" aria-label="太陽五大能量雷達圖"></canvas>
+    </div>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:1rem; max-width:900px; margin:0 auto;">
+      <div class="house-card reveal">
+        <h4>意志力</h4>
+        <p>你設定方向並排除萬難的能力。太陽在牡羊、獅子、天蠍的人，這條軸通常最飽滿。</p>
+      </div>
+      <div class="house-card reveal">
+        <h4>創造力</h4>
+        <p>把內在視野外化成具體形式的能力。第五宮或火象星座的太陽者最為顯著。</p>
+      </div>
+      <div class="house-card reveal">
+        <h4>表達力</h4>
+        <p>讓他人理解你、感受你的能力。風象星座太陽與第三宮、第一宮太陽強化這條軸。</p>
+      </div>
+      <div class="house-card reveal">
+        <h4>自信心</h4>
+        <p>相信自己有資格佔據空間的內在確信。獅子座、第一宮、木星相位的太陽特別強。</p>
+      </div>
+      <div class="house-card reveal">
+        <h4>領導力</h4>
+        <p>帶動他人走向共同目標的能力。第十宮太陽、牡羊座、土象星座太陽以不同方式展現。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTIONS 4-15: 12 HOUSES
+     ============================================================ -->
+
+<!-- House 1 -->
+<section id="house-1" class="house-section">
+  <div class="container">
+    <div class="house-header reveal">
+      <div class="house-number">I</div>
+      <div class="house-info">
+        <div class="section-tag">Section 04 — 宮位詳解</div>
+        <div class="house-name">第一宮：自我與身份</div>
+        <div class="house-domain">人生舞台：外貌、第一印象、個人特質、身體</div>
+      </div>
+    </div>
+    <div class="house-body">
+      <div class="house-card reveal"><h4>人生領域</h4><p>第一宮是「你本人」的宮位——外型、性格、給人的第一印象，以及你如何本能地面對新情境。上升點就在這裡。</p></div>
+      <div class="house-card reveal"><h4>核心驅動</h4><p>太陽在第一宮的人，驅動力來自「被看見本人」。他們需要真實呈現自我，而非透過角色或成就被認可。</p></div>
+      <div class="house-card reveal"><h4>行為表現</h4><p>通常有強烈的個人風格，直接、自信、存在感強。可能難以隱藏情緒，或在被忽視時感到特別不適。</p></div>
+    </div>
+    <div class="house-example reveal"><strong>真實案例：</strong>一個太陽第一宮的人在進入新環境時，會本能地「擺出自己的樣子」——不是刻意炫耀，只是無法假裝成別人。他們的英雄劇本寫在臉上。</div>
+    <button class="house-badge-trigger reveal" data-badge="house-1" data-label="第一宮">☀️ 解鎖第一宮洞見 +20 XP</button>
+  </div>
+</section>
+
+<!-- House 2 -->
+<section id="house-2" class="house-section">
+  <div class="container">
+    <div class="house-header reveal">
+      <div class="house-number">II</div>
+      <div class="house-info">
+        <div class="section-tag">Section 05 — 宮位詳解</div>
+        <div class="house-name">第二宮：資源與自我價值</div>
+        <div class="house-domain">人生舞台：金錢、才能、物質、自我評價</div>
+      </div>
+    </div>
+    <div class="house-body">
+      <div class="house-card reveal"><h4>人生領域</h4><p>第二宮管理你的資源——有形的金錢財物，以及無形的才能、技能，還有你如何評價自己的「值多少」。</p></div>
+      <div class="house-card reveal"><h4>核心驅動</h4><p>太陽在第二宮的人，認同感與財務/才能高度綁定。他們需要通過建立「有用的、有價值的自我」來確認身份。</p></div>
+      <div class="house-card reveal"><h4>行為表現</h4><p>對金錢或物質有強烈的主見，可能是天生的生財者，或長期糾結於自我價值的人——通常兩者都有過。</p></div>
+    </div>
+    <div class="house-example reveal"><strong>真實案例：</strong>一個太陽第二宮的企業家，不只是「為錢工作」，他的事業就是他自我展現的舞台——賺錢的過程等於在活出太陽。</div>
+    <button class="house-badge-trigger reveal" data-badge="house-2" data-label="第二宮">💰 解鎖第二宮洞見 +20 XP</button>
+  </div>
+</section>
+
+<!-- House 3 -->
+<section id="house-3" class="house-section">
+  <div class="container">
+    <div class="house-header reveal">
+      <div class="house-number">III</div>
+      <div class="house-info">
+        <div class="section-tag">Section 06 — 宮位詳解</div>
+        <div class="house-name">第三宮：溝通與智識</div>
+        <div class="house-domain">人生舞台：語言、學習、手足、近距離旅行</div>
+      </div>
+    </div>
+    <div class="house-body">
+      <div class="house-card reveal"><h4>人生領域</h4><p>第三宮是「說話與思考」的宮位——你如何組織語言、接收資訊、與周遭環境交換訊息，以及手足關係。</p></div>
+      <div class="house-card reveal"><h4>核心驅動</h4><p>太陽在第三宮的人，通過表達與學習來定義自己。說話、寫作、提問、解釋——是他們活出自我的主要管道。</p></div>
+      <div class="house-card reveal"><h4>行為表現</h4><p>通常話多（或有強烈的內在獨白），知識面廣，對新資訊敏感。可能在多種領域同時感興趣，難以聚焦是常見的功課。</p></div>
+    </div>
+    <div class="house-example reveal"><strong>真實案例：</strong>太陽第三宮的播客主持人，每集錄音對他而言不是工作——是用語言「燃燒太陽」的過程。沒得說話的週末讓他感覺自己消失了。</div>
+    <button class="house-badge-trigger reveal" data-badge="house-3" data-label="第三宮">📖 解鎖第三宮洞見 +20 XP</button>
+  </div>
+</section>
+
+<!-- House 4 -->
+<section id="house-4" class="house-section">
+  <div class="container">
+    <div class="house-header reveal">
+      <div class="house-number">IV</div>
+      <div class="house-info">
+        <div class="section-tag">Section 07 — 宮位詳解</div>
+        <div class="house-name">第四宮：根源與家族</div>
+        <div class="house-domain">人生舞台：家庭、根源、內心深處、人生終點</div>
+      </div>
+    </div>
+    <div class="house-body">
+      <div class="house-card reveal"><h4>人生領域</h4><p>第四宮是「家」的宮位——原生家庭、情感根基、你私下的樣子，以及你如何在人生後半段活出完整自我。</p></div>
+      <div class="house-card reveal"><h4>核心驅動</h4><p>太陽在第四宮的人，在私密、家庭、與根源連結的脈絡中最能發光。他們的能量需要「安全的地基」才能完全展開。</p></div>
+      <div class="house-card reveal"><h4>行為表現</h4><p>外人可能看到他們相對低調，但在家或親密關係中完全是另一個人——充滿能量、有主見、甚至是支柱型的存在。</p></div>
+    </div>
+    <div class="house-example reveal"><strong>真實案例：</strong>太陽第四宮的建築師，最重要的設計理念是「家應該讓人感覺活著」——因為她無意識在每個作品中重建自己的太陽。</div>
+    <button class="house-badge-trigger reveal" data-badge="house-4" data-label="第四宮">🏠 解鎖第四宮洞見 +20 XP</button>
+  </div>
+</section>
+
+<!-- House 5 -->
+<section id="house-5" class="house-section">
+  <div class="container">
+    <div class="house-header reveal">
+      <div class="house-number">V</div>
+      <div class="house-info">
+        <div class="section-tag">Section 08 — 宮位詳解</div>
+        <div class="house-name">第五宮：創造與表演</div>
+        <div class="house-domain">人生舞台：愛情、孩子、創作、娛樂、冒險</div>
+      </div>
+    </div>
+    <div class="house-body">
+      <div class="house-card reveal"><h4>人生領域</h4><p>第五宮是太陽在占星學中「本家」宮位（傳統上由獅子座和太陽統治）。這裡是創造、表演、戀愛、孩子與純粹樂趣的舞台。</p></div>
+      <div class="house-card reveal"><h4>核心驅動</h4><p>太陽在第五宮的人，需要舞台——被注視、被欣賞、被愛。他們通過創作或表演確認「我真的在這裡，我真的活著」。</p></div>
+      <div class="house-card reveal"><h4>行為表現</h4><p>天生的娛樂者，充滿活力、愛冒險，可能對戀愛或藝術有強烈執著。工作若少了創意成分，他們會逐漸熄滅。</p></div>
+    </div>
+    <div class="house-example reveal"><strong>真實案例：</strong>太陽第五宮的導演，拍片不是職業，是他確認自己還存在的方式。每次殺青後有一段空洞期——那是太陽能量找不到出口的症狀。</div>
+    <button class="house-badge-trigger reveal" data-badge="house-5" data-label="第五宮">🎭 解鎖第五宮洞見 +20 XP</button>
+  </div>
+</section>
+
+<!-- House 6 -->
+<section id="house-6" class="house-section">
+  <div class="container">
+    <div class="house-header reveal">
+      <div class="house-number">VI</div>
+      <div class="house-info">
+        <div class="section-tag">Section 09 — 宮位詳解</div>
+        <div class="house-name">第六宮：工作與服務</div>
+        <div class="house-domain">人生舞台：日常工作、健康、服務、技藝精進</div>
+      </div>
+    </div>
+    <div class="house-body">
+      <div class="house-card reveal"><h4>人生領域</h4><p>第六宮是每日例行工作、身體健康、服務他人，以及透過反覆鍛練精進技藝的場域。不是事業成就，而是過程與紀律。</p></div>
+      <div class="house-card reveal"><h4>核心驅動</h4><p>太陽在第六宮的人，「有用」是他們的核心需求。被需要、把事情做好、在細節中發現意義——這些是他們活出太陽的方式。</p></div>
+      <div class="house-card reveal"><h4>行為表現</h4><p>極度重視品質與效率，有時對自己或他人要求苛刻。健康問題往往反映自我要求過高的信號，身體是他們的太陽晴雨表。</p></div>
+    </div>
+    <div class="house-example reveal"><strong>真實案例：</strong>太陽第六宮的主廚不在乎米其林星星，他在乎的是每道菜上桌時的那個瞬間——客人吃到覺得「被照顧了」，就是他的太陽燃料。</div>
+    <button class="house-badge-trigger reveal" data-badge="house-6" data-label="第六宮">⚕️ 解鎖第六宮洞見 +20 XP</button>
+  </div>
+</section>
+
+<!-- House 7 -->
+<section id="house-7" class="house-section">
+  <div class="container">
+    <div class="house-header reveal">
+      <div class="house-number">VII</div>
+      <div class="house-info">
+        <div class="section-tag">Section 10 — 宮位詳解</div>
+        <div class="house-name">第七宮：伴侶與他者</div>
+        <div class="house-domain">人生舞台：婚姻、合夥、公開敵對、重要關係</div>
+      </div>
+    </div>
+    <div class="house-body">
+      <div class="house-card reveal"><h4>人生領域</h4><p>第七宮是「我」的鏡像——你在重要關係中如何定義自己，你吸引什麼樣的人，以及你在合夥中發光的方式。</p></div>
+      <div class="house-card reveal"><h4>核心驅動</h4><p>太陽在第七宮的人，身份認同需要「另一個人」作為鏡子。這不是依賴，而是他們在關係動態中才能找到最完整的自己。</p></div>
+      <div class="house-card reveal"><h4>行為表現</h4><p>天生的合作者，重視公平與平衡。常吸引強勢或有個性的伴侶——那些人其實映照了他們自己還沒整合的太陽面向。</p></div>
+    </div>
+    <div class="house-example reveal"><strong>真實案例：</strong>太陽第七宮的律師，在法庭上透過辯論找到活著的感覺——對手越強，她反而越清楚自己是誰。</div>
+    <button class="house-badge-trigger reveal" data-badge="house-7" data-label="第七宮">⚖️ 解鎖第七宮洞見 +20 XP</button>
+  </div>
+</section>
+
+<!-- House 8 -->
+<section id="house-8" class="house-section">
+  <div class="container">
+    <div class="house-header reveal">
+      <div class="house-number">VIII</div>
+      <div class="house-info">
+        <div class="section-tag">Section 11 — 宮位詳解</div>
+        <div class="house-name">第八宮：轉化與深層力量</div>
+        <div class="house-domain">人生舞台：死亡與重生、他人資源、心理深層、性、禁忌</div>
+      </div>
+    </div>
+    <div class="house-body">
+      <div class="house-card reveal"><h4>人生領域</h4><p>第八宮是「底層真相」的宮位——心理創傷、死亡議題、他人的資源（遺產、投資）、性能量，以及你如何在危機中蛻變。</p></div>
+      <div class="house-card reveal"><h4>核心驅動</h4><p>太陽在第八宮的人，需要「真正的深度」才能活著——他們無法忍受表面。危機、秘密、極限體驗是他們的太陽燃料。</p></div>
+      <div class="house-card reveal"><h4>行為表現</h4><p>洞察力極強，對人的動機看得很透，但也因此容易不信任他人。人生中往往有幾次「徹底重置」的時刻，每次蛻變後更強。</p></div>
+    </div>
+    <div class="house-example reveal"><strong>真實案例：</strong>太陽第八宮的心理治療師，選擇這個職業不是偶然——他自己走過了幾次黑暗谷底，每次出來都對生命多了一層理解。</div>
+    <button class="house-badge-trigger reveal" data-badge="house-8" data-label="第八宮">🔮 解鎖第八宮洞見 +20 XP</button>
+  </div>
+</section>
+
+<!-- House 9 -->
+<section id="house-9" class="house-section">
+  <div class="container">
+    <div class="house-header reveal">
+      <div class="house-number">IX</div>
+      <div class="house-info">
+        <div class="section-tag">Section 12 — 宮位詳解</div>
+        <div class="house-name">第九宮：信念與遠方</div>
+        <div class="house-domain">人生舞台：哲學、高等教育、跨文化、宗教、遠行</div>
+      </div>
+    </div>
+    <div class="house-body">
+      <div class="house-card reveal"><h4>人生領域</h4><p>第九宮是「意義的宮位」——你相信什麼、你對世界有什麼理解、遠方的文化與高等教育如何塑造你的世界觀。</p></div>
+      <div class="house-card reveal"><h4>核心驅動</h4><p>太陽在第九宮的人，需要「更大的答案」才能活得下去。哲學、旅行、不同文化、真理探索——是他們的太陽氧氣。</p></div>
+      <div class="house-card reveal"><h4>行為表現</h4><p>天生的老師或探索者，愛說自己的人生觀。可能難以接受「差不多就好」，對未知有強烈的吸引力，有時過分樂觀。</p></div>
+    </div>
+    <div class="house-example reveal"><strong>真實案例：</strong>太陽第九宮的旅遊作家，不是因為喜歡旅遊才寫作——是因為每次抵達陌生的地方，她才感覺太陽被點亮。</div>
+    <button class="house-badge-trigger reveal" data-badge="house-9" data-label="第九宮">🌏 解鎖第九宮洞見 +20 XP</button>
+  </div>
+</section>
+
+<!-- House 10 -->
+<section id="house-10" class="house-section">
+  <div class="container">
+    <div class="house-header reveal">
+      <div class="house-number">X</div>
+      <div class="house-info">
+        <div class="section-tag">Section 13 — 宮位詳解</div>
+        <div class="house-name">第十宮：事業與公眾形象</div>
+        <div class="house-domain">人生舞台：職業、聲譽、社會地位、與父親/權威的關係</div>
+      </div>
+    </div>
+    <div class="house-body">
+      <div class="house-card reveal"><h4>人生領域</h4><p>第十宮在星盤最高點（天頂 MC），是你在社會舞台上留下的印記——職業成就、公眾形象、你如何被歷史記住。</p></div>
+      <div class="house-card reveal"><h4>核心驅動</h4><p>太陽在第十宮的人，需要社會認可才能活出完整自我。這不是虛榮，而是他們的英雄舞台本來就在「公眾眼前」。</p></div>
+      <div class="house-card reveal"><h4>行為表現</h4><p>有強烈的事業心，天生的權威感，重視名聲。私下可能比外表脆弱很多——公眾形象和內在世界常有落差。</p></div>
+    </div>
+    <div class="house-example reveal"><strong>真實案例：</strong>歐巴馬（太陽獅子座，靠近第七宮）與賈伯斯（太陽雙魚座第十一宮）都展現了太陽在公眾舞台燃燒的不同形式——前者通過關係，後者通過社群願景。</div>
+    <button class="house-badge-trigger reveal" data-badge="house-10" data-label="第十宮">🏆 解鎖第十宮洞見 +20 XP</button>
+  </div>
+</section>
+
+<!-- House 11 -->
+<section id="house-11" class="house-section">
+  <div class="container">
+    <div class="house-header reveal">
+      <div class="house-number">XI</div>
+      <div class="house-info">
+        <div class="section-tag">Section 14 — 宮位詳解</div>
+        <div class="house-name">第十一宮：社群與理想</div>
+        <div class="house-domain">人生舞台：朋友圈、社群、人類理想、未來願景</div>
+      </div>
+    </div>
+    <div class="house-body">
+      <div class="house-card reveal"><h4>人生領域</h4><p>第十一宮是「我們」的宮位——你的社群、理想主義、未來願景，以及你如何在集體中找到個人位置。</p></div>
+      <div class="house-card reveal"><h4>核心驅動</h4><p>太陽在第十一宮的人，需要「屬於某個更大的東西」才能活出自我。他們的英雄劇本和社群、理念、改變世界的意圖綁在一起。</p></div>
+      <div class="house-card reveal"><h4>行為表現</h4><p>有強烈的理想主義，重視平等，可能有很多不同圈子的朋友。私下親密關係反而可能較難——他們對群體更自在。</p></div>
+    </div>
+    <div class="house-example reveal"><strong>真實案例：</strong>史蒂夫·賈伯斯（太陽雙魚座第十一宮）的核心驅動不是金錢，而是重新定義人類與科技的關係——一個標準的第十一宮太陽劇本。</div>
+    <button class="house-badge-trigger reveal" data-badge="house-11" data-label="第十一宮">🌐 解鎖第十一宮洞見 +20 XP</button>
+  </div>
+</section>
+
+<!-- House 12 -->
+<section id="house-12" class="house-section">
+  <div class="container">
+    <div class="house-header reveal">
+      <div class="house-number">XII</div>
+      <div class="house-info">
+        <div class="section-tag">Section 15 — 宮位詳解</div>
+        <div class="house-name">第十二宮：隱藏與靈性</div>
+        <div class="house-domain">人生舞台：潛意識、業力、隔離、靈性、隱藏的敵人</div>
+      </div>
+    </div>
+    <div class="house-body">
+      <div class="house-card reveal"><h4>人生領域</h4><p>第十二宮是「看不見的宮位」——潛意識、集體無意識、你不願承認的自己、業力主題，以及通過靜默或退隱找到的力量。</p></div>
+      <div class="house-card reveal"><h4>核心驅動</h4><p>太陽在第十二宮的人，英雄劇本在「無形的世界」展開。他們的光通常不在聚光燈下，而在幕後、夢境、藝術、或靈性實踐中。</p></div>
+      <div class="house-card reveal"><h4>行為表現</h4><p>往往對自己的真實需求難以清晰表達，感覺「自己不重要」是常見的心理動態。一旦整合潛意識，通常有驚人的靈性深度。</p></div>
+    </div>
+    <div class="house-example reveal"><strong>真實案例：</strong>許多藝術家或靈性導師有太陽第十二宮——他們的光是從黑暗中長出來的，Franz Kafka（太陽第十二宮）的作品就是對這個宮位最精準的描述。</div>
+    <button class="house-badge-trigger reveal" data-badge="house-12" data-label="第十二宮">🌊 解鎖第十二宮洞見 +20 XP</button>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTIONS 16-27: 12 SIGNS
+     ============================================================ -->
+
+<!-- Sign: Aries -->
+<section id="sign-aries" class="sign-section">
+  <div class="container">
+    <div class="section-tag">Section 16 — 星座詳解</div>
+    <div class="sign-grid reveal">
+      <div class="sign-glyph">♈</div>
+      <div class="sign-content">
+        <h2>太陽牡羊座</h2>
+        <div class="sign-dates">3/21 — 4/19｜火象·基本·火星守護</div>
+        <div class="sign-pillars">
+          <div class="pillar"><div class="pillar-label plus">核心特質</div><p>先行動再思考的原始衝動，對第一名有強烈渴望，生命力充沛，無法忍受停滯。</p></div>
+          <div class="pillar"><div class="pillar-label plus">優勢</div><p>開創力、膽識、行動速度、在危機中的本能反應、感染他人的熱情。</p></div>
+          <div class="pillar"><div class="pillar-label minus">陰影</div><p>易怒、衝動造成的後果、無法堅持到終點、把批評當攻擊、自我中心的盲點。</p></div>
+          <div class="pillar"><div class="pillar-label star">名人</div><p>查理·卓別林（3/28）——用喜劇衝破時代禁忌，牡羊座太陽典型的先鋒姿態。</p></div>
+        </div>
+        <div class="sign-celeb"><div class="celeb-icon">🎬</div><div><strong>查理·卓別林</strong>（1889/3/28）<span> — 太陽牡羊座，在無聲電影時代衝出一條路，至今無人複製。</span></div></div>
+        <button class="sign-badge-trigger" data-badge="sign-aries" style="display:none"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sign: Taurus -->
+<section id="sign-taurus" class="sign-section">
+  <div class="container">
+    <div class="section-tag">Section 17 — 星座詳解</div>
+    <div class="sign-grid reveal">
+      <div class="sign-glyph">♉</div>
+      <div class="sign-content">
+        <h2>太陽金牛座</h2>
+        <div class="sign-dates">4/20 — 5/20｜土象·固定·金星守護</div>
+        <div class="sign-pillars">
+          <div class="pillar"><div class="pillar-label plus">核心特質</div><p>穩定、感官享受、累積、耐力。金牛座的太陽需要「可以摸得到的東西」來確認自我價值。</p></div>
+          <div class="pillar"><div class="pillar-label plus">優勢</div><p>可靠、持久力、對美的直覺、財務敏感度、給人安全感的存在。</p></div>
+          <div class="pillar"><div class="pillar-label minus">陰影</div><p>固執到拒絕任何改變、物質主義的自我麻痺、對控制感的執著。</p></div>
+          <div class="pillar"><div class="pillar-label star">名人</div><p>奧黛麗·赫本（5/4）——優雅、耐久、真實——金牛座太陽最美的詮釋。</p></div>
+        </div>
+        <div class="sign-celeb"><div class="celeb-icon">💎</div><div><strong>奧黛麗·赫本</strong>（1929/5/4）<span> — 太陽金牛座，美不是表演，是她本來的樣子。</span></div></div>
+        <button class="sign-badge-trigger" data-badge="sign-taurus" style="display:none"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sign: Gemini -->
+<section id="sign-gemini" class="sign-section">
+  <div class="container">
+    <div class="section-tag">Section 18 — 星座詳解</div>
+    <div class="sign-grid reveal">
+      <div class="sign-glyph">♊</div>
+      <div class="sign-content">
+        <h2>太陽雙子座</h2>
+        <div class="sign-dates">5/21 — 6/20｜風象·變動·水星守護</div>
+        <div class="sign-pillars">
+          <div class="pillar"><div class="pillar-label plus">核心特質</div><p>好奇心是太陽燃料，在多元視角中活躍，思維快速跳接，天生的訊息收集者與傳遞者。</p></div>
+          <div class="pillar"><div class="pillar-label plus">優勢</div><p>適應力、機智、多工能力、溝通魅力、在複雜情境中找到連結的能力。</p></div>
+          <div class="pillar"><div class="pillar-label minus">陰影</div><p>表面而不深入、情緒迴避（用理智代替感受）、承諾恐懼。</p></div>
+          <div class="pillar"><div class="pillar-label star">名人</div><p>安琪拉·梅克爾（7/17，不是雙子——但瑪麗蓮夢露 6/1 是）——夢露的多面性是雙子太陽的活教材。</p></div>
+        </div>
+        <div class="sign-celeb"><div class="celeb-icon">✨</div><div><strong>瑪麗蓮·夢露</strong>（1926/6/1）<span> — 太陽雙子座，公眾看到的脆弱與智慧，是同一個人的兩面。</span></div></div>
+        <button class="sign-badge-trigger" data-badge="sign-gemini" style="display:none"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sign: Cancer -->
+<section id="sign-cancer" class="sign-section">
+  <div class="container">
+    <div class="section-tag">Section 19 — 星座詳解</div>
+    <div class="sign-grid reveal">
+      <div class="sign-glyph">♋</div>
+      <div class="sign-content">
+        <h2>太陽巨蟹座</h2>
+        <div class="sign-dates">6/21 — 7/22｜水象·基本·月亮守護</div>
+        <div class="sign-pillars">
+          <div class="pillar"><div class="pillar-label plus">核心特質</div><p>情感是指南針，照顧他人是活出太陽的路徑，對家與歸屬有深刻的需求。</p></div>
+          <div class="pillar"><div class="pillar-label plus">優勢</div><p>直覺力、情感深度、照顧能力、對他人需求的敏感、強烈的記憶力與歷史感。</p></div>
+          <div class="pillar"><div class="pillar-label minus">陰影</div><p>情緒化到讓人無所適從、黏附或操控傾向、用照顧別人來逃避自己的需求。</p></div>
+          <div class="pillar"><div class="pillar-label star">名人</div><p>黛安娜王妃（7/1）——她的公眾形象完全是巨蟹太陽：用情感連結重新定義王室。</p></div>
+        </div>
+        <div class="sign-celeb"><div class="celeb-icon">👑</div><div><strong>黛安娜王妃</strong>（1961/7/1）<span> — 太陽巨蟹座，在制度中注入了人的溫度。</span></div></div>
+        <button class="sign-badge-trigger" data-badge="sign-cancer" style="display:none"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sign: Leo -->
+<section id="sign-leo" class="sign-section">
+  <div class="container">
+    <div class="section-tag">Section 20 — 星座詳解</div>
+    <div class="sign-grid reveal">
+      <div class="sign-glyph">♌</div>
+      <div class="sign-content">
+        <h2>太陽獅子座</h2>
+        <div class="sign-dates">7/23 — 8/22｜火象·固定·太陽守護</div>
+        <div class="sign-pillars">
+          <div class="pillar"><div class="pillar-label plus">核心特質</div><p>太陽在自己的家——獅子座的太陽能量最純粹、最不妥協。被欣賞、表達、領導是本能。</p></div>
+          <div class="pillar"><div class="pillar-label plus">優勢</div><p>王者氣場、慷慨心胸、創造力、在人群中自然散發的暖度與磁場、對品質的堅持。</p></div>
+          <div class="pillar"><div class="pillar-label minus">陰影</div><p>自我中心到看不見他人、需要持續被讚美的依賴性、表演性格蓋過真實感受。</p></div>
+          <div class="pillar"><div class="pillar-label star">名人</div><p>麥當娜（8/16）——太陽獅子座，每十年重新定義自己，從不放棄舞台。</p></div>
+        </div>
+        <div class="sign-celeb"><div class="celeb-icon">🦁</div><div><strong>麥當娜</strong>（1958/8/16）<span> — 太陽獅子座，不是在表演自己，是在燃燒自己。</span></div></div>
+        <button class="sign-badge-trigger" data-badge="sign-leo" style="display:none"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sign: Virgo -->
+<section id="sign-virgo" class="sign-section">
+  <div class="container">
+    <div class="section-tag">Section 21 — 星座詳解</div>
+    <div class="sign-grid reveal">
+      <div class="sign-glyph">♍</div>
+      <div class="sign-content">
+        <h2>太陽處女座</h2>
+        <div class="sign-dates">8/23 — 9/22｜土象·變動·水星守護</div>
+        <div class="sign-pillars">
+          <div class="pillar"><div class="pillar-label plus">核心特質</div><p>分析、辨別、精進。處女座太陽需要「把事情做對」才感覺自我是完整的。</p></div>
+          <div class="pillar"><div class="pillar-label plus">優勢</div><p>精確度、解決問題的能力、健康意識、對模式的敏感、真誠的服務心。</p></div>
+          <div class="pillar"><div class="pillar-label minus">陰影</div><p>對自己和他人過度批判、完美主義讓行動癱瘓、擔憂成為主要情緒色調。</p></div>
+          <div class="pillar"><div class="pillar-label star">名人</div><p>碧昂絲（9/4）——處女座太陽，演出的精密程度是她活出太陽最直接的表現。</p></div>
+        </div>
+        <div class="sign-celeb"><div class="celeb-icon">⭐</div><div><strong>碧昂絲</strong>（1981/9/4）<span> — 太陽處女座，每個細節都是有意識的決定。</span></div></div>
+        <button class="sign-badge-trigger" data-badge="sign-virgo" style="display:none"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sign: Libra -->
+<section id="sign-libra" class="sign-section">
+  <div class="container">
+    <div class="section-tag">Section 22 — 星座詳解</div>
+    <div class="sign-grid reveal">
+      <div class="sign-glyph">♎</div>
+      <div class="sign-content">
+        <h2>太陽天秤座</h2>
+        <div class="sign-dates">9/23 — 10/22｜風象·基本·金星守護</div>
+        <div class="sign-pillars">
+          <div class="pillar"><div class="pillar-label plus">核心特質</div><p>通過關係與美感找到自我，對公平與和諧有強烈的本能需求，審美天賦是太陽燃料。</p></div>
+          <div class="pillar"><div class="pillar-label plus">優勢</div><p>外交能力、美感、邏輯推理、創造和諧氛圍、在對立中找到共同點。</p></div>
+          <div class="pillar"><div class="pillar-label minus">陰影</div><p>猶豫不決到令人抓狂、為了和諧壓抑真實意見、對被討厭的恐懼主宰決策。</p></div>
+          <div class="pillar"><div class="pillar-label star">名人</div><p>甘地（10/2）——太陽天秤座，通過非暴力的美學邏輯改變了歷史。</p></div>
+        </div>
+        <div class="sign-celeb"><div class="celeb-icon">☮️</div><div><strong>聖雄甘地</strong>（1869/10/2）<span> — 太陽天秤座，平衡不是妥協，是他的力量核心。</span></div></div>
+        <button class="sign-badge-trigger" data-badge="sign-libra" style="display:none"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sign: Scorpio -->
+<section id="sign-scorpio" class="sign-section">
+  <div class="container">
+    <div class="section-tag">Section 23 — 星座詳解</div>
+    <div class="sign-grid reveal">
+      <div class="sign-glyph">♏</div>
+      <div class="sign-content">
+        <h2>太陽天蠍座</h2>
+        <div class="sign-dates">10/23 — 11/21｜水象·固定·冥王星守護</div>
+        <div class="sign-pillars">
+          <div class="pillar"><div class="pillar-label plus">核心特質</div><p>深度、強度、轉化。天蠍座太陽無法在表面運作——他們需要進入本質才能活著。</p></div>
+          <div class="pillar"><div class="pillar-label plus">優勢</div><p>心理洞察力、危機中的穩定、蛻變能力、對秘密與底層真相的感知、不妥協的忠誠。</p></div>
+          <div class="pillar"><div class="pillar-label minus">陰影</div><p>控制欲、報復心、「全有或全無」的極端主義、把親密武器化。</p></div>
+          <div class="pillar"><div class="pillar-label star">名人</div><p>比爾·蓋茲（10/28）——太陽天蠍座，對底層系統的執著重寫了人類的工作方式。</p></div>
+        </div>
+        <div class="sign-celeb"><div class="celeb-icon">💻</div><div><strong>比爾·蓋茲</strong>（1955/10/28）<span> — 太陽天蠍座，看到別人還沒看到的底層力量。</span></div></div>
+        <button class="sign-badge-trigger" data-badge="sign-scorpio" style="display:none"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sign: Sagittarius -->
+<section id="sign-sagittarius" class="sign-section">
+  <div class="container">
+    <div class="section-tag">Section 24 — 星座詳解</div>
+    <div class="sign-grid reveal">
+      <div class="sign-glyph">♐</div>
+      <div class="sign-content">
+        <h2>太陽射手座</h2>
+        <div class="sign-dates">11/22 — 12/21｜火象·變動·木星守護</div>
+        <div class="sign-pillars">
+          <div class="pillar"><div class="pillar-label plus">核心特質</div><p>自由、意義、遠方。射手座太陽需要地平線——任何限制都是對靈魂的壓縮。</p></div>
+          <div class="pillar"><div class="pillar-label plus">優勢</div><p>樂觀感染力、哲學視野、跨文化適應力、誠實（有時赤裸）、永不熄滅的好奇心。</p></div>
+          <div class="pillar"><div class="pillar-label minus">陰影</div><p>承諾恐懼、「大圖景」讓細節失控、說話直接到傷人、過分樂觀迴避現實。</p></div>
+          <div class="pillar"><div class="pillar-label star">名人</div><p>泰勒絲（12/13）——太陽射手座，每一張專輯都是一次哲學宣言。</p></div>
+        </div>
+        <div class="sign-celeb"><div class="celeb-icon">🎸</div><div><strong>泰勒絲</strong>（1989/12/13）<span> — 太陽射手座，把自己的每段旅程變成全球共鳴的故事。</span></div></div>
+        <button class="sign-badge-trigger" data-badge="sign-sagittarius" style="display:none"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sign: Capricorn -->
+<section id="sign-capricorn" class="sign-section">
+  <div class="container">
+    <div class="section-tag">Section 25 — 星座詳解</div>
+    <div class="sign-grid reveal">
+      <div class="sign-glyph">♑</div>
+      <div class="sign-content">
+        <h2>太陽摩羯座</h2>
+        <div class="sign-dates">12/22 — 1/19｜土象·基本·土星守護</div>
+        <div class="sign-pillars">
+          <div class="pillar"><div class="pillar-label plus">核心特質</div><p>長遠視野、結構、責任感。摩羯座太陽要攀登山峰，而且要用最紮實的方式。</p></div>
+          <div class="pillar"><div class="pillar-label plus">優勢</div><p>策略性思維、紀律、可靠性、越到後期越強的「陳年酒」特質、對現實的精準感知。</p></div>
+          <div class="pillar"><div class="pillar-label minus">陰影</div><p>把成就與自我價值畫等號、情感壓抑、工作狂到忽視關係、對失敗的深度恐懼。</p></div>
+          <div class="pillar"><div class="pillar-label star">名人</div><p>大衛·鮑威（1/8）——太陽摩羯座，把自我重構成一個帝國，有結構地創新。</p></div>
+        </div>
+        <div class="sign-celeb"><div class="celeb-icon">🎤</div><div><strong>大衛·鮑威</strong>（1947/1/8）<span> — 太陽摩羯座，Ziggy Stardust 是他對結構的最高玩弄。</span></div></div>
+        <button class="sign-badge-trigger" data-badge="sign-capricorn" style="display:none"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sign: Aquarius -->
+<section id="sign-aquarius" class="sign-section">
+  <div class="container">
+    <div class="section-tag">Section 26 — 星座詳解</div>
+    <div class="sign-grid reveal">
+      <div class="sign-glyph">♒</div>
+      <div class="sign-content">
+        <h2>太陽水瓶座</h2>
+        <div class="sign-dates">1/20 — 2/18｜風象·固定·天王星守護</div>
+        <div class="sign-pillars">
+          <div class="pillar"><div class="pillar-label plus">核心特質</div><p>獨特性、集體意識、打破規則。水瓶座太陽需要「和別人不一樣」才能感覺自己存在。</p></div>
+          <div class="pillar"><div class="pillar-label plus">優勢</div><p>創新思維、對未來的直覺、人道主義視野、在邊緣地帶找到真理的能力。</p></div>
+          <div class="pillar"><div class="pillar-label minus">陰影</div><p>情感疏離、為了「原則」而冷漠、把獨特性變成另一種表演、理智凌駕一切。</p></div>
+          <div class="pillar"><div class="pillar-label star">名人</div><p>愛因斯坦（3/14，雙魚座——但歐普拉 1/29 是水瓶）——歐普拉用媒體重新定義了「集體療癒」。</p></div>
+        </div>
+        <div class="sign-celeb"><div class="celeb-icon">📡</div><div><strong>歐普拉·溫芙蕾</strong>（1954/1/29）<span> — 太陽水瓶座，把個人故事轉化成集體覺醒的工具。</span></div></div>
+        <button class="sign-badge-trigger" data-badge="sign-aquarius" style="display:none"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sign: Pisces -->
+<section id="sign-pisces" class="sign-section">
+  <div class="container">
+    <div class="section-tag">Section 27 — 星座詳解</div>
+    <div class="sign-grid reveal">
+      <div class="sign-glyph">♓</div>
+      <div class="sign-content">
+        <h2>太陽雙魚座</h2>
+        <div class="sign-dates">2/19 — 3/20｜水象·變動·海王星守護</div>
+        <div class="sign-pillars">
+          <div class="pillar"><div class="pillar-label plus">核心特質</div><p>同理、溶解邊界、靈性感受。雙魚座太陽在「我」與「一切」之間的邊界最薄。</p></div>
+          <div class="pillar"><div class="pillar-label plus">優勢</div><p>深度同理心、藝術直覺、靈性洞見、對集體情緒的感知、無條件的愛的能力。</p></div>
+          <div class="pillar"><div class="pillar-label minus">陰影</div><p>失去自我邊界、逃避現實（成癮、幻想）、犧牲者心態、情緒淹沒。</p></div>
+          <div class="pillar"><div class="pillar-label star">名人</div><p>史蒂夫·賈伯斯（2/24）——太陽雙魚座，把無形的美感注入科技，讓機器有了靈魂。</p></div>
+        </div>
+        <div class="sign-celeb"><div class="celeb-icon">🍎</div><div><strong>史蒂夫·賈伯斯</strong>（1955/2/24）<span> — 太陽雙魚座，最難解釋的產品願景，最不妥協的美感標準。</span></div></div>
+        <button class="sign-badge-trigger" data-badge="sign-pisces" style="display:none"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 28: ASPECT MATRIX (45 cells)
+     ============================================================ -->
+<section id="aspects">
+  <div class="container-wide">
+    <div class="reveal" style="text-align:center; margin-bottom:2rem">
+      <div class="section-tag">Section 28 — 相位矩陣</div>
+      <h2 class="section-heading">太陽 × 九大行星 × 五種相位</h2>
+      <p class="section-sub" style="margin:0 auto">點擊每格展開詳細解釋。每格都有具體的心理動力描述，非空話。</p>
+    </div>
+    <div class="aspect-table-wrap reveal">
+      <table class="aspect-matrix" role="grid" aria-label="太陽相位矩陣">
+        <thead>
+          <tr>
+            <th>行星</th>
+            <th><span class="asp-conj">☌ 合相 0°</span></th>
+            <th><span class="asp-opp">☍ 對分相 180°</span></th>
+            <th><span class="asp-sq">□ 四分相 90°</span></th>
+            <th><span class="asp-tri">△ 三分相 120°</span></th>
+            <th><span class="asp-sex">⚹ 六分相 60°</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Moon -->
+          <tr>
+            <td class="aspect-row-header">🌙 月亮</td>
+            <td><div class="aspect-cell" data-badge="asp-sun-moon-conj" tabindex="0">
+              <span class="cell-aspect asp-conj">合相 ☌</span>
+              <span class="cell-short">意志即情感</span>
+              <div class="cell-full">意識與潛意識同頻——想做的就是感受到的，行動力強但可能陷入自我參照，缺乏外部視角校正。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-moon-opp" tabindex="0">
+              <span class="cell-aspect asp-opp">對分相 ☍</span>
+              <span class="cell-short">自我 vs. 情感</span>
+              <div class="cell-full">理性目標與情感需求拉扯——想要成就，但身體想要安全；常在「努力」與「休息」之間震盪。滿月出生者有此相位。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-moon-sq" tabindex="0">
+              <span class="cell-aspect asp-sq">四分相 □</span>
+              <span class="cell-short">意志 vs. 安全感</span>
+              <div class="cell-full">每次前進一步，內在就有一個聲音問「但我安全嗎？」——外在行動與內心恐懼持續摩擦，是最強的成長壓力之一。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-moon-tri" tabindex="0">
+              <span class="cell-aspect asp-tri">三分相 △</span>
+              <span class="cell-short">自然整合</span>
+              <div class="cell-full">行動與情感自然流動——做自己想做的事時，身體和心同時感覺對。這種流暢感讓人顯得從容，但也可能少了摩擦帶來的深度。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-moon-sex" tabindex="0">
+              <span class="cell-aspect asp-sex">六分相 ⚹</span>
+              <span class="cell-short">情感支撐行動</span>
+              <div class="cell-full">情感資源可以被意識調用——知道自己想要什麼，且有情感能量去執行，需要主動開啟才發揮作用。</div>
+            </div></td>
+          </tr>
+          <!-- Mercury -->
+          <tr>
+            <td class="aspect-row-header">☿ 水星</td>
+            <td><div class="aspect-cell" data-badge="asp-sun-merc-conj" tabindex="0">
+              <span class="cell-aspect asp-conj">合相 ☌</span>
+              <span class="cell-short">思考即自我</span>
+              <div class="cell-full">思維方式與身份高度合一——說話就是在表達「我是誰」，觀點被質疑會觸發防禦。優點是思想清晰有力，缺點是難以從自己的思維框架出走。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-merc-opp" tabindex="0">
+              <span class="cell-aspect asp-opp">對分相 ☍</span>
+              <span class="cell-short">行動先於思考</span>
+              <div class="cell-full">太陽水星對分在自然界中不存在（水星最遠離太陽28°），因此此相位在技術上不可能發生——實際上無此相位。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-merc-sq" tabindex="0">
+              <span class="cell-aspect asp-sq">四分相 □</span>
+              <span class="cell-short">思考阻礙行動</span>
+              <div class="cell-full">同理，四分相（90°）在天文上也不可能存在——水星永遠不會離太陽超過28°。此格為天文上不可能的相位。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-merc-tri" tabindex="0">
+              <span class="cell-aspect asp-tri">三分相 △</span>
+              <span class="cell-short">思維加速發光</span>
+              <div class="cell-full">天文上同樣不可能。水星最大離角28°，無法形成三分相（120°）。此欄位標記為技術性不存在。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-merc-sex" tabindex="0">
+              <span class="cell-aspect asp-sex">六分相 ⚹</span>
+              <span class="cell-short">思維靈活助力</span>
+              <div class="cell-full">六分相（60°）技術上接近水星最大離角上限，偶爾可見。此時語言與自我表達呈現輕巧協調，溝通成為行動的橋樑而非阻礙。</div>
+            </div></td>
+          </tr>
+          <!-- Venus -->
+          <tr>
+            <td class="aspect-row-header">♀ 金星</td>
+            <td><div class="aspect-cell" data-badge="asp-sun-ven-conj" tabindex="0">
+              <span class="cell-aspect asp-conj">合相 ☌</span>
+              <span class="cell-short">魅力即存在</span>
+              <div class="cell-full">美感、吸引力和個人形象合一——外在形象和內在價值觀高度一致，天生有吸引力，但可能過度在意他人的喜歡。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-ven-opp" tabindex="0">
+              <span class="cell-aspect asp-opp">對分相 ☍</span>
+              <span class="cell-short">自我 vs. 關係</span>
+              <div class="cell-full">個人目標與對關係的渴望持續拉扯——在「做自己」與「被愛」之間搖擺，需要學習不用妥協換取認可。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-ven-sq" tabindex="0">
+              <span class="cell-aspect asp-sq">四分相 □</span>
+              <span class="cell-short">自尊與愛的摩擦</span>
+              <div class="cell-full">自我價值與被愛之間有不舒服的張力——可能用物質或魅力填補內在不足，核心功課是在不被欣賞時仍確認自己的價值。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-ven-tri" tabindex="0">
+              <span class="cell-aspect asp-tri">三分相 △</span>
+              <span class="cell-short">活出就是美</span>
+              <div class="cell-full">審美觀、人際關係與自我表達自然和諧——做自己時自然有魅力，不費力地吸引與價值觀相符的人事物。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-ven-sex" tabindex="0">
+              <span class="cell-aspect asp-sex">六分相 ⚹</span>
+              <span class="cell-short">美感賦能</span>
+              <div class="cell-full">美感天賦可以被有意識地調用——在藝術、設計、人際關係中展現時，給自我表達增添輕盈的吸引力。</div>
+            </div></td>
+          </tr>
+          <!-- Mars -->
+          <tr>
+            <td class="aspect-row-header">♂ 火星</td>
+            <td><div class="aspect-cell" data-badge="asp-sun-mars-conj" tabindex="0">
+              <span class="cell-aspect asp-conj">合相 ☌</span>
+              <span class="cell-short">意志即行動力</span>
+              <div class="cell-full">「想要」和「去做」之間零延遲——行動力強、競爭意識高、有時急躁，但在需要勇氣的時刻從不猶豫。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-mars-opp" tabindex="0">
+              <span class="cell-aspect asp-opp">對分相 ☍</span>
+              <span class="cell-short">行動引發衝突</span>
+              <div class="cell-full">自我展現時易觸發他人對抗——吸引競爭性的伴侶或情境，功課是把衝突轉化為動力而非身份威脅。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-mars-sq" tabindex="0">
+              <span class="cell-aspect asp-sq">四分相 □</span>
+              <span class="cell-short">行動力過載</span>
+              <div class="cell-full">衝動與意志衝突——要麼行動力爆棚但方向錯誤，要麼在自我審查中癱瘓。整合後是極強的執行力，失控時是自毀。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-mars-tri" tabindex="0">
+              <span class="cell-aspect asp-tri">三分相 △</span>
+              <span class="cell-short">意志流動暢行</span>
+              <div class="cell-full">能量自然流向目標——不費力地行動，勇氣是內建的，不需要說服自己「我做得到」，直接去做就是。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-mars-sex" tabindex="0">
+              <span class="cell-aspect asp-sex">六分相 ⚹</span>
+              <span class="cell-short">行動力隨召隨到</span>
+              <div class="cell-full">在需要的時候可以啟動強勁的行動力——不是持續燃燒，而是精準調用，讓太陽意圖有清晰的執行管道。</div>
+            </div></td>
+          </tr>
+          <!-- Jupiter -->
+          <tr>
+            <td class="aspect-row-header">♃ 木星</td>
+            <td><div class="aspect-cell" data-badge="asp-sun-jup-conj" tabindex="0">
+              <span class="cell-aspect asp-conj">合相 ☌</span>
+              <span class="cell-short">存在即放大</span>
+              <div class="cell-full">太陽能量被木星放大——自信、樂觀、吸引機會是本能，但也可能過度膨脹、承諾超過能力，需要「現實校正」機制。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-jup-opp" tabindex="0">
+              <span class="cell-aspect asp-opp">對分相 ☍</span>
+              <span class="cell-short">理想 vs. 現實</span>
+              <div class="cell-full">在別人身上看到的可能性無限，對自己卻有盲區——容易被他人的大格局吸引，卻忘了執行細節。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-jup-sq" tabindex="0">
+              <span class="cell-aspect asp-sq">四分相 □</span>
+              <span class="cell-short">自大或自我懷疑</span>
+              <div class="cell-full">木星的擴張力和太陽自我之間形成張力——要麼過度自信闖入地雷區，要麼突然崩塌到覺得自己什麼都不是。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-jup-tri" tabindex="0">
+              <span class="cell-aspect asp-tri">三分相 △</span>
+              <span class="cell-short">機遇自然湧現</span>
+              <div class="cell-full">展現自我時會自然吸引擴展機會——不是「努力換來的好運」，而是因為活出自己的方式本身就打開了門。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-jup-sex" tabindex="0">
+              <span class="cell-aspect asp-sex">六分相 ⚹</span>
+              <span class="cell-short">格局感召隨用</span>
+              <div class="cell-full">樂觀與擴張能力在需要的時候可以被有意識啟動——在演講、談判、教學中，這個能量特別有說服力。</div>
+            </div></td>
+          </tr>
+          <!-- Saturn -->
+          <tr>
+            <td class="aspect-row-header">♄ 土星</td>
+            <td><div class="aspect-cell" data-badge="asp-sun-sat-conj" tabindex="0">
+              <span class="cell-aspect asp-conj">合相 ☌</span>
+              <span class="cell-short">責任感即身份</span>
+              <div class="cell-full">自我被土星嚴格框限——天生的紀律感，但「我值得快樂嗎？」是持續的背景雜音。活出來是紮實的成就者，壓制住則是嚴苛的自我審判。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-sat-opp" tabindex="0">
+              <span class="cell-aspect asp-opp">對分相 ☍</span>
+              <span class="cell-short">權威 vs. 自我</span>
+              <div class="cell-full">自我表達時感受到外部的限制或否定——可能有嚴厲父親或社會壓力的印記，核心功課是建立不依賴認可的內在權威。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-sat-sq" tabindex="0">
+              <span class="cell-aspect asp-sq">四分相 □</span>
+              <span class="cell-short">發光引發懲罰感</span>
+              <div class="cell-full">每次太陽能量要展開，就有一個內在機制說「還不夠好」「不應該」——這是土星用考驗打造真正耐用的自我，整合後是極強的實力。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-sat-tri" tabindex="0">
+              <span class="cell-aspect asp-tri">三分相 △</span>
+              <span class="cell-short">結構支撐發光</span>
+              <div class="cell-full">紀律與自我表達不衝突——知道如何在系統內創造，規則對他們來說是跳板而非枷鎖，長期積累後的成就讓人信服。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-sat-sex" tabindex="0">
+              <span class="cell-aspect asp-sex">六分相 ⚹</span>
+              <span class="cell-short">紀律賦能自我</span>
+              <div class="cell-full">可以在需要時調用極強的紀律和專注力——不是持續的壓力，而是有意識的嚴肅感，讓自我表達有分量。</div>
+            </div></td>
+          </tr>
+          <!-- Uranus -->
+          <tr>
+            <td class="aspect-row-header">♅ 天王星</td>
+            <td><div class="aspect-cell" data-badge="asp-sun-ura-conj" tabindex="0">
+              <span class="cell-aspect asp-conj">合相 ☌</span>
+              <span class="cell-short">存在即顛覆</span>
+              <div class="cell-full">身份認同與革命性能量合一——無法不打破規則，是天生的局外人，最有活力的時刻就是在質疑「不能這樣做」的時刻。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-ura-opp" tabindex="0">
+              <span class="cell-aspect asp-opp">對分相 ☍</span>
+              <span class="cell-short">自我 vs. 群體自由</span>
+              <div class="cell-full">個人認同與集體改變的力量相互拉扯——在「做自己」與「代表某種更大可能性」之間尋找位置。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-ura-sq" tabindex="0">
+              <span class="cell-aspect asp-sq">四分相 □</span>
+              <span class="cell-short">不穩定的天才</span>
+              <div class="cell-full">自我表達衝突而突兀——突然要自由、突然要穩定；最不安分的相位之一，也是最容易在「天才」與「混亂」之間震盪的配置。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-ura-tri" tabindex="0">
+              <span class="cell-aspect asp-tri">三分相 △</span>
+              <span class="cell-short">創新自然流出</span>
+              <div class="cell-full">原創性和個人表達自然整合——做自己的方式本身就是獨特的，不需要努力「與眾不同」，獨特性是他們的預設值。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-ura-sex" tabindex="0">
+              <span class="cell-aspect asp-sex">六分相 ⚹</span>
+              <span class="cell-short">創新能量可調用</span>
+              <div class="cell-full">突破性思維可以在需要時被啟動——在創意工作、技術解題、改革場合，可以突然切換到完全不同的視角。</div>
+            </div></td>
+          </tr>
+          <!-- Neptune -->
+          <tr>
+            <td class="aspect-row-header">♆ 海王星</td>
+            <td><div class="aspect-cell" data-badge="asp-sun-nep-conj" tabindex="0">
+              <span class="cell-aspect asp-conj">合相 ☌</span>
+              <span class="cell-short">自我在霧中</span>
+              <div class="cell-full">身份感模糊如霧——極高的藝術與靈性感受力，但「我究竟是誰」很難清晰回答。最強的共情能力，最容易在他人期待中失去自己。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-nep-opp" tabindex="0">
+              <span class="cell-aspect asp-opp">對分相 ☍</span>
+              <span class="cell-short">現實 vs. 理想</span>
+              <div class="cell-full">在追求夢想的路上容易被現實幻滅——對他人有浪漫化投射的傾向，清醒後的失望感非常強烈。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-nep-sq" tabindex="0">
+              <span class="cell-aspect asp-sq">四分相 □</span>
+              <span class="cell-short">迷失在幻象中</span>
+              <div class="cell-full">自我意志與逃避幻想之間有強烈張力——行動力容易被不切實際的期待消耗，核心功課是把靈性/藝術感與踏實的執行整合。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-nep-tri" tabindex="0">
+              <span class="cell-aspect asp-tri">三分相 △</span>
+              <span class="cell-short">靈感自然湧入</span>
+              <div class="cell-full">藝術直覺與自我表達和諧共鳴——靈感不請自來，與更大場域的連接自然，常在不費力的狀態下創作出觸動他人的東西。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-nep-sex" tabindex="0">
+              <span class="cell-aspect asp-sex">六分相 ⚹</span>
+              <span class="cell-short">靈感隨需而至</span>
+              <div class="cell-full">藝術、靈性洞見可以被有意識地調用——不是全時間的漂浮感，而是可以在需要的場合切換到深層感知頻道。</div>
+            </div></td>
+          </tr>
+          <!-- Pluto -->
+          <tr>
+            <td class="aspect-row-header">♇ 冥王星</td>
+            <td><div class="aspect-cell" data-badge="asp-sun-plu-conj" tabindex="0">
+              <span class="cell-aspect asp-conj">合相 ☌</span>
+              <span class="cell-short">存在即轉化力</span>
+              <div class="cell-full">太陽能量被冥王星徹底強化——極強的意志與影響力，但也容易陷入控制慾或被他人的權力動態吸引。人生有強烈的「蛻變或死亡」的主題。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-plu-opp" tabindex="0">
+              <span class="cell-aspect asp-opp">對分相 ☍</span>
+              <span class="cell-short">與深層力量博弈</span>
+              <div class="cell-full">在與外部力量（機構、強勢他人、命運事件）的對抗中鍛煉自我——功課是在被摧毀的時候不忘記自己是誰。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-plu-sq" tabindex="0">
+              <span class="cell-aspect asp-sq">四分相 □</span>
+              <span class="cell-short">意志遇上命運</span>
+              <div class="cell-full">每次重大行動都似乎觸發更深層的力量測試——感覺在對抗看不見的阻力。整合後是不容置疑的深層力量，失控時是自我毀滅。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-plu-tri" tabindex="0">
+              <span class="cell-aspect asp-tri">三分相 △</span>
+              <span class="cell-short">轉化力流暢</span>
+              <div class="cell-full">蛻變能力與自我表達協同——在危機或深度轉化中反而最有活力，能以優雅的方式引導巨大的改變過程。</div>
+            </div></td>
+            <td><div class="aspect-cell" data-badge="asp-sun-plu-sex" tabindex="0">
+              <span class="cell-aspect asp-sex">六分相 ⚹</span>
+              <span class="cell-short">深層力量可調用</span>
+              <div class="cell-full">在需要時可以觸及極深的意志儲備——尤其在面對危機或要帶領重大改變時，能從一般人無法到達的層面提取力量。</div>
+            </div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 29: CELEBRITIES
+     ============================================================ -->
+<section id="celebs">
+  <div class="container">
+    <div class="reveal" style="text-align:center; margin-bottom:3rem">
+      <div class="section-tag">Section 29 — 真實案例</div>
+      <h2 class="section-heading">活出太陽的人</h2>
+      <p class="section-sub" style="margin:0 auto">三個有具體出生資料的案例，展示太陽能量的不同顯化方式。</p>
+    </div>
+    <div class="celeb-cards">
+      <div class="celeb-card reveal">
+        <div class="celeb-name">史蒂夫·賈伯斯</div>
+        <div class="celeb-meta">生於 1955/02/24 — 太陽雙魚座，接近第十一宮</div>
+        <p class="celeb-detail">賈伯斯的雙魚座太陽讓他無法接受「差不多」——他看到的是別人還看不到的美感境界，並且毫不妥協地執行。第十一宮的位置讓這股能量指向社群與人類未來：他不是在賣電腦，他在重新定義人與工具的關係。雙魚座太陽的陰影也清晰呈現：與他人邊界的模糊（認為別人的想法都是他的）、脫離現實的完美主義（不允許圓弧不夠美）。</p>
+        <span class="celeb-tag">太陽雙魚 × 第十一宮意志</span>
+      </div>
+      <div class="celeb-card reveal">
+        <div class="celeb-name">泰勒絲</div>
+        <div class="celeb-meta">生於 1989/12/13 — 太陽射手座</div>
+        <p class="celeb-detail">射手座太陽的典型路徑：每一張專輯都是一次自我重定義，而非重複。她把每段人生哲學（失去、憤怒、愛、重建）都變成了地圖，讓聽眾不只是在聽音樂，而是在跟著她的太陽一起旅行。射手座的直接（公開討論版稅、命名誰在操縱她）在娛樂業是反常識的——但那正是射手太陽的本能，說出來比沉默更活著。</p>
+        <span class="celeb-tag">太陽射手 × 哲學轉化力</span>
+      </div>
+      <div class="celeb-card reveal">
+        <div class="celeb-name">碧昂絲</div>
+        <div class="celeb-meta">生於 1981/09/04 — 太陽處女座，月亮天蠍座</div>
+        <p class="celeb-detail">處女座太陽的「精確」在碧昂絲身上是文化級別的——每場演出每個舞步都有理由。她的太陽不靠光芒取勝，靠的是讓人無法忽視的準確度。處女座陰影也出現過：公開的完美人設曾讓她說「那不是真正的我，那是 Beyoncé 這個品牌」——太陽與人格面具的分裂。《Lemonade》是她第一次把月亮天蠍座（憤怒、背叛、蛻變）拿出來和太陽直視。</p>
+        <span class="celeb-tag">太陽處女 × 月亮天蠍整合</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 30: PRACTICAL GUIDE
+     ============================================================ -->
+<section id="guide">
+  <div class="container">
+    <div class="reveal" style="text-align:center; margin-bottom:3rem">
+      <div class="section-tag">Section 30 — 實用指引</div>
+      <h2 class="section-heading">如何活出你的太陽能量</h2>
+      <p class="section-sub" style="margin:0 auto">知道太陽在哪裡是第一步，刻意練習才能讓它真正發光。</p>
+    </div>
+    <div class="guide-grid">
+      <div class="guide-card reveal">
+        <h3>☀️ 每日練習</h3>
+        <ul>
+          <li>早上問一次：「今天，我想要什麼？」（不是應該什麼）</li>
+          <li>做一件讓你感覺「活著」的小事，哪怕5分鐘</li>
+          <li>注意「我在表演」vs.「我在是自己」的時刻</li>
+          <li>每週找一個機會讓人看到你真實的樣子</li>
+          <li>當你壓縮自己的時候，問：為什麼？誰的聲音？</li>
+        </ul>
+      </div>
+      <div class="guide-card reveal">
+        <h3>🔍 自我認識 Checklist</h3>
+        <label class="checklist-item"><input type="checkbox"> <span>我知道自己的太陽星座與宮位</span></label>
+        <label class="checklist-item"><input type="checkbox"> <span>我能說出三件讓自己感覺「最自己」的事</span></label>
+        <label class="checklist-item"><input type="checkbox"> <span>我了解自己太陽的陰影面向</span></label>
+        <label class="checklist-item"><input type="checkbox"> <span>我知道自己在哪些情境下壓縮太陽能量</span></label>
+        <label class="checklist-item"><input type="checkbox"> <span>我有一個讓太陽能量流動的日常出口</span></label>
+        <label class="checklist-item"><input type="checkbox"> <span>我讀過自己的太陽相位配置</span></label>
+      </div>
+      <div class="guide-card reveal">
+        <h3>⚠️ 太陽壓縮的信號</h3>
+        <ul>
+          <li>做決定時總在問「他們覺得呢？」而不是「我要什麼？」</li>
+          <li>對成就無感，無論得到多少都空洞</li>
+          <li>強烈羨慕某些人「活得很自己」</li>
+          <li>在公開場合習慣縮小、隱身、過度謙遜</li>
+          <li>對「被看見」有強烈恐懼或強烈渴望（兩種都是信號）</li>
+        </ul>
+      </div>
+      <div class="guide-card reveal">
+        <h3>🚀 激活太陽的方法</h3>
+        <ul>
+          <li>找一個你可以完全「做自己」的空間或人</li>
+          <li>每年做一件「沒有人認識我的新嘗試」</li>
+          <li>把太陽宮位的生活領域當作刻意投資的舞台</li>
+          <li>閱讀你太陽星座的神話原型故事</li>
+          <li>找一個太陽能量強的「榜樣」，觀察他們如何活著</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION: BADGE COLLECTION
+     ============================================================ -->
+<section id="badges-section">
+  <div class="container">
+    <div class="reveal" style="text-align:center; margin-bottom:2rem">
+      <div class="section-tag">成就系統</div>
+      <h2 class="section-heading">成就徽章 — 英雄收藏</h2>
+      <p class="section-sub" style="margin:0 auto">瀏覽宮位、星座、相位時自動解鎖。總計 69 個徽章。</p>
+    </div>
+    <div class="badge-grid reveal" id="badge-grid"></div>
+    <p class="badge-count" id="badge-count">已解鎖 0 / 69 個</p>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION: GACHA
+     ============================================================ -->
+<section id="gacha-section">
+  <div class="container" style="text-align:center">
+    <div class="reveal">
+      <div class="section-tag">每日技能抽卡</div>
+      <h2 class="section-heading">抽取今日主角技能</h2>
+      <p class="section-sub" style="margin:0 auto">每次抽卡 +30 XP。十二種太陽英雄技能，隨機召喚。</p>
+      <button class="gacha-btn" id="gacha-btn">
+        <span>🎲</span> 召喚今日技能
+      </button>
+    </div>
+    <div class="gacha-card-wrap">
+      <div class="gacha-card" id="gacha-card">
+        <div class="skill-icon">✨</div>
+        <div class="skill-name">點擊召喚</div>
+        <div class="skill-desc">你的今日主角技能正在等待...</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION: LEADERBOARD
+     ============================================================ -->
+<section id="leaderboard">
+  <div class="container">
+    <div class="reveal" style="text-align:center; margin-bottom:2rem">
+      <div class="section-tag">王者排行榜</div>
+      <h2 class="section-heading">本地學習時數排行</h2>
+      <p class="section-sub" style="margin:0 auto">基於頁面停留時間累積，「你」的數據是真實記錄。</p>
+    </div>
+    <div id="lb-tbody" class="reveal"></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 31: SHARE CARD
+     ============================================================ -->
+<section id="share-section">
+  <div class="container" style="text-align:center">
+    <div class="reveal">
+      <div class="section-tag">Section 31 — 戰績分享</div>
+      <h2 class="section-heading">生成我的太陽英雄卡</h2>
+      <p class="section-sub" style="margin:0 auto">一鍵產出 1080×1920 IG 限動尺寸英雄卡，分享你的星盤戰績。</p>
+      <button class="share-btn" id="share-gen-btn" style="margin-top:2rem">
+        ✦ 生成英雄卡
+      </button>
+    </div>
+    <img id="share-canvas-preview" alt="太陽英雄卡預覽" style="display:none; max-width:280px; margin:2rem auto; border:1px solid rgba(255,210,100,0.2)">
+    <div style="margin-top:1rem">
+      <button class="share-btn" id="share-download-btn" style="display:none; margin-top:1rem; background:linear-gradient(135deg,#1B0A3C,#0D0B1E); color:#F5A623; border:1px solid #F5A623;">
+        ↓ 下載 PNG
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SHARE CARD TEMPLATE (off-screen, html2canvas target)
+     ============================================================ -->
+<div id="share-card-template" style="
+  display:none;
+  position:fixed; left:-9999px; top:0;
+  width:540px; height:960px;
+  background: linear-gradient(160deg, #0D0B1E 0%, #1B0A3C 50%, #080810 100%);
+  padding: 60px 48px;
+  font-family: 'DM Sans', sans-serif;
+  color: #F0E6C8;
+  overflow: hidden;
+">
+  <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.2em; color:#F5A623; margin-bottom:24px;">☀ 太陽英雄卡 · ASTRO SUN RPG</div>
+  <div style="font-family:'Fraunces',Georgia,serif; font-size:72px; font-weight:900; line-height:1; background:linear-gradient(135deg,#FFD166,#F5A623,#C1121F); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:16px;">太陽</div>
+  <div id="card-level" style="font-family:'Fraunces',Georgia,serif; font-size:28px; font-weight:700; color:#FFD166; margin-bottom:8px;">見習太陽</div>
+  <div id="card-xp" style="font-family:'JetBrains Mono',monospace; font-size:14px; color:rgba(240,230,200,0.6); margin-bottom:48px;">0 XP</div>
+  <div style="width:100%; height:1px; background:linear-gradient(90deg,transparent,rgba(255,210,100,0.3),transparent); margin-bottom:48px;"></div>
+  <div id="card-badges" style="font-size:18px; color:#F0E6C8; margin-bottom:16px;">0/69 徽章</div>
+  <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:rgba(240,230,200,0.4); margin-top:auto; position:absolute; bottom:60px; left:48px;">活出你的太陽 · luna.lab.20252025@gmail.com</div>
+  <div style="position:absolute; right:48px; bottom:60px; width:80px; height:80px; background:radial-gradient(circle,#FFD166 30%,#F5A623 70%,#C1121F 100%); border-radius:50%; box-shadow:0 0 40px rgba(245,166,35,0.5);"></div>
+</div>
+
+<!-- ============================================================
+     LEVEL UP MODAL
+     ============================================================ -->
+<div id="levelup-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="levelup-title">
+  <div class="modal-box" style="position:relative; overflow:hidden">
+    <div class="levelup-burst"></div>
+    <div id="levelup-icon" style="font-size:4rem; margin-bottom:1rem">⚡</div>
+    <h2 id="levelup-title">LEVEL UP!</h2>
+    <p>你已晉升為<br><strong id="levelup-name" style="color:#FFD166; font-size:1.3rem">初階英雄</strong></p>
+    <button class="modal-close" onclick="closeModal('levelup-modal')">繼續旅程</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     ORACLE MODAL (easter egg)
+     ============================================================ -->
+<div id="oracle-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="oracle-title">
+  <div class="modal-box">
+    <div style="font-size:3.5rem; margin-bottom:1rem">🌞</div>
+    <h2 id="oracle-title" style="color:#FFD166">神諭啟示</h2>
+    <p id="oracle-text" style="font-style:italic; font-size:1.1rem; color:#F0E6C8; line-height:1.8">
+      「你找到了這裡，說明你的太陽已經在燃燒了。<br>
+      真正的問題從來不是「我有多少太陽能量」，<br>
+      而是「我允許自己燃燒多少」。<br><br>
+      <span style="color:#F5A623">繼續問，繼續點亮。</span>」
+    </p>
+    <button class="modal-close" onclick="closeModal('oracle-modal')">我聽到了</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+// share download btn visibility
+document.getElementById('share-gen-btn')?.addEventListener('click', function() {
+  setTimeout(() => {
+    const dlBtn = document.getElementById('share-download-btn');
+    if (dlBtn) dlBtn.style.display = 'inline-flex';
+  }, 2000);
+});
+
+// checklist XP
+document.querySelectorAll('.checklist-item input').forEach(cb => {
+  cb.addEventListener('change', function() {
+    const item = this.closest('.checklist-item');
+    if (this.checked) {
+      item.classList.add('done');
+      if (typeof addXP === 'function') addXP(15, '自我認識');
+    } else {
+      item.classList.remove('done');
+    }
+  });
+});
+
+// XP toast keyframe injection
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fade-up { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fade-out { to { opacity:0; transform:translateY(-12px); } }
+`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>

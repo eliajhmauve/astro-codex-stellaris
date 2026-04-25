@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>月亮｜你的內在 OS — 情緒收集圖鑑</title>
+  <meta name="description" content="探索月亮占星：12宮、12星座、45相位完整圖鑑，遊戲化情緒收集體驗" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Italiana&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- AMBIENT AUDIO                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<button class="audio-toggle" id="audioToggle" aria-label="切換環境音效">
+  <span class="audio-icon">🔇</span>
+  <span class="audio-label">潮汐聲</span>
+</button>
+<!-- 使用 Web Audio API 生成白噪音，無需外部音檔 -->
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- XP / LEVEL BAR                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="xp-bar-container" id="xpBar">
+  <div class="xp-level-badge" id="levelBadge">新月學徒</div>
+  <div class="xp-track">
+    <div class="xp-fill" id="xpFill"></div>
+  </div>
+  <div class="xp-label" id="xpLabel">0 / 100 XP</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 01. HERO                                                         -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="hero-bg">
+    <img src="./images/hero.png" alt="" class="hero-img" onerror="this.style.display='none'" />
+    <div class="hero-gradient"></div>
+    <canvas class="star-canvas" id="starCanvas"></canvas>
+    <div class="fog-layer fog-1"></div>
+    <div class="fog-layer fog-2"></div>
+  </div>
+
+  <!-- 魔術方塊潮汐翻轉 -->
+  <div class="cube-container" id="heroCube">
+    <div class="cube">
+      <div class="cube-face cube-front"><span class="moon-glyph">☽</span></div>
+      <div class="cube-face cube-back"><span class="moon-glyph">○</span></div>
+      <div class="cube-face cube-top"><span class="moon-glyph">◐</span></div>
+      <div class="cube-face cube-bottom"><span class="moon-glyph">◑</span></div>
+      <div class="cube-face cube-left"><span class="moon-glyph">●</span></div>
+      <div class="cube-face cube-right"><span class="moon-glyph">◒</span></div>
+    </div>
+  </div>
+
+  <div class="hero-content">
+    <p class="hero-overline">西洋占星情緒圖鑑</p>
+    <h1 class="hero-title">月亮<br /><em>你的內在 OS</em></h1>
+    <p class="hero-subtitle">潛意識的操作系統｜情緒的原廠設定<br />28 種月相情緒 × 12 星座 × 45 相位</p>
+    <div class="hero-cta-row">
+      <button class="btn-primary" onclick="document.getElementById('gacha').scrollIntoView({behavior:'smooth'})">抽今日情緒天氣</button>
+      <button class="btn-ghost" onclick="document.getElementById('houses').scrollIntoView({behavior:'smooth'})">探索圖鑑</button>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-moon">☽</div>
+    <span>向下探索</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 02. 月神原型                                                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="myth-section" id="myth">
+  <div class="myth-bg">
+    <img src="./images/myth.png" alt="" class="myth-img" onerror="this.style.display='none'" />
+    <div class="myth-overlay"></div>
+  </div>
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag">月神原型</p>
+      <h2 class="section-title">三位一體的月亮女神</h2>
+      <p class="section-desc">月亮在神話中以三種面貌現身，對應你內在的三個情緒層次</p>
+    </div>
+    <div class="myth-grid">
+      <div class="myth-card" data-goddess="selene">
+        <div class="myth-icon">🌕</div>
+        <h3 class="myth-name">塞勒涅</h3>
+        <p class="myth-subtitle">Selene — 滿月女神</p>
+        <p class="myth-desc">完整、豐盛、情感的圓滿。她代表你在親密關係中的渴望：被全然看見、不需要隱藏任何一面。滿月時你的情緒最透明，想說的話藏不住。</p>
+        <div class="myth-keyword">完整 · 豐盛 · 顯化</div>
+      </div>
+      <div class="myth-card" data-goddess="artemis">
+        <div class="myth-icon">🌙</div>
+        <h3 class="myth-name">阿提米絲</h3>
+        <p class="myth-subtitle">Artemis — 新月女神</p>
+        <p class="myth-desc">獨立、邊界、自我主權。她提醒你：情緒不需要外界許可。新月是內在播種的時刻，你最清楚自己真正想要什麼，不受他人眼光影響。</p>
+        <div class="myth-keyword">獨立 · 邊界 · 意志</div>
+      </div>
+      <div class="myth-card" data-goddess="hecate">
+        <div class="myth-icon">🌑</div>
+        <h3 class="myth-name">黑卡蒂</h3>
+        <p class="myth-subtitle">Hecate — 暗月女神</p>
+        <p class="myth-desc">無意識、陰影、轉化。她掌管你不願承認的情緒角落——那些藏在夢裡、偶爾在深夜浮現的感受。與暗月同行，意味著進入自己的地下室。</p>
+        <div class="myth-keyword">陰影 · 轉化 · 深淵</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 03. 情緒核心隱喻 + 心情雷達圖                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="radar-section" id="radar">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag">情緒核心隱喻</p>
+      <h2 class="section-title">月亮 = 你的情緒作業系統</h2>
+      <p class="section-desc">太陽是你給世界看的應用程式，月亮是底層的作業系統——那個決定你如何感受、如何被安慰、如何找到安全感的核心程式</p>
+    </div>
+    <div class="radar-layout">
+      <div class="radar-info">
+        <div class="os-metaphor">
+          <div class="os-item">
+            <span class="os-icon">☀️</span>
+            <div class="os-text">
+              <strong>太陽星座</strong>
+              <span>你的前台 UI — 世界看到的你</span>
+            </div>
+          </div>
+          <div class="os-item highlight">
+            <span class="os-icon">🌙</span>
+            <div class="os-text">
+              <strong>月亮星座</strong>
+              <span>你的底層 OS — 情緒的原廠設定</span>
+            </div>
+          </div>
+          <div class="os-item">
+            <span class="os-icon">↗️</span>
+            <div class="os-text">
+              <strong>上升星座</strong>
+              <span>你的開機畫面 — 第一印象</span>
+            </div>
+          </div>
+        </div>
+        <div class="radar-legend">
+          <div class="legend-item"><span class="legend-dot fire"></span>火象直覺</div>
+          <div class="legend-item"><span class="legend-dot earth"></span>土象穩固</div>
+          <div class="legend-item"><span class="legend-dot air"></span>風象分析</div>
+          <div class="legend-item"><span class="legend-dot water"></span>水象感知</div>
+        </div>
+      </div>
+      <div class="radar-canvas-wrap">
+        <canvas id="radarCanvas" width="400" height="400"></canvas>
+        <div class="radar-controls">
+          <button class="radar-btn active" data-element="fire" onclick="updateRadar('fire')">火</button>
+          <button class="radar-btn" data-element="earth" onclick="updateRadar('earth')">土</button>
+          <button class="radar-btn" data-element="air" onclick="updateRadar('air')">風</button>
+          <button class="radar-btn" data-element="water" onclick="updateRadar('water')">水</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 04–15. 12 宮位                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="houses-section" id="houses">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag">月亮落宮</p>
+      <h2 class="section-title">月亮在十二宮</h2>
+      <p class="section-desc">宮位告訴你：你的情緒能量投注在哪個生活場域，以及你從哪裡汲取安全感</p>
+    </div>
+    <div class="houses-grid" id="housesGrid">
+
+      <!-- 第1宮 -->
+      <div class="house-card" data-house="1" tabindex="0">
+        <div class="house-front">
+          <div class="house-number">I</div>
+          <div class="house-glyph">♈</div>
+          <h3 class="house-name">第一宮 · 自我宮</h3>
+          <p class="house-theme">情緒即身份</p>
+        </div>
+        <div class="house-back">
+          <h3>月亮在第一宮</h3>
+          <p class="house-core">你的情緒直接寫在臉上。心情即是你的第一印象，難以偽裝。</p>
+          <div class="house-detail">
+            <strong>情緒模式：</strong>瞬間反應強烈，喜怒哀樂即時呈現，需要被他人「看見」才有安全感。情緒是你的身份識別，不高興就是不高興，不會表演。
+          </div>
+          <div class="house-life">
+            <strong>生活案例：</strong>開會時一不開心整個表情就垮下來，同事馬上察覺。但也因此讓人覺得真實可信，反而建立深度連結。
+          </div>
+          <div class="house-shadow">
+            <strong>陰影功課：</strong>學習情緒不代表身份，感受可以存在而不需要立刻表演。
+          </div>
+          <button class="unlock-btn" onclick="unlockHouse(1)">解鎖月光寶箱 🔮</button>
+        </div>
+      </div>
+
+      <!-- 第2宮 -->
+      <div class="house-card" data-house="2" tabindex="0">
+        <div class="house-front">
+          <div class="house-number">II</div>
+          <div class="house-glyph">♉</div>
+          <h3 class="house-name">第二宮 · 財富宮</h3>
+          <p class="house-theme">安全感 = 物質基礎</p>
+        </div>
+        <div class="house-back">
+          <h3>月亮在第二宮</h3>
+          <p class="house-core">金錢與物質是你的情緒穩定器。帳戶數字會直接影響你的心理狀態。</p>
+          <div class="house-detail">
+            <strong>情緒模式：</strong>需要通過擁有、積累、觸碰有形事物來獲得安全感。壓力大時可能購物療癒，或執著囤積。身體感官是重要的情緒出口。
+          </div>
+          <div class="house-life">
+            <strong>生活案例：</strong>工作不穩定時焦慮程度遠超他人。但一旦財務穩定，情緒異常平穩，是朋友圈裡的定海神針。
+          </div>
+          <div class="house-shadow">
+            <strong>陰影功課：</strong>安全感不能完全外包給銀行存款，內在資源的建立同樣重要。
+          </div>
+          <button class="unlock-btn" onclick="unlockHouse(2)">解鎖月光寶箱 🔮</button>
+        </div>
+      </div>
+
+      <!-- 第3宮 -->
+      <div class="house-card" data-house="3" tabindex="0">
+        <div class="house-front">
+          <div class="house-number">III</div>
+          <div class="house-glyph">♊</div>
+          <h3 class="house-name">第三宮 · 溝通宮</h3>
+          <p class="house-theme">說話是情緒釋放閥</p>
+        </div>
+        <div class="house-back">
+          <h3>月亮在第三宮</h3>
+          <p class="house-core">你需要把感受說出來、寫下來才能消化。沉默對你來說是一種折磨。</p>
+          <div class="house-detail">
+            <strong>情緒模式：</strong>語言是你處理情緒的主要工具。不說出來就積壓，說出來立刻釋放。日記、訊息、電話都是你的情緒療癒管道。也容易因為誤解文字而情緒波動。
+          </div>
+          <div class="house-life">
+            <strong>生活案例：</strong>心情不好時狂傳訊息給朋友，發完一大段話立刻覺得好多了。或者養成寫日記的習慣，每天必須寫完才能入睡。
+          </div>
+          <div class="house-shadow">
+            <strong>陰影功課：</strong>有些感受不需要立刻言說，讓它靜靜存在也是一種方式。
+          </div>
+          <button class="unlock-btn" onclick="unlockHouse(3)">解鎖月光寶箱 🔮</button>
+        </div>
+      </div>
+
+      <!-- 第4宮 -->
+      <div class="house-card" data-house="4" tabindex="0">
+        <div class="house-front">
+          <div class="house-number">IV</div>
+          <div class="house-glyph">♋</div>
+          <h3 class="house-name">第四宮 · 家庭宮</h3>
+          <p class="house-theme">家是情緒的充電站</p>
+        </div>
+        <div class="house-back">
+          <h3>月亮在第四宮</h3>
+          <p class="house-core">月亮在自己的宮位，情緒能量最純粹。家庭、根源是你最深的安全感來源。</p>
+          <div class="house-detail">
+            <strong>情緒模式：</strong>強烈需要「家」的感覺——不一定是建築物，而是讓你感到歸屬的人和場所。與原生家庭的情緒糾纏深，母親形象對你影響巨大。
+          </div>
+          <div class="house-life">
+            <strong>生活案例：</strong>無論出差多久，回到家的瞬間整個人鬆下來。或是一碗媽媽煮的湯，能解決所有負面情緒。家的佈置對心情影響極深。
+          </div>
+          <div class="house-shadow">
+            <strong>陰影功課：</strong>警惕過度封閉在家庭保護圈，世界也可以是你的家。
+          </div>
+          <button class="unlock-btn" onclick="unlockHouse(4)">解鎖月光寶箱 🔮</button>
+        </div>
+      </div>
+
+      <!-- 第5宮 -->
+      <div class="house-card" data-house="5" tabindex="0">
+        <div class="house-front">
+          <div class="house-number">V</div>
+          <div class="house-glyph">♌</div>
+          <h3 class="house-name">第五宮 · 創意宮</h3>
+          <p class="house-theme">玩樂是最好的情緒療法</p>
+        </div>
+        <div class="house-back">
+          <h3>月亮在第五宮</h3>
+          <p class="house-core">你的情緒需要被「表演」、被看見、被欣賞。創作和玩耍是你的情緒出口。</p>
+          <div class="house-detail">
+            <strong>情緒模式：</strong>心情好時創意爆發，情緒高漲時像個孩子。戀愛中需要被讚美和認可，否則容易失落。對自己的情緒表達有強烈的美感要求。
+          </div>
+          <div class="house-life">
+            <strong>生活案例：</strong>心情不好就去畫畫、唱歌或看喜劇電影，立刻好轉。或者需要有人欣賞自己的情緒狀態，覺得「我的悲傷也很美」。
+          </div>
+          <div class="house-shadow">
+            <strong>陰影功課：</strong>情緒不是表演，有些感受值得私下消化而非公開呈現。
+          </div>
+          <button class="unlock-btn" onclick="unlockHouse(5)">解鎖月光寶箱 🔮</button>
+        </div>
+      </div>
+
+      <!-- 第6宮 -->
+      <div class="house-card" data-house="6" tabindex="0">
+        <div class="house-front">
+          <div class="house-number">VI</div>
+          <div class="house-glyph">♍</div>
+          <h3 class="house-name">第六宮 · 健康宮</h3>
+          <p class="house-theme">焦慮化為身體訊號</p>
+        </div>
+        <div class="house-back">
+          <h3>月亮在第六宮</h3>
+          <p class="house-core">情緒壓力會直接轉化為身體症狀。「有用」和「被需要」是你的安全感來源。</p>
+          <div class="house-detail">
+            <strong>情緒模式：</strong>藉由服務他人、把事情做好來獲得情緒滿足。焦慮時會瘋狂打掃、整理、做任務清單。工作環境和日常作息直接影響心理健康。
+          </div>
+          <div class="house-life">
+            <strong>生活案例：</strong>情緒緊繃時胃不舒服或頭痛。但只要把桌子整理乾淨、清單打勾，心情就明顯好轉。對工作環境的混亂高度敏感。
+          </div>
+          <div class="house-shadow">
+            <strong>陰影功課：</strong>你的價值不在於你做了多少事，停下來休息也是一種生產力。
+          </div>
+          <button class="unlock-btn" onclick="unlockHouse(6)">解鎖月光寶箱 🔮</button>
+        </div>
+      </div>
+
+      <!-- 第7宮 -->
+      <div class="house-card" data-house="7" tabindex="0">
+        <div class="house-front">
+          <div class="house-number">VII</div>
+          <div class="house-glyph">♎</div>
+          <h3 class="house-name">第七宮 · 伴侶宮</h3>
+          <p class="house-theme">關係是情緒的鏡子</p>
+        </div>
+        <div class="house-back">
+          <h3>月亮在第七宮</h3>
+          <p class="house-core">你的情緒狀態高度依附於關係的品質。一個人時難以確認自己的感受。</p>
+          <div class="house-detail">
+            <strong>情緒模式：</strong>需要透過另一個人的反應來確認自己的情緒是否「正確」。極度在意關係中的公平與平衡，情緒被伴侶的情緒牽動。
+          </div>
+          <div class="house-life">
+            <strong>生活案例：</strong>伴侶心情不好，自己立刻感到不安，忍不住問「你還好嗎」。單身時情緒特別不穩定，需要有人「同頻」才有安全感。
+          </div>
+          <div class="house-shadow">
+            <strong>陰影功課：</strong>學習在關係之外獨立確認自己的情緒，不讓他人成為情緒的唯一驗證者。
+          </div>
+          <button class="unlock-btn" onclick="unlockHouse(7)">解鎖月光寶箱 🔮</button>
+        </div>
+      </div>
+
+      <!-- 第8宮 -->
+      <div class="house-card" data-house="8" tabindex="0">
+        <div class="house-front">
+          <div class="house-number">VIII</div>
+          <div class="house-glyph">♏</div>
+          <h3 class="house-name">第八宮 · 轉化宮</h3>
+          <p class="house-theme">深層情緒的黑洞</p>
+        </div>
+        <div class="house-back">
+          <h3>月亮在第八宮</h3>
+          <p class="house-core">你的情緒世界非常深邃，表面平靜下是洶湧的暗流，輕易不示人。</p>
+          <div class="house-detail">
+            <strong>情緒模式：</strong>情感強烈但極少直接表達。需要深度的情感連結，討厭膚淺。容易執念，情緒傷口難以忘記，但痊癒後反而轉化成力量。
+          </div>
+          <div class="house-life">
+            <strong>生活案例：</strong>朋友聚會時看起來沒事，回家後一個人靜靜哭了兩小時。能感知到別人藏在表面下的情緒，成為天然的心理諮詢師。
+          </div>
+          <div class="house-shadow">
+            <strong>陰影功課：</strong>強度不等於深度，讓自己偶爾輕盈一些，不需要每個情緒都是生死交關。
+          </div>
+          <button class="unlock-btn" onclick="unlockHouse(8)">解鎖月光寶箱 🔮</button>
+        </div>
+      </div>
+
+      <!-- 第9宮 -->
+      <div class="house-card" data-house="9" tabindex="0">
+        <div class="house-front">
+          <div class="house-number">IX</div>
+          <div class="house-glyph">♐</div>
+          <h3 class="house-name">第九宮 · 哲學宮</h3>
+          <p class="house-theme">意義感是情緒燃料</p>
+        </div>
+        <div class="house-back">
+          <h3>月亮在第九宮</h3>
+          <p class="house-core">你的情緒需要「意義」作為燃料。沒有方向感時，情緒會快速崩潰。</p>
+          <div class="house-detail">
+            <strong>情緒模式：</strong>相信人生有更大的目的，情緒波動時需要哲學視角幫助消化。旅行、學習、信仰是重要的情緒調節工具。無法忍受瑣碎和停滯。
+          </div>
+          <div class="house-life">
+            <strong>生活案例：</strong>失戀時不只傷心，還要問「這段感情對我的人生旅程有什麼意義」。訂一張機票或報名一門課，幾乎能解決所有情緒低谷。
+          </div>
+          <div class="house-shadow">
+            <strong>陰影功課：</strong>不是每個情緒都需要意義，有時候只是有點難受，就讓它只是難受。
+          </div>
+          <button class="unlock-btn" onclick="unlockHouse(9)">解鎖月光寶箱 🔮</button>
+        </div>
+      </div>
+
+      <!-- 第10宮 -->
+      <div class="house-card" data-house="10" tabindex="0">
+        <div class="house-front">
+          <div class="house-number">X</div>
+          <div class="house-glyph">♑</div>
+          <h3 class="house-name">第十宮 · 事業宮</h3>
+          <p class="house-theme">成就感是情緒錨點</p>
+        </div>
+        <div class="house-back">
+          <h3>月亮在第十宮</h3>
+          <p class="house-core">你的情緒健康與社會成就高度捆綁。在意他人評價，難以忽視公眾目光。</p>
+          <div class="house-detail">
+            <strong>情緒模式：</strong>工作順利時情緒穩定，失敗或被批評時打擊極深。需要從職業成就中獲得情緒認可，對「不被尊重」高度敏感。
+          </div>
+          <div class="house-life">
+            <strong>生活案例：</strong>升職加薪比任何戀愛更讓你感到安全。但一旦工作出問題，私生活的情緒也會連帶崩潰，需要意識到兩者的邊界。
+          </div>
+          <div class="house-shadow">
+            <strong>陰影功課：</strong>你的情緒價值不能完全外包給 LinkedIn 上的頭銜，學習在「平凡」中找到自我。
+          </div>
+          <button class="unlock-btn" onclick="unlockHouse(10)">解鎖月光寶箱 🔮</button>
+        </div>
+      </div>
+
+      <!-- 第11宮 -->
+      <div class="house-card" data-house="11" tabindex="0">
+        <div class="house-front">
+          <div class="house-number">XI</div>
+          <div class="house-glyph">♒</div>
+          <h3 class="house-name">第十一宮 · 友誼宮</h3>
+          <p class="house-theme">同溫層是情緒充電站</p>
+        </div>
+        <div class="house-back">
+          <h3>月亮在第十一宮</h3>
+          <p class="house-core">你的情緒安全感來自於找到「同類人」——被群體接納比個人關係更重要。</p>
+          <div class="house-detail">
+            <strong>情緒模式：</strong>需要在志同道合的群體中才能放鬆。情緒表達較為理性化，傾向用「大家都這樣感覺」來描述自己的情緒，有時顯得疏離。
+          </div>
+          <div class="house-life">
+            <strong>生活案例：</strong>加入一個志趣相投的社群後，情緒整個月都很穩定。被社群排擠比失戀還讓你崩潰。容易把人類共同情感當作自己情緒的出口。
+          </div>
+          <div class="house-shadow">
+            <strong>陰影功課：</strong>群體認同不能代替個人的情感連結，學習一對一的情緒接觸。
+          </div>
+          <button class="unlock-btn" onclick="unlockHouse(11)">解鎖月光寶箱 🔮</button>
+        </div>
+      </div>
+
+      <!-- 第12宮 -->
+      <div class="house-card" data-house="12" tabindex="0">
+        <div class="house-front">
+          <div class="house-number">XII</div>
+          <div class="house-glyph">♓</div>
+          <h3 class="house-name">第十二宮 · 靈性宮</h3>
+          <p class="house-theme">情緒沉入海洋深處</p>
+        </div>
+        <div class="house-back">
+          <h3>月亮在第十二宮</h3>
+          <p class="house-core">你最深的情緒連自己都感知不到。情緒在夢境和孤獨中流動，需要獨處才能充電。</p>
+          <div class="house-detail">
+            <strong>情緒模式：</strong>高度敏感，像海綿一樣吸收周遭能量。需要大量獨處時間消化情緒。情緒常以模糊形式呈現，難以命名，夢境是重要的情緒訊息來源。
+          </div>
+          <div class="house-life">
+            <strong>生活案例：</strong>人多的場合後必須獨處幾小時才能恢復。情緒常常「莫名其妙」，但事後發現是感知到別人的壓力。冥想和獨處是最有效的情緒療法。
+          </div>
+          <div class="house-shadow">
+            <strong>陰影功課：</strong>不要用「我說不清楚」逃避情緒。學習把無邊界的感知轉化為可溝通的語言。
+          </div>
+          <button class="unlock-btn" onclick="unlockHouse(12)">解鎖月光寶箱 🔮</button>
+        </div>
+      </div>
+
+    </div><!-- /housesGrid -->
+
+    <div class="houses-progress">
+      <div class="progress-label">宮位解鎖進度</div>
+      <div class="progress-track">
+        <div class="progress-fill" id="houseProgressFill"></div>
+      </div>
+      <div class="progress-count" id="houseProgressCount">0 / 12</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 16–27. 12 星座                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="signs-section" id="signs">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag">月亮星座</p>
+      <h2 class="section-title">月亮在十二星座</h2>
+      <p class="section-desc">星座決定月亮的「表達語言」——相同的情緒，用完全不同的方式處理</p>
+    </div>
+    <div class="signs-grid" id="signsGrid">
+
+      <!-- 牡羊月亮 -->
+      <div class="sign-card" data-sign="aries" tabindex="0">
+        <div class="sign-card-inner">
+          <div class="sign-front">
+            <div class="sign-symbol">♈</div>
+            <h3 class="sign-name">牡羊月亮</h3>
+            <p class="sign-element fire-tag">火象</p>
+          </div>
+          <div class="sign-back">
+            <h3>♈ 牡羊月亮</h3>
+            <p class="sign-core"><strong>情緒原型：</strong>衝動的戰士。情緒來得快去得也快，需要立即行動來釋放張力。</p>
+            <p class="sign-pattern"><strong>情緒模式：</strong>憤怒是最快出口，但不帶惡意。受傷時會用攻擊性掩蓋脆弱。需要自主，被控制會激發強烈反抗。安慰方式：給空間，不要分析，讓他去跑步。</p>
+            <p class="sign-celeb"><strong>名人實例：</strong>碧昂絲（Beyoncé）月亮牡羊——她的舞台爆發力與情緒直擊感，正是牡羊月亮的生命力。</p>
+            <div class="sign-tags"><span>直接</span><span>衝動</span><span>勇敢</span><span>燃燒快</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 金牛月亮 -->
+      <div class="sign-card" data-sign="taurus" tabindex="0">
+        <div class="sign-card-inner">
+          <div class="sign-front">
+            <div class="sign-symbol">♉</div>
+            <h3 class="sign-name">金牛月亮</h3>
+            <p class="sign-element earth-tag">土象</p>
+          </div>
+          <div class="sign-back">
+            <h3>♉ 金牛月亮</h3>
+            <p class="sign-core"><strong>情緒原型：</strong>穩定的守護者。月亮在金牛入旺，情緒最為穩定紮實，是圖鑑中的 SSR。</p>
+            <p class="sign-pattern"><strong>情緒模式：</strong>情緒變化緩慢但持久，一旦受傷很難快速修復。通過感官享受（美食、觸摸、美景）獲得安撫。不喜歡突然的變化，需要穩定的例行程序。</p>
+            <p class="sign-celeb"><strong>名人實例：</strong>比爾·蓋茨月亮金牛——他長達數十年不變的生活習慣與穩定感，是金牛月亮情緒穩定性的最佳展現。</p>
+            <div class="sign-tags"><span>穩定</span><span>感官</span><span>持久</span><span>入旺</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 雙子月亮 -->
+      <div class="sign-card" data-sign="gemini" tabindex="0">
+        <div class="sign-card-inner">
+          <div class="sign-front">
+            <div class="sign-symbol">♊</div>
+            <h3 class="sign-name">雙子月亮</h3>
+            <p class="sign-element air-tag">風象</p>
+          </div>
+          <div class="sign-back">
+            <h3>♊ 雙子月亮</h3>
+            <p class="sign-core"><strong>情緒原型：</strong>情緒的旁觀者。會把自己的感受智識化，需要語言才能確認情緒存在。</p>
+            <p class="sign-pattern"><strong>情緒模式：</strong>情緒多變，一天可以高低起伏數次但不覺得有問題。通過說話、寫作、學習來消化情感。難以長時間停在一種感受中，也容易迴避深層情緒。</p>
+            <p class="sign-celeb"><strong>名人實例：</strong>梅莉·史翠普月亮雙子——她在詮釋角色時的情緒變化速度與智識距離感，正是雙子月亮的特質。</p>
+            <div class="sign-tags"><span>多變</span><span>語言</span><span>輕盈</span><span>雙面</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 巨蟹月亮 -->
+      <div class="sign-card" data-sign="cancer" tabindex="0">
+        <div class="sign-card-inner">
+          <div class="sign-front">
+            <div class="sign-symbol">♋</div>
+            <h3 class="sign-name">巨蟹月亮</h3>
+            <p class="sign-element water-tag">水象</p>
+          </div>
+          <div class="sign-back">
+            <h3>♋ 巨蟹月亮</h3>
+            <p class="sign-core"><strong>情緒原型：</strong>情感的容器。月亮在巨蟹入廟，情緒感知力最強，幾乎是純粹的感受體。</p>
+            <p class="sign-pattern"><strong>情緒模式：</strong>情緒記憶超強，過去的傷痛鮮明如昨日。極度保護自己（外殼堅硬，內在柔軟）。需要被照顧，同時也以照顧他人滿足情感需求。</p>
+            <p class="sign-celeb"><strong>名人實例：</strong>黛安娜王妃月亮巨蟹——她對人類苦難的深刻感知與無條件的情感給予，完美展現巨蟹月亮的情感深度。</p>
+            <div class="sign-tags"><span>深感知</span><span>記憶</span><span>照護</span><span>入廟</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 獅子月亮 -->
+      <div class="sign-card" data-sign="leo" tabindex="0">
+        <div class="sign-card-inner">
+          <div class="sign-front">
+            <div class="sign-symbol">♌</div>
+            <h3 class="sign-name">獅子月亮</h3>
+            <p class="sign-element fire-tag">火象</p>
+          </div>
+          <div class="sign-back">
+            <h3>♌ 獅子月亮</h3>
+            <p class="sign-core"><strong>情緒原型：</strong>情緒的舞台表演者。需要感受到自己的情緒是重要的、值得被見證的。</p>
+            <p class="sign-pattern"><strong>情緒模式：</strong>情緒強烈且需要被欣賞。對批評極度敏感（尤其是對「創作」的批評）。愛的語言是誇獎與肯定，被忽視比被批評更難受。</p>
+            <p class="sign-celeb"><strong>名人實例：</strong>瑪丹娜月亮獅子——她對舞台掌控和情感戲劇化的追求，以及對「被看見」的強烈需求，是獅子月亮的教科書。</p>
+            <div class="sign-tags"><span>戲劇性</span><span>榮耀</span><span>熱情</span><span>被見證</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 處女月亮 -->
+      <div class="sign-card" data-sign="virgo" tabindex="0">
+        <div class="sign-card-inner">
+          <div class="sign-front">
+            <div class="sign-symbol">♍</div>
+            <h3 class="sign-name">處女月亮</h3>
+            <p class="sign-element earth-tag">土象</p>
+          </div>
+          <div class="sign-back">
+            <h3>♍ 處女月亮</h3>
+            <p class="sign-core"><strong>情緒原型：</strong>焦慮的分析師。把情緒轉化為待解決的問題，通過「修正」獲得安全感。</p>
+            <p class="sign-pattern"><strong>情緒模式：</strong>傾向過度分析自己的情緒（「我為什麼會這樣感覺？」）。服務他人是情感表達方式，焦慮時通過整理、計劃、完善細節來控制情緒。</p>
+            <p class="sign-celeb"><strong>名人實例：</strong>奧巴馬月亮處女——他冷靜分析、精準措辭的情緒表達風格，以及對細節與準確性的執著，是處女月亮的典型。</p>
+            <div class="sign-tags"><span>分析</span><span>完美</span><span>服務</span><span>焦慮</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 天秤月亮 -->
+      <div class="sign-card" data-sign="libra" tabindex="0">
+        <div class="sign-card-inner">
+          <div class="sign-front">
+            <div class="sign-symbol">♎</div>
+            <h3 class="sign-name">天秤月亮</h3>
+            <p class="sign-element air-tag">風象</p>
+          </div>
+          <div class="sign-back">
+            <h3>♎ 天秤月亮</h3>
+            <p class="sign-core"><strong>情緒原型：</strong>和諧的尋求者。害怕衝突，需要在關係中找到情緒的平衡點。</p>
+            <p class="sign-pattern"><strong>情緒模式：</strong>難以做決定，因為每個選擇都牽動情感天秤。需要美麗的環境和和諧的人際關係。會壓抑不舒服的情緒以維持「沒關係」的表象。</p>
+            <p class="sign-celeb"><strong>名人實例：</strong>約翰·藍儂月亮天秤——他一生對和平與愛的追求，以及在創作中呈現的矛盾與美感，是天秤月亮情緒本質的展現。</p>
+            <div class="sign-tags"><span>和諧</span><span>美感</span><span>衝突迴避</span><span>公平</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 天蠍月亮 -->
+      <div class="sign-card" data-sign="scorpio" tabindex="0">
+        <div class="sign-card-inner">
+          <div class="sign-front">
+            <div class="sign-symbol">♏</div>
+            <h3 class="sign-name">天蠍月亮</h3>
+            <p class="sign-element water-tag">水象</p>
+          </div>
+          <div class="sign-back">
+            <h3>♏ 天蠍月亮</h3>
+            <p class="sign-core"><strong>情緒原型：</strong>情感的深海潛水者。月亮在天蠍落陷，情緒強度最高，是圖鑑中的高難度角色。</p>
+            <p class="sign-pattern"><strong>情緒模式：</strong>極少主動表達情緒，但內在翻騰不止。控制感是安全感的來源，害怕被掌控或背叛。情感傷痛有長達多年的記憶，但轉化後有驚人的復原力。</p>
+            <p class="sign-celeb"><strong>名人實例：</strong>查理茲·塞隆月亮天蠍——她在電影中詮釋黑暗心理的精準度，以及在現實生活中的情感保護性，正是天蠍月亮的投影。</p>
+            <div class="sign-tags"><span>強烈</span><span>神秘</span><span>轉化</span><span>落陷</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 射手月亮 -->
+      <div class="sign-card" data-sign="sagittarius" tabindex="0">
+        <div class="sign-card-inner">
+          <div class="sign-front">
+            <div class="sign-symbol">♐</div>
+            <h3 class="sign-name">射手月亮</h3>
+            <p class="sign-element fire-tag">火象</p>
+          </div>
+          <div class="sign-back">
+            <h3>♐ 射手月亮</h3>
+            <p class="sign-core"><strong>情緒原型：</strong>自由的冒險家。情緒需要廣闊的空間，被束縛時會感到窒息。</p>
+            <p class="sign-pattern"><strong>情緒模式：</strong>樂觀、不記仇，但難以在深層悲傷中停留。通過旅行、哲學、戶外活動調節情緒。承諾感會帶來情緒焦慮，需要自由感。</p>
+            <p class="sign-celeb"><strong>名人實例：</strong>泰勒絲（Taylor Swift）月亮射手——她一直以來的情感表達方式，從一段感情跳到下一段，都帶著射手月亮「向前看、不回頭」的衝動。</p>
+            <div class="sign-tags"><span>自由</span><span>樂觀</span><span>哲學</span><span>探索</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 摩羯月亮 -->
+      <div class="sign-card" data-sign="capricorn" tabindex="0">
+        <div class="sign-card-inner">
+          <div class="sign-front">
+            <div class="sign-symbol">♑</div>
+            <h3 class="sign-name">摩羯月亮</h3>
+            <p class="sign-element earth-tag">土象</p>
+          </div>
+          <div class="sign-back">
+            <h3>♑ 摩羯月亮</h3>
+            <p class="sign-core"><strong>情緒原型：</strong>情緒的管理者。會把感受放在目標之後，情緒被嚴格自我管理。</p>
+            <p class="sign-pattern"><strong>情緒模式：</strong>不輕易表現脆弱，認為情緒化是不成熟的。通過達成目標、積累成就獲得情緒滿足。容易壓抑情緒到身體出問題。</p>
+            <p class="sign-celeb"><strong>名人實例：</strong>大衛·鮑伊月亮摩羯——他嚴格的自我塑造能力、以藝術形式昇華個人情緒，以及對事業的高度控制感，是摩羯月亮的縮影。</p>
+            <div class="sign-tags"><span>自律</span><span>壓抑</span><span>成就</span><span>務實</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 水瓶月亮 -->
+      <div class="sign-card" data-sign="aquarius" tabindex="0">
+        <div class="sign-card-inner">
+          <div class="sign-front">
+            <div class="sign-symbol">♒</div>
+            <h3 class="sign-name">水瓶月亮</h3>
+            <p class="sign-element air-tag">風象</p>
+          </div>
+          <div class="sign-back">
+            <h3>♒ 水瓶月亮</h3>
+            <p class="sign-core"><strong>情緒原型：</strong>情緒的異類。傾向「觀察」自己的情緒而非「沉浸」其中，有時讓人覺得冷漠。</p>
+            <p class="sign-pattern"><strong>情緒模式：</strong>需要情感獨立，排斥依賴。通過人道主義關懷、理念認同表達情感。個人情緒經常轉化為對社會的觀察，難以處理一對一的親密情感。</p>
+            <p class="sign-celeb"><strong>名人實例：</strong>安潔莉娜·裘莉月亮水瓶——她將個人情感升華為全球人道關懷的模式，以及公開場合情緒的疏離感，是水瓶月亮的典型表現。</p>
+            <div class="sign-tags"><span>疏離</span><span>理念</span><span>獨立</span><span>人道</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 雙魚月亮 -->
+      <div class="sign-card" data-sign="pisces" tabindex="0">
+        <div class="sign-card-inner">
+          <div class="sign-front">
+            <div class="sign-symbol">♓</div>
+            <h3 class="sign-name">雙魚月亮</h3>
+            <p class="sign-element water-tag">水象</p>
+          </div>
+          <div class="sign-back">
+            <h3>♓ 雙魚月亮</h3>
+            <p class="sign-core"><strong>情緒原型：</strong>情感的海洋。沒有邊界，與宇宙連通，情緒與他人、與環境融為一體。</p>
+            <p class="sign-pattern"><strong>情緒模式：</strong>極度共情，容易「吸收」他人的情緒當作自己的。需要通過藝術、夢境、靜心來辨識自己真實的感受。容易有不切實際的幻想來逃避痛苦現實。</p>
+            <p class="sign-celeb"><strong>名人實例：</strong>芭芭拉·史翠珊月亮雙魚——她的歌聲能讓整個場館的觀眾流淚，那種無邊界的情感傳遞，是雙魚月亮最純粹的表現。</p>
+            <div class="sign-tags"><span>無邊界</span><span>夢境</span><span>共情</span><span>神秘</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /signsGrid -->
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 28. 45 相位矩陣                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="aspects-section" id="aspects">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag">月亮相位矩陣</p>
+      <h2 class="section-title">45 個相位全圖鑑</h2>
+      <p class="section-desc">月亮與九大行星的對話，決定你情緒能量的流動方式</p>
+    </div>
+
+    <div class="aspect-filter-row">
+      <button class="aspect-filter-btn active" data-filter="all" onclick="filterAspects('all')">全部</button>
+      <button class="aspect-filter-btn" data-filter="sun" onclick="filterAspects('sun')">☉ 太陽</button>
+      <button class="aspect-filter-btn" data-filter="mercury" onclick="filterAspects('mercury')">☿ 水星</button>
+      <button class="aspect-filter-btn" data-filter="venus" onclick="filterAspects('venus')">♀ 金星</button>
+      <button class="aspect-filter-btn" data-filter="mars" onclick="filterAspects('mars')">♂ 火星</button>
+      <button class="aspect-filter-btn" data-filter="jupiter" onclick="filterAspects('jupiter')">♃ 木星</button>
+      <button class="aspect-filter-btn" data-filter="saturn" onclick="filterAspects('saturn')">♄ 土星</button>
+      <button class="aspect-filter-btn" data-filter="uranus" onclick="filterAspects('uranus')">♅ 天王星</button>
+      <button class="aspect-filter-btn" data-filter="neptune" onclick="filterAspects('neptune')">♆ 海王星</button>
+      <button class="aspect-filter-btn" data-filter="pluto" onclick="filterAspects('pluto')">♇ 冥王星</button>
+    </div>
+
+    <div class="aspects-grid" id="aspectsGrid">
+      <!-- 45 相位卡片由 JS 渲染 -->
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 29. 真實案例                                                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="cases-section" id="cases">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag">真實案例解析</p>
+      <h2 class="section-title">名人月亮星座</h2>
+      <p class="section-desc">從真實人物的情緒模式，驗證月亮星座的作用</p>
+    </div>
+    <div class="cases-grid">
+      <div class="case-card">
+        <div class="case-header">
+          <div class="case-moon">🌙</div>
+          <div class="case-info">
+            <h3 class="case-name">黛安娜王妃</h3>
+            <p class="case-sign">月亮♒ 水瓶 · 太陽♋ 巨蟹</p>
+          </div>
+        </div>
+        <div class="case-body">
+          <p>月亮水瓶的矛盾性在黛安娜身上展現得極為清晰：她有巨大的情感需求（巨蟹太陽），卻用水瓶月亮的方式表達——將個人痛苦轉化為公眾使命，擁抱愛滋病患者、反地雷運動，把私人情緒昇華為人道主義行動。這正是水瓶月亮的「情緒外包給全人類」機制。她的「如果我愛你，全世界都要知道」的情感表達方式，對比她私下深刻的孤獨感，是水瓶月亮與巨蟹太陽衝突的最佳案例。</p>
+        </div>
+      </div>
+      <div class="case-card">
+        <div class="case-header">
+          <div class="case-moon">🌙</div>
+          <div class="case-info">
+            <h3 class="case-name">伊隆·馬斯克</h3>
+            <p class="case-sign">月亮♐ 射手 · 太陽♋ 巨蟹</p>
+          </div>
+        </div>
+        <div class="case-body">
+          <p>月亮射手最需要「下一個目標」來維持情緒穩定。馬斯克的情緒模式非常典型：他不能停下來，一旦一個目標（Tesla、SpaceX）上軌道，立刻需要下一個更大的挑戰（Twitter/X、火星殖民）。射手月亮的情緒安全感來自「還有更遠的地方可以去」。他的情感表達也是射手式的——大膽、毫無過濾、不計後果。被束縛或被限制時的反應激烈，也是射手月亮的特徵。</p>
+        </div>
+      </div>
+      <div class="case-card">
+        <div class="case-header">
+          <div class="case-moon">🌙</div>
+          <div class="case-info">
+            <h3 class="case-name">碧昂絲</h3>
+            <p class="case-sign">月亮♈ 牡羊 · 太陽♐ 射手</p>
+          </div>
+        </div>
+        <div class="case-body">
+          <p>月亮牡羊的即時情緒能量，結合射手太陽的自由意志，造就了碧昂絲獨一無二的舞台魅力。牡羊月亮讓她的情緒直接轉化為行動——《Lemonade》專輯把個人婚姻危機直接投射成視覺藝術，這種「受傷了就立刻反擊」的模式，是牡羊月亮的本能。她的憤怒不是冷靜的報復，而是即時的、充滿火焰的自我宣告。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 今日 GACHA                                                       -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="gacha-section" id="gacha">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag">情緒天氣 Gacha</p>
+      <h2 class="section-title">抽今日情緒牌</h2>
+      <p class="section-desc">每日一抽，探索你今天可能遭遇的情緒天氣</p>
+    </div>
+    <div class="gacha-arena">
+      <div class="gacha-machine" id="gachaMachine">
+        <div class="gacha-ball" id="gachaBall">
+          <span class="gacha-moon">🌙</span>
+        </div>
+        <div class="gacha-result" id="gachaResult" style="display:none">
+          <div class="result-card" id="resultCard">
+            <div class="result-emotion" id="resultEmotion"></div>
+            <div class="result-title" id="resultTitle"></div>
+            <div class="result-desc" id="resultDesc"></div>
+            <div class="result-advice" id="resultAdvice"></div>
+            <div class="result-rarity" id="resultRarity"></div>
+          </div>
+        </div>
+      </div>
+      <button class="gacha-btn" id="gachaBtn" onclick="doGacha()">
+        <span class="gacha-btn-text">抽取今日情緒天氣</span>
+        <span class="gacha-btn-sub">每日限抽一次</span>
+      </button>
+      <div class="gacha-daily-msg" id="gachaDailyMsg"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 情緒圖鑑 收集                                                    -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="pokedex-section" id="pokedex">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag">情緒圖鑑</p>
+      <h2 class="section-title">收集你的月相情緒</h2>
+      <p class="section-desc">28 種月相情緒 × 12 星座，點擊卡片收集，解鎖完整圖鑑說明</p>
+    </div>
+    <div class="pokedex-progress-bar">
+      <div class="poke-progress-fill" id="pokeProgressFill"></div>
+      <span class="poke-progress-label" id="pokeProgressLabel">已收集 0 / 28</span>
+    </div>
+    <div class="pokedex-grid" id="pokedexGrid">
+      <!-- JS 渲染 28 張情緒卡 -->
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 夢境日誌打卡                                                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="dreamlog-section" id="dreamlog">
+  <div class="container">
+    <div class="dreamlog-card">
+      <div class="dreamlog-header">
+        <h2 class="dreamlog-title">🌙 夢境日誌</h2>
+        <p class="dreamlog-subtitle">記錄你的月相情緒日記，連續打卡解鎖徽章</p>
+      </div>
+      <div class="streak-display">
+        <div class="streak-count" id="streakCount">0</div>
+        <div class="streak-label">連續打卡天數</div>
+      </div>
+      <div class="badges-row">
+        <div class="badge-item" id="badge7" data-days="7">
+          <div class="badge-icon">🌙</div>
+          <div class="badge-name">新月守望者</div>
+          <div class="badge-req">7 天</div>
+        </div>
+        <div class="badge-item" id="badge21" data-days="21">
+          <div class="badge-icon">🌕</div>
+          <div class="badge-name">滿月騎士</div>
+          <div class="badge-req">21 天</div>
+        </div>
+        <div class="badge-item" id="badge100" data-days="100">
+          <div class="badge-icon">⭐</div>
+          <div class="badge-name">月相傳說</div>
+          <div class="badge-req">100 天</div>
+        </div>
+      </div>
+      <div class="dreamlog-input-area">
+        <textarea id="dreamInput" class="dream-textarea" placeholder="今天的心情或夢境… (記錄後獲得 10 XP)" rows="4"></textarea>
+        <button class="dream-submit-btn" onclick="submitDream()">記錄今日月相 ✦</button>
+      </div>
+      <div class="dreamlog-history" id="dreamlogHistory"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 30. 實用指引                                                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="guide-section" id="guide">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag">月亮能量實踐</p>
+      <h2 class="section-title">用月相調節情緒的具體方法</h2>
+    </div>
+    <div class="guide-grid">
+      <div class="guide-card">
+        <div class="guide-phase">🌑</div>
+        <h3>新月（0-3.5 天）</h3>
+        <p class="guide-action">播種意圖</p>
+        <p>寫下這個月你想在情緒上有什麼改變。不是目標，是意圖。例：「我願意練習在憤怒中停頓 3 秒」。</p>
+        <div class="guide-practice">
+          <strong>具體練習：</strong>新月夜，關燈，點蠟燭，寫 3 個「我願意⋯⋯」的句子，折起來放在枕頭下。
+        </div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-phase">🌓</div>
+        <h3>上弦月（7 天）</h3>
+        <p class="guide-action">行動與挑戰</p>
+        <p>意圖遭遇第一個阻礙。這是真正的測試：你的情緒模式會在壓力下現形。記錄是什麼讓你退縮了。</p>
+        <div class="guide-practice">
+          <strong>具體練習：</strong>每天晚上問自己：「今天有什麼情緒我沒有說出來？為什麼？」，寫 1-3 行。
+        </div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-phase">🌕</div>
+        <h3>滿月（14 天）</h3>
+        <p class="guide-action">顯化與看見</p>
+        <p>情緒最透明的時刻，壓抑的感受會自動浮現。不要試圖控制，讓它出來。也是釋放舊有情緒模式的最佳時機。</p>
+        <div class="guide-practice">
+          <strong>具體練習：</strong>滿月夜，把過去一個月內你想放下的情緒模式寫在紙上，燒掉或撕碎，象徵釋放。
+        </div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-phase">🌗</div>
+        <h3>下弦月（21 天）</h3>
+        <p class="guide-action">收穫與感謝</p>
+        <p>這個月你的情緒旅程帶來了什麼洞察？不管是好是壞，每個情緒都是資料。下弦月是整理這些資料的時機。</p>
+        <div class="guide-practice">
+          <strong>具體練習：</strong>寫「這個月情緒上的三個禮物」——即使是痛苦的經歷，也問：它給了我什麼資訊？
+        </div>
+      </div>
+    </div>
+
+    <div class="emotion-journal-tip">
+      <h3>情緒日誌三問法</h3>
+      <div class="tip-grid">
+        <div class="tip-item">
+          <strong>1. 身體在哪裡感受到？</strong>
+          <p>胸口緊？喉嚨卡？腹部沉？身體比大腦誠實。</p>
+        </div>
+        <div class="tip-item">
+          <strong>2. 這個感受像什麼顏色？</strong>
+          <p>繞過語言的直接通道，讓右腦說話。</p>
+        </div>
+        <div class="tip-item">
+          <strong>3. 這個情緒在保護什麼？</strong>
+          <p>憤怒保護邊界，恐懼保護安全，悲傷保護連結。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- 31. 分享卡 + 結尾                                               -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<section class="share-section" id="shareSection">
+  <div class="share-bg">
+    <img src="./images/share-bg.png" alt="" class="share-bg-img" onerror="this.style.display='none'" />
+    <div class="share-overlay"></div>
+  </div>
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag">收藏戰績卡</p>
+      <h2 class="section-title">我的月相圖鑑</h2>
+      <p class="section-desc">記錄你的探索成果，生成專屬分享卡</p>
+    </div>
+    <div class="share-layout">
+      <!-- 分享卡預覽 -->
+      <div class="share-card-preview" id="shareCardPreview">
+        <div class="share-card-inner" id="shareCardInner">
+          <div class="sc-header">
+            <div class="sc-moon-icon">☽</div>
+            <div class="sc-title">月亮情緒圖鑑</div>
+            <div class="sc-subtitle">我的月相收藏戰績</div>
+          </div>
+          <div class="sc-stats">
+            <div class="sc-stat">
+              <div class="sc-stat-num" id="sc-level">1</div>
+              <div class="sc-stat-label">等級</div>
+            </div>
+            <div class="sc-stat">
+              <div class="sc-stat-num" id="sc-xp">0</div>
+              <div class="sc-stat-label">XP</div>
+            </div>
+            <div class="sc-stat">
+              <div class="sc-stat-num" id="sc-emotions">0</div>
+              <div class="sc-stat-label">情緒收集</div>
+            </div>
+            <div class="sc-stat">
+              <div class="sc-stat-num" id="sc-houses">0</div>
+              <div class="sc-stat-label">宮位解鎖</div>
+            </div>
+          </div>
+          <div class="sc-level-name" id="scLevelName">新月學徒</div>
+          <div class="sc-footer">astro-moon.app · 月亮占星圖鑑</div>
+        </div>
+      </div>
+      <div class="share-actions">
+        <button class="btn-primary" onclick="generateShareCard()">生成分享卡 📸</button>
+        <p class="share-tip">點擊下載 1080×1920 圖片</p>
+        <div class="share-stats-live">
+          <div class="live-stat"><span id="liveLevel">1</span> 等級</div>
+          <div class="live-stat"><span id="liveXP">0</span> XP</div>
+          <div class="live-stat"><span id="liveEmotions">0/28</span> 情緒</div>
+          <div class="live-stat"><span id="liveStreak">0</span> 天連續</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 月光寶箱 Modal -->
+<div class="modal-overlay" id="chestModal" role="dialog" aria-modal="true" style="display:none">
+  <div class="modal-box">
+    <div class="chest-animation" id="chestAnim">🎁</div>
+    <h3 id="chestTitle">月光寶箱</h3>
+    <p id="chestContent"></p>
+    <div class="xp-reward" id="chestXP"></div>
+    <button class="btn-primary" onclick="closeModal('chestModal')">收下洞察 ✦</button>
+  </div>
+</div>
+
+<!-- 滿月彩蛋 Modal -->
+<div class="modal-overlay" id="fullMoonModal" role="dialog" aria-modal="true" style="display:none">
+  <div class="modal-box full-moon-modal">
+    <div class="full-moon-anim" id="fullMoonAnim">🌕</div>
+    <h3>今夜是滿月</h3>
+    <p id="fullMoonMsg">情緒能量達到頂點，你壓抑的感受正在浮現。這是最好的釋放時機——什麼事讓你最近一直想迴避？</p>
+    <div class="full-moon-xp">限定獎勵 +50 XP</div>
+    <button class="btn-primary" onclick="claimFullMoon()">接受滿月加持 🌕</button>
+  </div>
+</div>
+
+<!-- XP 通知 Toast -->
+<div class="xp-toast" id="xpToast"></div>
+
+<!-- 解鎖通知 Toast -->
+<div class="unlock-toast" id="unlockToast"></div>
+
+<footer class="site-footer">
+  <div class="footer-moon">☽</div>
+  <p>月亮占星情緒圖鑑 · 探索你的內在宇宙</p>
+  <p class="footer-note">占星是一種內省工具，不構成醫療或心理診斷建議</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

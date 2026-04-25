@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>火星｜戰鬥競技場</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Black+Ops+One&family=Oswald:wght@300;400;500;600;700&family=Rubik+Mono+One&family=Staatliches&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #c0392b;
+  --lava: #e74c3c;
+  --orange: #e67e22;
+  --electric: #ff6b00;
+  --black: #0a0a0a;
+  --dark: #111111;
+  --darker: #1a0a0a;
+  --gray: #222222;
+  --smoke: #333333;
+  --gold: #f39c12;
+  --white: #f0e6d3;
+  --dim: #888;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--black);
+  color:var(--white);
+  font-family:'Oswald',sans-serif;
+  overflow-x:hidden;
+  cursor:crosshair;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--black);}
+::-webkit-scrollbar-thumb{background:var(--lava);}
+
+/* ===== GLOBAL DIAGONAL BG ===== */
+.diag-bg{
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 40px,
+    rgba(192,57,43,0.03) 40px,
+    rgba(192,57,43,0.03) 42px
+  );
+}
+
+/* ===== FIRE BORDER ===== */
+.fire-border{
+  border:2px solid var(--lava);
+  box-shadow:0 0 12px var(--lava),inset 0 0 12px rgba(192,57,43,0.1);
+}
+
+/* ===== XP BAR (fixed top) ===== */
+#xp-hud{
+  position:fixed;top:0;left:0;width:100%;z-index:9999;
+  background:rgba(10,10,10,0.95);
+  border-bottom:2px solid var(--lava);
+  padding:6px 20px;
+  display:flex;align-items:center;gap:16px;
+  backdrop-filter:blur(8px);
+}
+#xp-hud .level-badge{
+  font-family:'Anton',sans-serif;
+  color:var(--orange);
+  font-size:1rem;
+  white-space:nowrap;
+  min-width:90px;
+}
+#xp-bar-wrap{
+  flex:1;height:12px;
+  background:var(--smoke);
+  border:1px solid var(--lava);
+  position:relative;overflow:hidden;
+}
+#xp-bar-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--lava),var(--orange));
+  transition:width 0.4s;
+  position:relative;
+}
+#xp-bar-fill::after{
+  content:'';position:absolute;right:0;top:0;height:100%;width:20px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4));
+  animation:shimmer 1s infinite;
+}
+@keyframes shimmer{0%{opacity:0}50%{opacity:1}100%{opacity:0}}
+#xp-text{font-family:'Rubik Mono One',sans-serif;font-size:0.65rem;color:var(--dim);white-space:nowrap;}
+#combo-hud{
+  font-family:'Anton',sans-serif;
+  font-size:1.1rem;
+  color:var(--orange);
+  min-width:80px;
+  text-align:right;
+  text-shadow:0 0 10px var(--orange);
+}
+#combo-break{
+  font-family:'Rubik Mono One',sans-serif;
+  font-size:0.7rem;color:var(--lava);
+  display:none;animation:blink 0.3s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ===== RAGE MODE ===== */
+body.rage-mode{
+  filter:hue-rotate(0deg) saturate(3) brightness(1.1);
+  animation:rage-pulse 0.5s infinite;
+}
+@keyframes rage-pulse{0%{filter:saturate(3) brightness(1.1)}50%{filter:saturate(5) brightness(1.3) hue-rotate(10deg)}100%{filter:saturate(3) brightness(1.1)}}
+
+/* ===== SHAKE ===== */
+@keyframes shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-6px)}20%,40%,60%,80%{transform:translateX(6px)}}
+.shake{animation:shake 0.5s;}
+
+/* ===== SECTIONS ===== */
+section{padding:80px 20px;position:relative;}
+
+/* ===== HERO ===== */
+#hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;
+  position:relative;overflow:hidden;
+  padding-top:100px;
+}
+#hero-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(192,57,43,0.25) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(230,126,34,0.1) 0%, transparent 60%),
+    var(--black);
+  z-index:0;
+}
+#particle-canvas{position:absolute;inset:0;z-index:1;pointer-events:none;}
+.hero-content{position:relative;z-index:2;}
+.hero-symbol{
+  font-family:'Anton',sans-serif;
+  font-size:clamp(6rem,18vw,14rem);
+  color:var(--lava);
+  text-shadow:0 0 40px var(--lava),0 0 80px rgba(192,57,43,0.5);
+  line-height:1;
+  animation:hero-pulse 3s ease-in-out infinite;
+}
+@keyframes hero-pulse{0%,100%{text-shadow:0 0 40px var(--lava),0 0 80px rgba(192,57,43,0.5)}50%{text-shadow:0 0 60px var(--orange),0 0 120px rgba(230,126,34,0.6),0 0 200px rgba(192,57,43,0.3)}}
+.hero-title{
+  font-family:'Anton',sans-serif;
+  font-size:clamp(2rem,8vw,6rem);
+  color:var(--white);
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  line-height:1.1;
+  margin-bottom:16px;
+}
+.hero-sub{
+  font-family:'Staatliches',sans-serif;
+  font-size:clamp(1.2rem,3vw,1.8rem);
+  color:var(--orange);
+  letter-spacing:0.3em;
+  text-transform:uppercase;
+  margin-bottom:40px;
+}
+/* CUBE EXPLODE */
+#cube-container{
+  position:relative;width:200px;height:200px;margin:40px auto;
+  perspective:600px;
+}
+.cube{
+  width:200px;height:200px;
+  position:relative;transform-style:preserve-3d;
+  animation:cube-spin 10s linear infinite;
+}
+@keyframes cube-spin{from{transform:rotateX(15deg) rotateY(0deg)}to{transform:rotateX(15deg) rotateY(360deg)}}
+.cube-face{
+  position:absolute;width:200px;height:200px;
+  background:rgba(192,57,43,0.08);
+  border:1px solid rgba(192,57,43,0.4);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Anton',sans-serif;font-size:1.4rem;color:var(--lava);
+  backdrop-filter:blur(4px);
+}
+.cube-face.front {transform:translateZ(100px);}
+.cube-face.back  {transform:rotateY(180deg) translateZ(100px);}
+.cube-face.left  {transform:rotateY(-90deg) translateZ(100px);}
+.cube-face.right {transform:rotateY(90deg)  translateZ(100px);}
+.cube-face.top   {transform:rotateX(90deg)  translateZ(100px);}
+.cube-face.bottom{transform:rotateX(-90deg) translateZ(100px);}
+
+.hero-cta{
+  display:inline-block;
+  font-family:'Anton',sans-serif;
+  font-size:1.2rem;
+  letter-spacing:0.2em;
+  color:var(--black);
+  background:linear-gradient(135deg,var(--lava),var(--orange));
+  padding:16px 48px;
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  cursor:pointer;
+  transition:transform 0.2s,box-shadow 0.2s;
+  border:none;
+  text-transform:uppercase;
+}
+.hero-cta:hover{transform:scale(1.05);box-shadow:0 0 30px var(--lava);}
+
+/* ===== SECTION HEADERS ===== */
+.sec-header{
+  text-align:center;
+  margin-bottom:60px;
+}
+.sec-label{
+  font-family:'Rubik Mono One',sans-serif;
+  font-size:0.8rem;
+  color:var(--lava);
+  letter-spacing:0.4em;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+.sec-title{
+  font-family:'Anton',sans-serif;
+  font-size:clamp(2rem,6vw,4.5rem);
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+  line-height:1;
+  color:var(--white);
+}
+.sec-title span{color:var(--lava);}
+.sec-divider{
+  width:100px;height:3px;
+  background:linear-gradient(90deg,transparent,var(--lava),transparent);
+  margin:20px auto;
+}
+
+/* ===== MYTH SECTION ===== */
+#myth{background:var(--darker);}
+.myth-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:40px;
+  max-width:1100px;margin:0 auto;
+}
+.myth-card{
+  background:rgba(192,57,43,0.06);
+  border-left:4px solid var(--lava);
+  padding:32px;
+  clip-path:polygon(0 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%);
+}
+.myth-card h3{
+  font-family:'Black Ops One',sans-serif;
+  color:var(--orange);font-size:1.4rem;margin-bottom:16px;
+}
+.myth-card p{
+  font-family:'Oswald',sans-serif;
+  font-size:1rem;line-height:1.7;color:var(--white);opacity:0.85;
+}
+.myth-img{
+  width:100%;max-width:400px;display:block;margin:0 auto;
+  border:2px solid var(--lava);
+  box-shadow:0 0 40px rgba(192,57,43,0.3);
+}
+.myth-img-wrap{text-align:center;position:relative;}
+
+/* ===== RADAR SECTION ===== */
+#radar-section{
+  background:var(--black);
+  text-align:center;
+}
+.radar-wrap{
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:60px;
+  max-width:1000px;margin:0 auto;
+}
+#radar-svg{cursor:pointer;}
+.radar-labels{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  align-self:center;
+}
+.radar-stat{
+  background:rgba(192,57,43,0.1);
+  border:1px solid var(--lava);
+  padding:16px 24px;
+  text-align:center;
+  clip-path:polygon(6px 0,100% 0,calc(100%-6px) 100%,0 100%);
+}
+.radar-stat-label{
+  font-family:'Rubik Mono One',sans-serif;
+  font-size:0.7rem;color:var(--dim);letter-spacing:0.2em;
+}
+.radar-stat-val{
+  font-family:'Anton',sans-serif;
+  font-size:2rem;color:var(--orange);
+  text-shadow:0 0 10px var(--orange);
+}
+
+/* ===== HOUSE / SIGN CARDS ===== */
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:24px;
+  max-width:1300px;margin:0 auto;
+}
+.boss-card{
+  background:rgba(10,10,10,0.8);
+  border:1px solid rgba(192,57,43,0.3);
+  padding:28px;
+  position:relative;overflow:hidden;
+  transition:border-color 0.3s,transform 0.2s;
+  clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100%-16px));
+}
+.boss-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--lava),var(--orange),var(--lava));
+  opacity:0;transition:opacity 0.3s;
+}
+.boss-card:hover{border-color:var(--lava);transform:translateY(-4px);}
+.boss-card:hover::before{opacity:1;}
+.boss-card.defeated{
+  border-color:var(--gold) !important;
+  background:rgba(243,156,18,0.05);
+}
+.boss-card.defeated::after{
+  content:'✓ DEFEATED';
+  position:absolute;top:8px;right:8px;
+  font-family:'Rubik Mono One',sans-serif;font-size:0.6rem;
+  color:var(--gold);letter-spacing:0.1em;
+}
+.card-num{
+  font-family:'Rubik Mono One',sans-serif;
+  font-size:0.7rem;color:var(--lava);
+  letter-spacing:0.2em;margin-bottom:8px;
+}
+.card-title{
+  font-family:'Black Ops One',sans-serif;
+  font-size:1.2rem;color:var(--white);margin-bottom:4px;
+}
+.card-subtitle{
+  font-family:'Staatliches',sans-serif;
+  font-size:1rem;color:var(--orange);
+  letter-spacing:0.15em;margin-bottom:16px;
+}
+.card-body{
+  font-family:'Oswald',sans-serif;
+  font-size:0.9rem;line-height:1.6;color:rgba(240,230,211,0.8);
+}
+.card-example{
+  margin-top:12px;padding:10px;
+  background:rgba(192,57,43,0.1);
+  border-left:3px solid var(--orange);
+  font-size:0.8rem;color:var(--orange);
+  font-family:'Oswald',sans-serif;
+}
+/* HP BAR */
+.boss-hp-wrap{
+  margin-top:16px;height:8px;
+  background:var(--smoke);border:1px solid var(--lava);
+  position:relative;overflow:hidden;
+}
+.boss-hp-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--lava),var(--orange));
+  transition:width 0.2s;
+}
+.boss-hp-text{
+  font-family:'Rubik Mono One',sans-serif;
+  font-size:0.65rem;color:var(--dim);margin-top:4px;
+  display:flex;justify-content:space-between;
+}
+.boss-btn{
+  margin-top:12px;width:100%;
+  font-family:'Anton',sans-serif;
+  font-size:0.85rem;letter-spacing:0.15em;
+  color:var(--black);
+  background:linear-gradient(135deg,var(--lava),var(--orange));
+  border:none;padding:10px;cursor:pointer;
+  clip-path:polygon(4px 0,100% 0,calc(100%-4px) 100%,0 100%);
+  transition:transform 0.1s;
+  text-transform:uppercase;
+}
+.boss-btn:active{transform:scale(0.95);}
+
+/* ===== ASPECTS ===== */
+#aspects{background:var(--darker);}
+.aspect-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:20px;max-width:1300px;margin:0 auto;
+}
+.aspect-card{
+  background:rgba(10,10,10,0.9);
+  border:1px solid rgba(192,57,43,0.25);
+  padding:20px 24px;
+  transition:border-color 0.3s;
+}
+.aspect-card:hover{border-color:var(--orange);}
+.aspect-header{
+  display:flex;align-items:center;gap:12px;margin-bottom:10px;
+}
+.aspect-symbol{
+  font-family:'Rubik Mono One',sans-serif;
+  font-size:1.4rem;color:var(--lava);
+  min-width:30px;
+}
+.aspect-name{
+  font-family:'Black Ops One',sans-serif;
+  font-size:1rem;color:var(--white);
+}
+.aspect-tag{
+  margin-left:auto;
+  font-family:'Rubik Mono One',sans-serif;
+  font-size:0.6rem;
+  padding:3px 8px;
+  background:rgba(192,57,43,0.2);
+  border:1px solid var(--lava);
+  color:var(--lava);
+}
+.aspect-body{
+  font-family:'Oswald',sans-serif;
+  font-size:0.88rem;line-height:1.6;
+  color:rgba(240,230,211,0.8);
+}
+
+/* ===== CASES ===== */
+#cases{background:var(--black);}
+.cases-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:32px;max-width:1100px;margin:0 auto;
+}
+.case-card{
+  background:rgba(192,57,43,0.06);
+  border:1px solid rgba(192,57,43,0.3);
+  padding:32px;
+  position:relative;
+}
+.case-card::before{
+  content:'';position:absolute;top:0;left:0;width:4px;height:100%;
+  background:linear-gradient(180deg,var(--lava),var(--orange));
+}
+.case-name{
+  font-family:'Anton',sans-serif;
+  font-size:1.8rem;color:var(--white);margin-bottom:4px;
+}
+.case-mars{
+  font-family:'Staatliches',sans-serif;
+  font-size:1.1rem;color:var(--orange);
+  letter-spacing:0.2em;margin-bottom:16px;
+}
+.case-body{
+  font-family:'Oswald',sans-serif;
+  font-size:0.9rem;line-height:1.7;color:rgba(240,230,211,0.8);
+}
+
+/* ===== GUIDE ===== */
+#guide{background:var(--darker);}
+.guide-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:24px;max-width:1100px;margin:0 auto;
+}
+.guide-card{
+  background:rgba(10,10,10,0.9);
+  border-top:3px solid var(--lava);
+  padding:28px;
+}
+.guide-icon{font-size:2.5rem;margin-bottom:12px;}
+.guide-title{
+  font-family:'Black Ops One',sans-serif;
+  font-size:1.1rem;color:var(--orange);margin-bottom:12px;
+}
+.guide-list{
+  list-style:none;
+}
+.guide-list li{
+  font-family:'Oswald',sans-serif;
+  font-size:0.9rem;line-height:1.6;
+  color:rgba(240,230,211,0.8);
+  padding:6px 0;
+  border-bottom:1px solid rgba(192,57,43,0.15);
+}
+.guide-list li::before{content:'▶ ';color:var(--lava);font-size:0.7rem;}
+
+/* ===== DAILY MISSION ===== */
+#daily-mission{
+  background:var(--black);
+  text-align:center;
+}
+.mission-box{
+  max-width:600px;margin:0 auto;
+  background:rgba(192,57,43,0.08);
+  border:2px solid var(--lava);
+  padding:40px;
+  box-shadow:0 0 40px rgba(192,57,43,0.2);
+}
+#mission-timer{
+  font-family:'Rubik Mono One',sans-serif;
+  font-size:4rem;color:var(--lava);
+  text-shadow:0 0 20px var(--lava);
+  margin-bottom:16px;
+}
+#mission-prompt{
+  font-family:'Staatliches',sans-serif;
+  font-size:1.4rem;color:var(--white);
+  letter-spacing:0.1em;margin-bottom:24px;
+}
+#mission-click-area{
+  width:180px;height:180px;border-radius:50%;
+  background:radial-gradient(circle,var(--lava),#8b0000);
+  border:4px solid var(--orange);
+  cursor:pointer;
+  margin:0 auto 24px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Anton',sans-serif;font-size:2rem;color:var(--white);
+  box-shadow:0 0 30px var(--lava);
+  transition:transform 0.1s;
+  user-select:none;
+}
+#mission-click-area:active{transform:scale(0.92);}
+#mission-score{
+  font-family:'Anton',sans-serif;
+  font-size:1.4rem;color:var(--orange);
+}
+#mission-start-btn{
+  font-family:'Anton',sans-serif;
+  font-size:1rem;letter-spacing:0.15em;
+  color:var(--black);
+  background:linear-gradient(135deg,var(--lava),var(--orange));
+  border:none;padding:14px 40px;cursor:pointer;
+  clip-path:polygon(8px 0,100% 0,calc(100%-8px) 100%,0 100%);
+  text-transform:uppercase;
+}
+
+/* ===== SHARE CARD ===== */
+#share-section{
+  background:var(--darker);text-align:center;
+}
+#share-card{
+  max-width:500px;margin:0 auto;
+  background:linear-gradient(135deg,#1a0505,#0a0a0a);
+  border:2px solid var(--lava);
+  padding:40px;
+  box-shadow:0 0 60px rgba(192,57,43,0.3);
+}
+#share-card .card-mars-sign{
+  font-family:'Anton',sans-serif;
+  font-size:3rem;color:var(--lava);margin-bottom:8px;
+}
+#share-card .card-tagline{
+  font-family:'Staatliches',sans-serif;
+  font-size:1.2rem;color:var(--orange);letter-spacing:0.3em;margin-bottom:24px;
+}
+.share-stats{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px;
+}
+.share-stat-item{
+  background:rgba(192,57,43,0.1);
+  border:1px solid rgba(192,57,43,0.4);
+  padding:12px;
+}
+.share-stat-item .val{
+  font-family:'Anton',sans-serif;font-size:1.6rem;color:var(--orange);
+}
+.share-stat-item .lbl{
+  font-family:'Rubik Mono One',sans-serif;font-size:0.6rem;color:var(--dim);
+  letter-spacing:0.2em;
+}
+#share-btn{
+  font-family:'Anton',sans-serif;font-size:1rem;letter-spacing:0.15em;
+  color:var(--black);
+  background:linear-gradient(135deg,var(--lava),var(--orange));
+  border:none;padding:14px 40px;cursor:pointer;
+  clip-path:polygon(8px 0,100% 0,calc(100%-8px) 100%,0 100%);
+  text-transform:uppercase;margin-top:8px;
+}
+
+/* ===== FIRE OVERLAY (victory) ===== */
+#fire-overlay{
+  position:fixed;inset:0;z-index:99999;
+  pointer-events:none;
+  display:none;
+  background:radial-gradient(ellipse at 50% 100%, rgba(192,57,43,0.8) 0%, transparent 60%);
+  animation:fire-rise 2s ease-out forwards;
+}
+@keyframes fire-rise{
+  0%{opacity:0;background:radial-gradient(ellipse at 50% 120%, rgba(192,57,43,0.9) 0%, transparent 50%);}
+  50%{opacity:1;}
+  100%{opacity:0;background:radial-gradient(ellipse at 50% 0%, rgba(230,126,34,0.6) 0%, transparent 70%);}
+}
+
+/* ===== RAGE PARTICLES ===== */
+#rage-canvas{
+  position:fixed;inset:0;z-index:99998;
+  pointer-events:none;display:none;
+}
+
+/* ===== FLAME ICON ===== */
+#flame-trigger{
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  font-size:2.5rem;cursor:pointer;
+  filter:drop-shadow(0 0 10px var(--lava));
+  user-select:none;
+  transition:transform 0.2s;
+}
+#flame-trigger:hover{transform:scale(1.2);}
+#rage-hint{
+  position:fixed;bottom:72px;right:24px;z-index:9999;
+  font-family:'Rubik Mono One',sans-serif;font-size:0.6rem;
+  color:var(--dim);letter-spacing:0.1em;
+  display:none;
+}
+
+/* ===== FOOTER ===== */
+footer{
+  background:var(--black);
+  border-top:2px solid var(--lava);
+  text-align:center;padding:40px 20px;
+}
+footer p{
+  font-family:'Oswald',sans-serif;
+  font-size:0.85rem;color:var(--dim);
+}
+footer .footer-symbol{
+  font-family:'Anton',sans-serif;
+  font-size:3rem;color:var(--lava);
+  display:block;margin-bottom:12px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+  .myth-grid{grid-template-columns:1fr;}
+  .radar-wrap{flex-direction:column;align-items:center;}
+  .radar-labels{grid-template-columns:repeat(4,1fr);}
+  #xp-text{display:none;}
+}
+@media(max-width:480px){
+  .radar-labels{grid-template-columns:repeat(2,1fr);}
+  .hero-symbol{font-size:6rem;}
+}
+
+/* ===== MISC ===== */
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.tag{
+  font-family:'Rubik Mono One',sans-serif;
+  font-size:0.6rem;color:var(--black);
+  background:var(--lava);padding:3px 8px;
+  letter-spacing:0.1em;
+}
+.quote-block{
+  max-width:800px;margin:40px auto;
+  border-left:4px solid var(--lava);
+  padding:24px 32px;
+  background:rgba(192,57,43,0.05);
+}
+.quote-block p{
+  font-family:'Staatliches',sans-serif;
+  font-size:1.8rem;letter-spacing:0.05em;
+  color:var(--white);line-height:1.4;
+}
+.quote-block cite{
+  display:block;margin-top:12px;
+  font-family:'Oswald',sans-serif;font-size:0.9rem;
+  color:var(--orange);font-style:normal;
+}
+</style>
+</head>
+<body>
+
+<!-- XP HUD -->
+<div id="xp-hud">
+  <div class="level-badge" id="level-display">⚔ 士兵</div>
+  <div id="xp-bar-wrap"><div id="xp-bar-fill"></div></div>
+  <div id="xp-text">XP: <span id="xp-num">0</span> / <span id="xp-max">100</span></div>
+  <div id="combo-hud">COMBO: <span id="combo-num">0</span></div>
+  <div id="combo-break">COMBO BREAK!</div>
+</div>
+
+<!-- FIRE OVERLAY -->
+<div id="fire-overlay"></div>
+<!-- RAGE CANVAS -->
+<canvas id="rage-canvas"></canvas>
+<!-- FLAME TRIGGER -->
+<div id="flame-trigger" title="長按3秒觸發狂暴模式">🔥</div>
+<div id="rage-hint">HOLD 3s → RAGE</div>
+
+<!-- ============================================================ -->
+<!-- 1. HERO -->
+<!-- ============================================================ -->
+<section id="hero">
+  <div id="hero-bg"></div>
+  <canvas id="particle-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-symbol">♂</div>
+    <h1 class="hero-title">火星<br><span style="color:var(--orange)">戰鬥引擎</span></h1>
+    <p class="hero-sub">你的行動力 · 慾望 · 憤怒 · 戰場</p>
+    <div id="cube-container">
+      <div class="cube" id="main-cube">
+        <div class="cube-face front">攻擊</div>
+        <div class="cube-face back">慾望</div>
+        <div class="cube-face left">行動</div>
+        <div class="cube-face right">憤怒</div>
+        <div class="cube-face top">♂</div>
+        <div class="cube-face bottom">戰神</div>
+      </div>
+    </div>
+    <button class="hero-cta" onclick="scrollToSection('myth')">進入戰場 →</button>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 2. 戰神神話 -->
+<!-- ============================================================ -->
+<section id="myth" class="diag-bg">
+  <div class="sec-header">
+    <div class="sec-label">MYTHOLOGY</div>
+    <h2 class="sec-title">戰神<span>神話</span></h2>
+    <div class="sec-divider"></div>
+  </div>
+  <div class="myth-grid">
+    <div>
+      <img src="./images/myth.png" class="myth-img" onerror="this.style.display='none'" alt="戰神">
+      <div class="myth-card" style="margin-top:24px;">
+        <h3>阿瑞斯 (Ares) — 希臘</h3>
+        <p>奧林帕斯的戰爭之神，宙斯與赫拉之子。他不是勝利的象徵，而是戰鬥本身的化身：混亂、鮮血、原始衝動。其他神明不喜愛他，卻無法忽視他——因為沒有戰鬥就沒有英雄誕生。</p>
+      </div>
+    </div>
+    <div>
+      <div class="myth-card">
+        <h3>馬爾斯 (Mars) — 羅馬</h3>
+        <p>羅馬人對火星有更高的評價：馬爾斯是農業守護神兼戰神，羅馬建城者羅慕路斯的父親。他代表有秩序的軍事力量，是帝國擴張背後的意志。火星月份（March / 三月）以他命名，象徵萬物甦醒的第一擊。</p>
+      </div>
+      <div class="myth-card" style="margin-top:24px;">
+        <h3>占星學中的火星</h3>
+        <p>火星是你的「行動引擎」：你如何追逐慾望、面對衝突、消耗體力、感受憤怒。它是本能反應，是第一衝動，是你在壓力下的真實樣貌。火星位置揭示你戰鬥的方式，而非是否戰鬥——因為每個人都在戰鬥。</p>
+      </div>
+    </div>
+  </div>
+  <div class="quote-block">
+    <p>「火星不是壞的行星，它是誠實的行星。它讓你看見自己真正想要什麼。」</p>
+    <cite>— 現代占星傳統</cite>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 3. 行動力核心 + 雷達 -->
+<!-- ============================================================ -->
+<section id="radar-section">
+  <div class="sec-header">
+    <div class="sec-label">BATTLE STATS</div>
+    <h2 class="sec-title">戰力<span>四維</span>雷達</h2>
+    <div class="sec-divider"></div>
+    <p style="font-family:'Oswald';color:var(--dim);font-size:0.9rem;">點擊雷達頂點拖動調整你的戰力值</p>
+  </div>
+  <div class="radar-wrap">
+    <svg id="radar-svg" width="320" height="320" viewBox="0 0 320 320">
+      <defs>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <!-- Grid circles -->
+      <circle cx="160" cy="160" r="120" fill="none" stroke="rgba(192,57,43,0.15)" stroke-width="1"/>
+      <circle cx="160" cy="160" r="90"  fill="none" stroke="rgba(192,57,43,0.15)" stroke-width="1"/>
+      <circle cx="160" cy="160" r="60"  fill="none" stroke="rgba(192,57,43,0.15)" stroke-width="1"/>
+      <circle cx="160" cy="160" r="30"  fill="none" stroke="rgba(192,57,43,0.15)" stroke-width="1"/>
+      <!-- Axes -->
+      <line x1="160" y1="40"  x2="160" y2="280" stroke="rgba(192,57,43,0.3)" stroke-width="1"/>
+      <line x1="40"  y1="160" x2="280" y2="160" stroke="rgba(192,57,43,0.3)" stroke-width="1"/>
+      <!-- Radar fill -->
+      <polygon id="radar-poly" points="160,70 250,160 160,250 70,160" fill="rgba(192,57,43,0.25)" stroke="var(--lava)" stroke-width="2" filter="url(#glow)"/>
+      <!-- Dots -->
+      <circle id="dot-0" cx="160" cy="70"  r="7" fill="var(--orange)" stroke="var(--black)" stroke-width="2" style="cursor:pointer"/>
+      <circle id="dot-1" cx="250" cy="160" r="7" fill="var(--orange)" stroke="var(--black)" stroke-width="2" style="cursor:pointer"/>
+      <circle id="dot-2" cx="160" cy="250" r="7" fill="var(--orange)" stroke="var(--black)" stroke-width="2" style="cursor:pointer"/>
+      <circle id="dot-3" cx="70"  cy="160" r="7" fill="var(--orange)" stroke="var(--black)" stroke-width="2" style="cursor:pointer"/>
+      <!-- Labels -->
+      <text x="160" y="26"  text-anchor="middle" fill="var(--white)" font-family="Anton" font-size="14">攻擊</text>
+      <text x="295" y="165" text-anchor="start"  fill="var(--white)" font-family="Anton" font-size="14">速度</text>
+      <text x="160" y="300" text-anchor="middle" fill="var(--white)" font-family="Anton" font-size="14">爆擊</text>
+      <text x="25"  y="165" text-anchor="end"    fill="var(--white)" font-family="Anton" font-size="14">防禦</text>
+    </svg>
+    <div class="radar-labels">
+      <div class="radar-stat">
+        <div class="radar-stat-label">攻擊 ATK</div>
+        <div class="radar-stat-val" id="stat-atk">75</div>
+      </div>
+      <div class="radar-stat">
+        <div class="radar-stat-label">速度 SPD</div>
+        <div class="radar-stat-val" id="stat-spd">75</div>
+      </div>
+      <div class="radar-stat">
+        <div class="radar-stat-label">爆擊 CRIT</div>
+        <div class="radar-stat-val" id="stat-crit">75</div>
+      </div>
+      <div class="radar-stat">
+        <div class="radar-stat-label">防禦 DEF</div>
+        <div class="radar-stat-val" id="stat-def">75</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 4-15. 火星十二宮 -->
+<!-- ============================================================ -->
+<section id="houses" class="diag-bg">
+  <div class="sec-header">
+    <div class="sec-label">12 HOUSES</div>
+    <h2 class="sec-title">火星<span>十二宮</span></h2>
+    <div class="sec-divider"></div>
+    <p style="font-family:'Oswald';color:var(--dim);font-size:0.9rem;">點擊 ATTACK 連擊 10 次擊敗 Boss，獲得 XP</p>
+  </div>
+  <div class="cards-grid" id="houses-grid"></div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 16-27. 火星十二星座 -->
+<!-- ============================================================ -->
+<section id="signs" style="background:var(--black);">
+  <div class="sec-header">
+    <div class="sec-label">12 SIGNS</div>
+    <h2 class="sec-title">火星<span>十二星座</span></h2>
+    <div class="sec-divider"></div>
+  </div>
+  <div class="cards-grid" id="signs-grid"></div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 28. 45 相位矩陣 -->
+<!-- ============================================================ -->
+<section id="aspects" class="diag-bg">
+  <div class="sec-header">
+    <div class="sec-label">45 ASPECTS</div>
+    <h2 class="sec-title">火星<span>相位矩陣</span></h2>
+    <div class="sec-divider"></div>
+    <p style="font-family:'Oswald';color:var(--dim);font-size:0.9rem;">火星 × 9 行星 × 5 相位</p>
+  </div>
+  <div class="aspect-grid" id="aspects-grid"></div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 29. 名人案例 -->
+<!-- ============================================================ -->
+<section id="cases" style="background:var(--black);">
+  <div class="sec-header">
+    <div class="sec-label">CASE FILES</div>
+    <h2 class="sec-title">名人<span>戰力檔案</span></h2>
+    <div class="sec-divider"></div>
+  </div>
+  <div class="cases-grid" id="cases-grid"></div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 30. 實用指引 -->
+<!-- ============================================================ -->
+<section id="guide" class="diag-bg">
+  <div class="sec-header">
+    <div class="sec-label">FIELD MANUAL</div>
+    <h2 class="sec-title">戰場<span>指引</span></h2>
+    <div class="sec-divider"></div>
+  </div>
+  <div class="guide-grid" id="guide-grid"></div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 每日挑戰 -->
+<!-- ============================================================ -->
+<section id="daily-mission" style="background:var(--darker);">
+  <div class="sec-header">
+    <div class="sec-label">DAILY MISSION</div>
+    <h2 class="sec-title">每日<span>任務</span></h2>
+    <div class="sec-divider"></div>
+  </div>
+  <div class="mission-box">
+    <div id="mission-timer">60</div>
+    <div id="mission-prompt">60秒內盡量點擊 — 測試你的火星爆發力</div>
+    <div id="mission-click-area">⚔</div>
+    <div id="mission-score">點擊數：<span id="mission-clicks">0</span></div>
+    <br>
+    <button id="mission-start-btn" onclick="startDailyMission()">開始任務</button>
+    <div id="mission-result" style="margin-top:16px;font-family:'Anton';font-size:1.1rem;color:var(--orange);display:none;"></div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- 31. 分享卡 -->
+<!-- ============================================================ -->
+<section id="share-section" style="background:var(--black);">
+  <div class="sec-header">
+    <div class="sec-label">BATTLE CARD</div>
+    <h2 class="sec-title">我的火星<span>戰力卡</span></h2>
+    <div class="sec-divider"></div>
+  </div>
+  <div id="share-card">
+    <img src="./images/share-bg.png" style="width:100%;margin-bottom:16px;display:none" onerror="this.style.display='none'" alt="">
+    <div class="card-mars-sign">♂ 火星戰士</div>
+    <div class="card-tagline">MARS BATTLE CARD</div>
+    <div class="share-stats">
+      <div class="share-stat-item">
+        <div class="val" id="share-level">士兵</div>
+        <div class="lbl">戰力等級</div>
+      </div>
+      <div class="share-stat-item">
+        <div class="val" id="share-xp">0</div>
+        <div class="lbl">總經驗值</div>
+      </div>
+      <div class="share-stat-item">
+        <div class="val" id="share-boss">0/12</div>
+        <div class="lbl">Boss 討伐</div>
+      </div>
+      <div class="share-stat-item">
+        <div class="val" id="share-combo">0</div>
+        <div class="lbl">最高連擊</div>
+      </div>
+    </div>
+    <button id="share-btn" onclick="shareCard()">截圖分享戰力卡</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-symbol">♂</span>
+  <p>火星 — 你的戰鬥引擎 · 你的原始慾望 · 你的行動意志</p>
+  <p style="margin-top:8px;font-size:0.75rem;">占星知識僅供參考，人生戰場由你自主掌控</p>
+</footer>
+
+<!-- ============================================================ -->
+<!-- SCRIPTS -->
+<!-- ============================================================ -->
+<script>
+// ===== DATA =====
+const HOUSES_DATA = [
+  {num:"宮 I",title:"第一宮",sub:"我如何行動",body:"火星在第一宮：行動力直接爆發在外表與第一印象。你天生強勢，走路有風，衝突往往從你啟動。體能旺盛，但容易衝動行事、不計後果。最強的自我展示，也最容易被誤解為攻擊性。",example:"行動模式：衝——想再說，本能先行"},
+  {num:"宮 II",title:"第二宮",sub:"我如何賺錢",body:"火星在第二宮：為金錢與物質資源拚命。你有強烈的財務行動力，但也容易衝動消費或因財爭執。賺錢是一種戰鬥，擁有感讓你有安全感。最適合需要主動開拓的業務型工作。",example:"行動模式：先搶資源，後算帳"},
+  {num:"宮 III",title:"第三宮",sub:"我如何溝通",body:"火星在第三宮：說話快、直接、有時傷人。爭論是你的日常訓練。寫作或口頭表達帶有攻擊力，也可以是說服力的武器。與兄弟姐妹或鄰居容易有摩擦。學習速度快但缺乏耐心。",example:"行動模式：辯論是你的戰場"},
+  {num:"宮 IV",title:"第四宮",sub:"我如何守護家",body:"火星在第四宮：家是你的堡壘，也是你的戰場。對家人保護欲強，但也帶來家庭衝突。童年可能有父母之間的緊張關係。內心深處有強烈的情緒火焰，表面卻往往看起來比較克制。",example:"行動模式：保護家人是最強動力"},
+  {num:"宮 V",title:"第五宮",sub:"我如何創造與玩",body:"火星在第五宮：創作力十足，愛冒險，追求刺激。戀愛是一場獵人遊戲，喜歡主動追求。在藝術、運動或任何創意領域能全力以赴。孩子教育方式強硬，注重成就與競爭。",example:"行動模式：愛與創作都要贏"},
+  {num:"宮 VI",title:"第六宮",sub:"我如何工作",body:"火星在第六宮：工作狂且追求效率。你憎恨拖拉，喜歡立即執行。可能有工作場所的衝突，或因過度勞累導致身體問題。最適合需要精確執行的技術型或醫療型工作。健康需要有意識地維護。",example:"行動模式：效率即正義"},
+  {num:"宮 VII",title:"第七宮",sub:"我如何建立關係",body:"火星在第七宮：你在關係中最有活力，也最有戰火。伴侶往往是你的競爭對象或激發你的對手。強烈吸引有主見、強勢的人。公開合作或婚姻中容易有摩擦，但也充滿激情。法律糾紛需要警戒。",example:"行動模式：伴侶是最強的對手"},
+  {num:"宮 VIII",title:"第八宮",sub:"我如何面對黑暗",body:"火星在第八宮：深入禁忌地帶的戰士。性慾強烈，對權力、遺產、心理暗面都有穿透力。可能有激烈的財務糾紛或遺產爭議。轉化是你的戰場：你能從廢墟中站起來。危機反而讓你最清醒。",example:"行動模式：越黑暗越銳利"},
+  {num:"宮 IX",title:"第九宮",sub:"我如何探索真理",body:"火星在第九宮：思想冒險家，信仰鬥士。你為理想和哲學打架，旅行是你的補給，海外是你的戰場。大學或宗教環境中可能與權威衝突。你不接受別人的答案，要親自找到真理。",example:"行動模式：跨越邊界去找答案"},
+  {num:"宮 X",title:"第十宮",sub:"我如何建立事業",body:"火星在第十宮：職業野心最強配置之一。你天生知道自己要站在哪個山頭，並且願意為此戰鬥。可能有職場衝突，也可能成為業界強人。在公眾眼中帶有競爭性與領袖氣場。事業是你最主要的戰場。",example:"行動模式：職涯就是登頂遊戲"},
+  {num:"宮 XI",title:"第十一宮",sub:"我如何參與群體",body:"火星在第十一宮：你在群體中點燃火焰。社群運動、理想主義、集體行動——你是推進者。但也容易與朋友或組織發生摩擦，因你的行動意志難以被制度束縛。最適合社會改革或新創圈。",example:"行動模式：革命需要你這種人"},
+  {num:"宮 XII",title:"第十二宮",sub:"我如何隱藏力量",body:"火星在第十二宮：隱藏的戰士。你的憤怒和行動力是潛伏的，外人看不到你在水面下的動作。可能有自我破壞傾向，或在幕後默默發力。靜修、藝術、精神療癒是你最佳出口。偶爾會爆發令人驚訝的能量。",example:"行動模式：水面下的暗流，暗中蓄力"}
+];
+
+const SIGNS_DATA = [
+  {num:"♈",title:"牡羊座",sub:"本命宮，最純粹",body:"火星在牡羊：這是火星的本命星座，能量最純粹。衝動、直接、永遠是第一個衝出去的人。不喜歡計劃，行動就是思考。耐心幾乎為零，但爆發力驚人。需要自己決定怎麼做，不接受他人指揮。",example:"名人：Lady Gaga（火星牡羊）— 直衝一線，不走傳統路線"},
+  {num:"♉",title:"金牛座",sub:"慢而穩，勢不可擋",body:"火星在金牛：行動遲緩但一旦啟動，如推土機般無法阻擋。為物質報酬行動，耐力超凡。不輕易生氣，但真的激怒後是最恐怖的存在。身體感官是動力來源。在財務和資產上行動果決。",example:"名人：希特勒（火星金牛）— 慢熱的執念最危險（警示案例）"},
+  {num:"♊",title:"雙子座",sub:"多線並進，腦力戰",body:"火星在雙子：思維速度即行動速度。同時進行多個計畫，用語言和資訊作為武器。爭辯是享受，邏輯是劍。注意力容易分散，很少把一件事做到極致。但在需要快速反應和溝通的場景無可匹敵。",example:"名人：伊隆·馬斯克（火星雙子）— 多線並發，言語即行動"},
+  {num:"♋",title:"巨蟹座",sub:"守護是最強攻擊",body:"火星在巨蟹：為家人、情感和歸屬感而戰。行動受情緒驅動，憤怒是被壓抑的，但一旦釋放，帶有淹沒性力量。間接行動，從側面攻擊。對所愛之人是最強護衛，對敵人是無聲的消耗戰。",example:"行動特質：以情感連結換取行動承諾"},
+  {num:"♌",title:"獅子座",sub:"為榮耀而戰",body:"火星在獅子：戲劇性十足的戰鬥風格。你必須成為舞台中央的英雄。為尊嚴、讚美和創意成就行動。自我驅動力極強，但也需要他人肯定。在舞台上爆發力驚人，需要觀眾才能達到最高輸出。",example:"名人：Jennifer Lopez（火星獅子）— 台上永遠是主角"},
+  {num:"♍",title:"處女座",sub:"精準打擊，不浪費子彈",body:"火星在處女：完美主義戰士。行動前先分析，執行時追求精確。在工作和健康領域行動力最強。批評是武器，效率是信仰。可能因為太完美主義而遲遲不出手，或出手時讓對方感受到的是「挑剔」而非攻擊。",example:"行動特質：把細節當作戰略資產"},
+  {num:"♎",title:"天秤座",sub:"公平才是真正的勝利",body:"火星在天秤：為公正和美而戰。行動需要他人配合，難以獨立行動。拖延決策是主要弱點，但在關係和法律糾紛中反而是冷靜的戰略家。憤怒非常文明，但積累後的爆發具有社交殺傷力。",example:"行動特質：談判桌上的終極武器"},
+  {num:"♏",title:"天蠍座",sub:"傳統守護，最強意志",body:"火星在天蠍：最具穿透力的火星。不達目的不罷休，意志力如熔岩——表面冷靜，內部燃燒。洞察力讓你永遠知道對方的弱點。復仇力驚人，但也有深度療癒和轉化的能力。性慾與權力渴望同樣強烈。",example:"名人：阿諾·史瓦辛格（火星天蠍）— 從沒有背景到頂點"},
+  {num:"♐",title:"射手座",sub:"為理想衝鋒",body:"火星在射手：哲學冒險家的行動力。目標是宏大的，執行是隨興的。喜歡自由，討厭被束縛。在旅行、教育、海外行動力最強。憤怒直接但消散快，不記仇。需要意義感才能全力以赴。",example:"行動特質：為了更大的Why可以不顧一切"},
+  {num:"♑",title:"摩羯座",sub:"策略耐力，登頂必然",body:"火星在摩羯：最有耐力的火星。行動有計劃、有紀律，像職業軍人。不衝動，但也不停止。目標是長期的，戰略是深思熟慮的。在職業和地位追求上的行動力是所有星座中最持久的。傳統守護之外最強的落地配置。",example:"名人：拿破崙（火星摩羯）— 所有行動都在服務戰略全局"},
+  {num:"♒",title:"水瓶座",sub:"革命性行動",body:"火星在水瓶：為系統改革和未來理想行動。不接受「本來就是這樣」。集體行動、科技革命、社會創新是舞台。行動邏輯性強，但有時太執著於原則而忽略人的情感。獨特的戰鬥風格讓對手摸不清意圖。",example:"行動特質：規則本身就是需要破壞的障礙"},
+  {num:"♓",title:"雙魚座",sub:"無形的滲透戰",body:"火星在雙魚：最難定義的行動力。行動受直覺和夢想驅動，界限模糊。可能有拖延或迴避直接衝突的傾向，但在藝術、靈性和幕後工作中有驚人的投入度。憤怒內化，需要學習表達。最強時是藝術家、靈療師、冥想戰士。",example:"名人：Kurt Cobain（火星雙魚）— 音樂是他的戰場"}
+];
+
+const ASPECTS_DATA = [
+  // 火星合相 (☌)
+  {pair:"火星 ☌ 太陽",symbol:"☌",tag:"合相 0°",body:"自我意志與行動力完全融合。極強的衝勁和自信，行動力爆表。容易過度自我中心或衝動，但能量巨大。領袖氣質，戰鬥力滿格。"},
+  {pair:"火星 ☌ 月亮",symbol:"☌",tag:"合相 0°",body:"情緒即行動。憤怒和感情衝動同步爆發，反應速度快但容易後悔。家庭環境可能充滿激烈互動。情感是你行動的燃料，也是最大的弱點。"},
+  {pair:"火星 ☌ 水星",symbol:"☌",tag:"合相 0°",body:"思考即行動。說話快、決策快、執行快。言語有攻擊性，但也有鋒利的說服力。適合辯論、談判、快速寫作。容易言多必失。"},
+  {pair:"火星 ☌ 金星",symbol:"☌",tag:"合相 0°",body:"慾望的完全爆發。性吸引力極強，追求愛情充滿激情。藝術創作有強烈的感官衝擊力。在關係中主動且熱烈，但也容易激情後迅速冷卻。"},
+  {pair:"火星 ☌ 木星",symbol:"☌",tag:"合相 0°",body:"行動力 × 擴張欲 = 無限膨脹。大膽冒險，過度自信，可能同時開展太多項目。在海外、法律、教育領域行動力驚人。注意莽撞帶來的風險。"},
+  {pair:"火星 ☌ 土星",symbol:"☌",tag:"合相 0°",body:"行動力遇上制約。能量被壓縮後變得更精準和持久。有強大的紀律和執行力，但可能壓抑憤怒至爆發。長期戰略執行的最強配置。"},
+  {pair:"火星 ☌ 天王星",symbol:"☌",tag:"合相 0°",body:"電光石火式的行動衝擊。突然的爆發和革命性行動。極端的獨立性和反體制衝動。行動不可預測，有時是天才，有時是混亂製造者。"},
+  {pair:"火星 ☌ 海王星",symbol:"☌",tag:"合相 0°",body:"行動力浸入夢境。模糊的目標和理想驅動行動，有時找不到明確方向。藝術、靈性、幕後工作中爆發力驚人。需要具體化夢想才能真正執行。"},
+  {pair:"火星 ☌ 冥王星",symbol:"☌",tag:"合相 0°",body:"最強的意志力炸彈。行動帶有毀滅和重生的力量。極致的執念，不達目的不罷休。心理操控力強，但也有深度轉化的能力。小心權力慾望吞噬自我。"},
+  // 火星六分相 (⚹)
+  {pair:"火星 ⚹ 太陽",symbol:"⚹",tag:"六分相 60°",body:"行動力與自我認同互相支持。能量順暢流動，較容易在需要時調動行動力。自信而不過激，有良好的啟動力。"},
+  {pair:"火星 ⚹ 月亮",symbol:"⚹",tag:"六分相 60°",body:"情感與行動協調。能將感受轉化為建設性行動。情緒調節相對健康，憤怒有出口。在家庭和照顧關係中行動有效。"},
+  {pair:"火星 ⚹ 水星",symbol:"⚹",tag:"六分相 60°",body:"思考與行動配合良好。計劃執行能力強，說到做到。溝通清晰有效，能在壓力下快速找到解決方案。"},
+  {pair:"火星 ⚹ 金星",symbol:"⚹",tag:"六分相 60°",body:"追求美好事物的能力強。在愛情和藝術中行動自然。魅力與主動性並存，吸引異性且懂得適時進退。"},
+  {pair:"火星 ⚹ 木星",symbol:"⚹",tag:"六分相 60°",body:"行動力有擴張的支撐。冒險有成功的傾向，機遇與行動配合良好。在海外或教育領域能順利推進計畫。"},
+  {pair:"火星 ⚹ 土星",symbol:"⚹",tag:"六分相 60°",body:"行動力有紀律支撐。能把爆發力轉化為持續輸出。適合需要長期專注的技術型工作，執行效率高。"},
+  {pair:"火星 ⚹ 天王星",symbol:"⚹",tag:"六分相 60°",body:"創新行動的順暢通道。革命性的想法能付諸實行，不僅是空想。科技、社會創新領域中有突破性行動力。"},
+  {pair:"火星 ⚹ 海王星",symbol:"⚹",tag:"六分相 60°",body:"直覺與行動協調。藝術靈感能落地執行，夢想有實踐的通道。療癒和靈性工作中行動自然流暢。"},
+  {pair:"火星 ⚹ 冥王星",symbol:"⚹",tag:"六分相 60°",body:"深層意志能轉化為建設性行動。轉型期間能保持行動力，不被黑暗吞噬。在危機中展現出驚人的韌性。"},
+  // 火星四分相 (□)
+  {pair:"火星 □ 太陽",symbol:"□",tag:"四分相 90°",body:"行動力與自我意志相互衝突。容易過度消耗，把能量用在內部鬥爭。需要整合「我想要」和「我行動」之間的矛盾。克服後能爆發出超強的意志力。"},
+  {pair:"火星 □ 月亮",symbol:"□",tag:"四分相 90°",body:"情緒與行動衝突。情緒爆發容易不受控制，衝動行事後後悔。家庭關係中有緊張張力。學會辨識情緒觸發點是關鍵突破口。"},
+  {pair:"火星 □ 水星",symbol:"□",tag:"四分相 90°",body:"思維與行動相互干擾。想太多而難以行動，或行動後才後悔沒想清楚。言語衝突頻繁，容易說錯話。訓練自己「先思考3秒」能大幅改善。"},
+  {pair:"火星 □ 金星",symbol:"□",tag:"四分相 90°",body:"慾望與愛的矛盾。愛與戰爭在同一個人身上，關係充滿激情也充滿衝突。財務決策衝動。美好的吸引力與破壞性行為同時存在，需要整合。"},
+  {pair:"火星 □ 木星",symbol:"□",tag:"四分相 90°",body:"過度擴張的行動危機。行動超過資源能承受的範圍，容易因過於樂觀而冒過大風險。「再試一次」可能是傑出，也可能是固執。"},
+  {pair:"火星 □ 土星",symbol:"□",tag:"四分相 90°",body:"行動力被紀律壓抑，易拖延又急躁，衝撞體制。憤怒長期壓抑後猛烈爆發。但這個張力也是巨大的動力：克服恐懼後能成就非凡。"},
+  {pair:"火星 □ 天王星",symbol:"□",tag:"四分相 90°",body:"叛逆衝動難以控制。突然的爆發和衝動行為，容易意外受傷或製造混亂。電光石火的憤怒。如果能引導進入創新，是革命的力量。"},
+  {pair:"火星 □ 海王星",symbol:"□",tag:"四分相 90°",body:"行動方向模糊不清。理想與執行之間有巨大鴻溝，容易被欺騙或自欺。能量在夢想中消耗，行動缺乏落地性。需要具體的執行計劃。"},
+  {pair:"火星 □ 冥王星",symbol:"□",tag:"四分相 90°",body:"強制性的意志衝突。可能有控制狂傾向，或被他人強制。憤怒深沉而具破壞性。轉化這股力量是人生功課，成功後是最強的鳳凰涅槃。"},
+  // 火星三分相 (△)
+  {pair:"火星 △ 太陽",symbol:"△",tag:"三分相 120°",body:"行動力與自我認同完美和諧。能量流動自然，行動符合自我價值。運動、競爭、領導力都是天賦。自信而不衝動，是最健康的行動力配置之一。"},
+  {pair:"火星 △ 月亮",symbol:"△",tag:"三分相 120°",body:"情感能轉化為行動的能量。憤怒有健康的出口，情緒不會堆積。在照顧他人和保護家人上的行動力特別有效，情感驅動強大但可控。"},
+  {pair:"火星 △ 水星",symbol:"△",tag:"三分相 120°",body:"思維與行動高效配合。從決策到執行的速度快且準確。辯論和寫作是天賦，能把想法迅速轉化為可執行計劃。技術性工作中的行動優勢。"},
+  {pair:"火星 △ 金星",symbol:"△",tag:"三分相 120°",body:"行動力與魅力自然融合。在愛情中主動且懂得分寸，追求藝術有持續的熱情。財務決策有直覺，創作型工作中行動力強且具美感。"},
+  {pair:"火星 △ 木星",symbol:"△",tag:"三分相 120°",body:"行動力與好運共振。冒險傾向有保護，有能力在大格局中行動。海外機遇把握得好，教育和哲學追求中有強勁動力。"},
+  {pair:"火星 △ 土星",symbol:"△",tag:"三分相 120°",body:"行動力有架構支撐。能將衝動轉化為有計劃的長期執行。紀律是你的武器，不是束縛。職業上的行動力持久且專業。"},
+  {pair:"火星 △ 天王星",symbol:"△",tag:"三分相 120°",body:"革命性行動天賦。能在恰當時機啟動顛覆性改變，天才與實踐者合一。科技和社會創新中有突破力，獨特的行動風格令人印象深刻。"},
+  {pair:"火星 △ 海王星",symbol:"△",tag:"三分相 120°",body:"直覺引導行動的天賦。藝術靈感自然落地，靈性追求有行動力支持。在幕後或需要同理心的領域中行動自然高效，夢想與實踐相互支撐。"},
+  {pair:"火星 △ 冥王星",symbol:"△",tag:"三分相 120°",body:"轉化力量的天賦通道。能在危機中保持行動力，甚至因危機而爆發出最強能量。深層意志驅動長期行動，心理洞察力是行動的強大工具。"},
+  // 火星對分相 (☍)
+  {pair:"火星 ☍ 太陽",symbol:"☍",tag:"對分相 180°",body:"行動力與意志的正面對決。自我認同的掙扎表現為外部衝突或過度競爭。與他人的對立中看見自己。整合後能做到「為自我而戰」的成熟戰士。"},
+  {pair:"火星 ☍ 月亮",symbol:"☍",tag:"對分相 180°",body:"行動衝動與情感需求的極端拉鋸。行動時情感受傷，情感充沛時又無法行動。可能在親密關係中表現為反覆衝突和和好。整合情緒與行動是人生功課。"},
+  {pair:"火星 ☍ 水星",symbol:"☍",tag:"對分相 180°",body:"行動與溝通的拉鋸。說的和做的常常不一致，言語衝突是特徵。與手足或鄰居的對立。但在需要從對立中找真相的職業（如律師、調查記者）中是優勢。"},
+  {pair:"火星 ☍ 金星",symbol:"☍",tag:"對分相 180°",body:"愛與戰鬥的永恆拉鋸。激情關係中吸引力與衝突並存，很難平靜相處。慾望與美好的需求相互拉扯。整合後能在關係中既有激情又有溫柔。"},
+  {pair:"火星 ☍ 木星",symbol:"☍",tag:"對分相 180°",body:"行動與信念的拉鋸。理想與執行中間有鴻溝，計畫宏大但落實困難。宗教或哲學上可能與他人有激烈分歧。需要在「夢想要大」和「腳踏實地」中找到平衡。"},
+  {pair:"火星 ☍ 土星",symbol:"☍",tag:"對分相 180°",body:"行動力與限制的正面對決。感覺永遠有外部阻力，但其實是在訓練你的精準度。憤怒來自被限制，克服後的耐力是超級武器。"},
+  {pair:"火星 ☍ 天王星",symbol:"☍",tag:"對分相 180°",body:"革命衝動與現實的極端對立。突然爆發的叛逆行為，難以預測。與體制的對抗是主旋律。能在革命性時刻成為改變的力量，但日常需要穩定才能運作。"},
+  {pair:"火星 ☍ 海王星",symbol:"☍",tag:"對分相 180°",body:"行動力在幻象中迷失。能量被理想化的目標消耗，難以落地。容易因他人的謊言或自我欺騙而行動失誤。整合直覺與理性是關鍵。"},
+  {pair:"火星 ☍ 冥王星",symbol:"☍",tag:"對分相 180°",body:"權力意志的終極對決。外部的控制與自我意志的激烈衝突，可能吸引來自他人的強制性力量。但在這種極端對立中，能鍛造出最堅硬的意志。"}
+];
+
+const CASES_DATA = [
+  {name:"Bruce Lee",mars:"火星雙子",body:"李小龍火星落雙子，行動力與思維速度完全融合。他不只是打鬥——他哲學化了格鬥術，用語言和著作傳播截拳道理念。「功夫不是把對手打倒的技術，而是把自己打倒的過程。」多線並發：武術家、演員、哲學家、作家，同時進行。"},
+  {name:"Serena Williams",mars:"火星天秤",body:"威廉絲火星落天秤——這看起來矛盾：天秤的戰士？但她的力量來自對「公平競爭」的執念。每一記球都是在追求完美比例的藝術。在網球法庭上的衝突（裁判爭執事件）正是天秤式憤怒：感到不公正時爆發最強戰力。"},
+  {name:"拿破崙",mars:"火星摩羯",body:"拿破崙火星落摩羯，是最典型的長期戰略行動力。不是衝動型的，而是計算型的。每一場戰役都服務於更大的政治目標。從科西嘉無名小兵到統治歐洲——這是摩羯式行動力的最強示範：慢熱但不停止，目標只有山頂。"}
+];
+
+const GUIDE_DATA = [
+  {icon:"💢",title:"憤怒管理",items:["先辨識憤怒的星盤根源（是火星宮位還是相位？）","找到你的「憤怒出口」：運動、創作、直接溝通","不要壓抑——找安全的方式宣洩，再解決問題","火星逆行期（每兩年）更易積累憤怒，加強自我覺察"]},
+  {icon:"🎯",title:"目標行動",items:["用火星星座設計適合自己的行動風格","牡羊/獅子/射手：短衝刺型——設30天小目標","金牛/天蠍/摩羯：長期型——設季度目標","雙子/水瓶/天秤：多線型——並行但設主線優先"]},
+  {icon:"💪",title:"健身週期",items:["火星代表體能與肌肉，也是受傷的警示","火星逆行（約2個月）：減少高衝擊運動，做恢復訓練","火星直行：最佳突破期，加重量、挑戰新項目","火星宮位對應最易使力的身體部位"]},
+  {icon:"⚔",title:"職場戰略",items:["找出你的火星宮位 = 職業戰場所在","火星相位揭示你在職場的衝突模式","學會區分「有效進攻」和「情緒爆發」","最適合的行業往往和火星宮位/星座直接對應"]}
+];
+
+// ===== STATE =====
+const LS = {
+  get:(k,d)=>{ try{const v=localStorage.getItem(k); return v!==null?JSON.parse(v):d;}catch{return d;}},
+  set:(k,v)=>{ try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+};
+
+let xp = LS.get('astro_mars_xp', 0);
+let level = LS.get('astro_mars_level', 0); // 0=士兵,1=戰士,2=將軍,3=戰神
+let bossDefeated = LS.get('astro_mars_boss_defeated', []);
+let comboBest = LS.get('astro_mars_combo_best', 0);
+let radarVals = LS.get('astro_mars_radar', [75,75,75,75]);
+let comboCount = 0;
+let comboTimer = null;
+
+const LEVELS = ['⚔ 士兵','🗡 戰士','🛡 將軍','👑 戰神'];
+const LEVEL_XP = [0,200,500,1000];
+const BOSS_HP_MAX = 10;
+const bossHP = {}; // house index -> current HP
+
+// ===== XP / LEVEL =====
+function addXP(amount) {
+  xp += amount;
+  LS.set('astro_mars_xp', xp);
+  checkLevelUp();
+  updateHUD();
+}
+
+function checkLevelUp() {
+  let newLevel = 0;
+  for(let i=LEVEL_XP.length-1;i>=0;i--){
+    if(xp >= LEVEL_XP[i]){ newLevel=i; break; }
+  }
+  if(newLevel > level){
+    level = newLevel;
+    LS.set('astro_mars_level', level);
+    showVictory(`LEVEL UP! 晉升 ${LEVELS[level]}`);
+  }
+}
+
+function updateHUD() {
+  document.getElementById('xp-num').textContent = xp;
+  const nextXP = level < 3 ? LEVEL_XP[level+1] : 9999;
+  document.getElementById('xp-max').textContent = nextXP;
+  const pct = level < 3 ? Math.min(100,(xp - LEVEL_XP[level])/(nextXP-LEVEL_XP[level])*100) : 100;
+  document.getElementById('xp-bar-fill').style.width = pct+'%';
+  document.getElementById('level-display').textContent = LEVELS[level];
+  updateShareCard();
+}
+
+// ===== COMBO =====
+function addCombo() {
+  comboCount++;
+  if(comboTimer) clearTimeout(comboTimer);
+  document.getElementById('combo-break').style.display='none';
+  document.getElementById('combo-num').textContent = comboCount;
+  document.getElementById('combo-hud').style.color = comboCount > 5 ? 'var(--orange)' : 'var(--dim)';
+  comboTimer = setTimeout(()=>{
+    if(comboCount > 0){
+      document.getElementById('combo-break').style.display='inline';
+      setTimeout(()=>{ document.getElementById('combo-break').style.display='none'; },1500);
+    }
+    if(comboCount > comboBest){
+      comboBest = comboCount;
+      LS.set('astro_mars_combo_best', comboBest);
+    }
+    comboCount = 0;
+    document.getElementById('combo-num').textContent = '0';
+    document.getElementById('combo-hud').style.color='var(--dim)';
+    updateShareCard();
+  },1000);
+  playHit();
+}
+
+// ===== BOSS FIGHT =====
+function initBossHP(idx) {
+  if(bossHP[idx]===undefined) bossHP[idx] = BOSS_HP_MAX;
+}
+
+function attackBoss(idx) {
+  if(bossDefeated.includes(idx)) return;
+  initBossHP(idx);
+  bossHP[idx] = Math.max(0, bossHP[idx]-1);
+  addCombo();
+  addXP(5);
+  const fill = document.getElementById(`hp-fill-${idx}`);
+  const text = document.getElementById(`hp-text-${idx}`);
+  if(fill) fill.style.width = (bossHP[idx]/BOSS_HP_MAX*100)+'%';
+  if(text) text.textContent = `HP: ${bossHP[idx]}/${BOSS_HP_MAX}`;
+
+  // Shake card
+  const card = document.getElementById(`house-card-${idx}`);
+  if(card){ card.classList.add('shake'); setTimeout(()=>card.classList.remove('shake'),500); }
+
+  if(bossHP[idx] <= 0) defeatBoss(idx);
+}
+
+function defeatBoss(idx) {
+  if(bossDefeated.includes(idx)) return;
+  bossDefeated.push(idx);
+  LS.set('astro_mars_boss_defeated', bossDefeated);
+  const card = document.getElementById(`house-card-${idx}`);
+  if(card) card.classList.add('defeated');
+  const btn = document.getElementById(`boss-btn-${idx}`);
+  if(btn){ btn.textContent='✓ BOSS DEFEATED'; btn.disabled=true; btn.style.opacity='0.5'; }
+  showVictory(`第${idx+1}宮 Boss 已擊敗！+50 XP`);
+  addXP(50);
+
+  if(bossDefeated.length >= 12) showVictory('全12宮 BOSS 完全制霸！🔥');
+}
+
+// ===== VICTORY EFFECT =====
+function showVictory(msg) {
+  const overlay = document.getElementById('fire-overlay');
+  overlay.style.display='block';
+  document.body.classList.add('shake');
+  setTimeout(()=>{ overlay.style.display='none'; document.body.classList.remove('shake'); },2000);
+  playVictory();
+  if(msg){
+    const toast = document.createElement('div');
+    toast.style.cssText=`position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:99999;background:linear-gradient(135deg,var(--lava),var(--orange));color:var(--black);font-family:Anton,sans-serif;font-size:1.2rem;padding:14px 32px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);letter-spacing:0.1em;`;
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(()=>toast.remove(),2500);
+  }
+}
+
+// ===== AUDIO =====
+let audioCtx = null;
+function getAudioCtx(){
+  if(!audioCtx){ try{ audioCtx=new(window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+  return audioCtx;
+}
+function playHit(){
+  const ctx=getAudioCtx(); if(!ctx)return;
+  const o=ctx.createOscillator(); const g=ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o.frequency.setValueAtTime(120,ctx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(60,ctx.currentTime+0.1);
+  g.gain.setValueAtTime(0.3,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.15);
+  o.start(); o.stop(ctx.currentTime+0.15);
+}
+function playVictory(){
+  const ctx=getAudioCtx(); if(!ctx)return;
+  [220,330,440,660].forEach((f,i)=>{
+    const o=ctx.createOscillator(); const g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value=f;
+    const t=ctx.currentTime+i*0.12;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(0.25,t+0.05);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+    o.start(t); o.stop(t+0.4);
+  });
+}
+
+// ===== RADAR =====
+const RADAR_AXES = [
+  {cx:160,cy:160,dx:0,dy:-1,statId:'stat-atk'},   // top: attack
+  {cx:160,cy:160,dx:1,dy:0,statId:'stat-spd'},    // right: speed
+  {cx:160,cy:160,dx:0,dy:1,statId:'stat-crit'},   // bottom: crit
+  {cx:160,cy:160,dx:-1,dy:0,statId:'stat-def'},   // left: defense
+];
+const RADAR_MAX = 120;
+
+function updateRadarPoly(){
+  const pts = radarVals.map((v,i)=>{
+    const ax = RADAR_AXES[i];
+    const r = v/100*RADAR_MAX;
+    return `${ax.cx+ax.dx*r},${ax.cy+ax.dy*r}`;
+  });
+  document.getElementById('radar-poly').setAttribute('points',pts.join(' '));
+  radarVals.forEach((v,i)=>{
+    const ax = RADAR_AXES[i];
+    const r = v/100*RADAR_MAX;
+    const dot = document.getElementById(`dot-${i}`);
+    if(dot){ dot.setAttribute('cx', ax.cx+ax.dx*r); dot.setAttribute('cy', ax.cy+ax.dy*r); }
+    const el = document.getElementById(ax.statId);
+    if(el) el.textContent = v;
+  });
+  LS.set('astro_mars_radar', radarVals);
+}
+
+function initRadarDrag(){
+  const svg = document.getElementById('radar-svg');
+  let dragging = -1;
+
+  function getVal(e, idx){
+    const rect = svg.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const scaleX = 320/rect.width, scaleY = 320/rect.height;
+    const sx = (clientX-rect.left)*scaleX;
+    const sy = (clientY-rect.top)*scaleY;
+    const ax = RADAR_AXES[idx];
+    const dx = sx-ax.cx, dy = sy-ax.cy;
+    // Project onto axis direction
+    const proj = dx*ax.dx + dy*ax.dy;
+    return Math.min(100, Math.max(5, Math.round(proj/RADAR_MAX*100)));
+  }
+
+  for(let i=0;i<4;i++){
+    (function(idx){
+      const dot = document.getElementById(`dot-${idx}`);
+      dot.addEventListener('mousedown',e=>{ dragging=idx; e.preventDefault(); });
+      dot.addEventListener('touchstart',e=>{ dragging=idx; e.preventDefault(); },{passive:false});
+    })(i);
+  }
+
+  svg.addEventListener('mousemove',e=>{ if(dragging>=0){ radarVals[dragging]=getVal(e,dragging); updateRadarPoly(); }});
+  svg.addEventListener('touchmove',e=>{ if(dragging>=0){ radarVals[dragging]=getVal(e,dragging); updateRadarPoly(); e.preventDefault(); }},{passive:false});
+  document.addEventListener('mouseup',()=>{ dragging=-1; });
+  document.addEventListener('touchend',()=>{ dragging=-1; });
+}
+
+// ===== DAILY MISSION =====
+let missionActive = false, missionInterval = null, missionClicks = 0, missionTime = 60;
+
+function startDailyMission(){
+  const todayKey = 'astro_mars_daily_mission_' + new Date().toISOString().slice(0,10);
+  const done = LS.get(todayKey, false);
+  if(done){
+    document.getElementById('mission-result').style.display='block';
+    document.getElementById('mission-result').textContent='今日任務已完成！明日再戰。';
+    return;
+  }
+  if(missionActive) return;
+  missionActive=true; missionClicks=0; missionTime=60;
+  document.getElementById('mission-start-btn').style.display='none';
+  document.getElementById('mission-clicks').textContent='0';
+  missionInterval = setInterval(()=>{
+    missionTime--;
+    document.getElementById('mission-timer').textContent=missionTime;
+    if(missionTime<=0){
+      clearInterval(missionInterval);
+      missionActive=false;
+      const xpGained = Math.floor(missionClicks * 0.5);
+      addXP(xpGained);
+      LS.set(todayKey, true);
+      document.getElementById('mission-result').style.display='block';
+      document.getElementById('mission-result').textContent=`任務完成！點擊${missionClicks}次，獲得${xpGained} XP`;
+      playVictory();
+    }
+  },1000);
+
+  document.getElementById('mission-click-area').addEventListener('click', missionClick);
+}
+
+function missionClick(){
+  if(!missionActive) return;
+  missionClicks++;
+  document.getElementById('mission-clicks').textContent=missionClicks;
+  addCombo();
+  playHit();
+  const el = document.getElementById('mission-click-area');
+  el.style.transform='scale(0.88)';
+  setTimeout(()=>el.style.transform='',80);
+}
+
+// ===== SHARE CARD =====
+function updateShareCard(){
+  document.getElementById('share-level').textContent = LEVELS[level].replace(/^[^\s]+ /,'');
+  document.getElementById('share-xp').textContent = xp;
+  document.getElementById('share-boss').textContent = bossDefeated.length+'/12';
+  document.getElementById('share-combo').textContent = comboBest;
+}
+
+function shareCard(){
+  if(typeof html2canvas !== 'undefined'){
+    html2canvas(document.getElementById('share-card'),{backgroundColor:'#0a0a0a'}).then(canvas=>{
+      const link=document.createElement('a');
+      link.download='mars-battle-card.png';
+      link.href=canvas.toDataURL();
+      link.click();
+    });
+  } else {
+    alert('分享功能需要 html2canvas，請截圖分享！');
+  }
+}
+
+// ===== RAGE MODE =====
+let rageTimer = null, rageActive = false;
+const flameTrigger = document.getElementById('flame-trigger');
+const rageHint = document.getElementById('rage-hint');
+
+flameTrigger.addEventListener('mouseenter',()=>rageHint.style.display='block');
+flameTrigger.addEventListener('mouseleave',()=>{ rageHint.style.display='none'; if(!rageActive) clearTimeout(rageTimer); });
+
+flameTrigger.addEventListener('mousedown',startRageHold);
+flameTrigger.addEventListener('touchstart',startRageHold,{passive:true});
+flameTrigger.addEventListener('mouseup',cancelRageHold);
+flameTrigger.addEventListener('touchend',cancelRageHold);
+
+function startRageHold(){
+  rageTimer=setTimeout(activateRage,3000);
+}
+function cancelRageHold(){
+  clearTimeout(rageTimer);
+}
+function activateRage(){
+  if(rageActive) return;
+  rageActive=true;
+  LS.set('astro_mars_easter_rage',true);
+  document.body.classList.add('rage-mode');
+  startRageParticles();
+  playVictory();
+  const toast=document.createElement('div');
+  toast.style.cssText=`position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999999;background:rgba(192,57,43,0.95);color:white;font-family:Anton,sans-serif;font-size:2.5rem;padding:20px 40px;letter-spacing:0.2em;text-shadow:0 0 20px orange;`;
+  toast.textContent='⚠ 狂暴模式啟動！';
+  document.body.appendChild(toast);
+  setTimeout(()=>{
+    toast.remove();
+    document.body.classList.remove('rage-mode');
+    rageActive=false;
+    stopRageParticles();
+  },5000);
+}
+
+// ===== RAGE PARTICLES =====
+let rageAnimFrame=null;
+function startRageParticles(){
+  const canvas=document.getElementById('rage-canvas');
+  canvas.style.display='block';
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d');
+  const particles=[];
+  for(let i=0;i<200;i++){
+    particles.push({
+      x:Math.random()*canvas.width,
+      y:canvas.height+Math.random()*200,
+      vx:(Math.random()-0.5)*4,
+      vy:-(Math.random()*6+3),
+      size:Math.random()*8+2,
+      alpha:Math.random(),
+      color:`hsl(${Math.random()*40+10},100%,${50+Math.random()*30}%)`
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.vy-=0.05; p.alpha-=0.008;
+      if(p.alpha<=0||p.y<-50){
+        p.x=Math.random()*canvas.width;
+        p.y=canvas.height+20;
+        p.vy=-(Math.random()*6+3);
+        p.alpha=1;
+      }
+      ctx.save();
+      ctx.globalAlpha=p.alpha;
+      ctx.fillStyle=p.color;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    });
+    rageAnimFrame=requestAnimationFrame(draw);
+  }
+  draw();
+}
+function stopRageParticles(){
+  cancelAnimationFrame(rageAnimFrame);
+  const canvas=document.getElementById('rage-canvas');
+  canvas.style.display='none';
+}
+
+// ===== HERO PARTICLES =====
+function initHeroParticles(){
+  const canvas=document.getElementById('particle-canvas');
+  canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight;
+  const ctx=canvas.getContext('2d');
+  const pts=[];
+  for(let i=0;i<80;i++){
+    pts.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height,
+      vx:(Math.random()-0.5)*0.8,
+      vy:-(Math.random()*0.5+0.2),
+      size:Math.random()*3+1,
+      alpha:Math.random()*0.6+0.2,
+      color:`hsl(${Math.random()*30+5},100%,${40+Math.random()*40}%)`
+    });
+  }
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.y<-10){ p.y=canvas.height+10; p.x=Math.random()*canvas.width; }
+      if(p.x<0) p.x=canvas.width; if(p.x>canvas.width) p.x=0;
+      ctx.save();
+      ctx.globalAlpha=p.alpha;
+      ctx.fillStyle=p.color;
+      ctx.shadowBlur=6; ctx.shadowColor=p.color;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+// ===== RENDER CARDS =====
+function renderHouses(){
+  const grid=document.getElementById('houses-grid');
+  HOUSES_DATA.forEach((h,i)=>{
+    const defeated=bossDefeated.includes(i);
+    const hp=bossHP[i]!==undefined?bossHP[i]:BOSS_HP_MAX;
+    const card=document.createElement('div');
+    card.className='boss-card'+(defeated?' defeated':'');
+    card.id=`house-card-${i}`;
+    card.innerHTML=`
+      <div class="card-num">BOSS ${i+1} · ${h.num}</div>
+      <div class="card-title">${h.title}</div>
+      <div class="card-subtitle">${h.sub}</div>
+      <div class="card-body">${h.body}</div>
+      <div class="card-example">${h.example}</div>
+      <div class="boss-hp-wrap"><div class="boss-hp-fill" id="hp-fill-${i}" style="width:${hp/BOSS_HP_MAX*100}%"></div></div>
+      <div class="boss-hp-text"><span>BOSS HP</span><span id="hp-text-${i}">HP: ${hp}/${BOSS_HP_MAX}</span></div>
+      <button class="boss-btn" id="boss-btn-${i}" onclick="attackBoss(${i})" ${defeated?'disabled style="opacity:0.5"':''}>
+        ${defeated?'✓ BOSS DEFEATED':'⚔ ATTACK (+5 XP)'}
+      </button>`;
+    grid.appendChild(card);
+  });
+}
+
+function renderSigns(){
+  const grid=document.getElementById('signs-grid');
+  SIGNS_DATA.forEach((s,i)=>{
+    const card=document.createElement('div');
+    card.className='boss-card';
+    card.innerHTML=`
+      <div class="card-num">SIGN ${i+1}</div>
+      <div class="card-title">${s.num} ${s.title}</div>
+      <div class="card-subtitle">${s.sub}</div>
+      <div class="card-body">${s.body}</div>
+      <div class="card-example">${s.example}</div>
+      <button class="boss-btn" onclick="addXP(10);addCombo();this.textContent='✓ +10 XP';this.disabled=true;this.style.opacity=0.5;">⚡ 學習 (+10 XP)</button>`;
+    grid.appendChild(card);
+  });
+}
+
+function renderAspects(){
+  const grid=document.getElementById('aspects-grid');
+  ASPECTS_DATA.forEach(a=>{
+    const card=document.createElement('div');
+    card.className='aspect-card';
+    card.innerHTML=`
+      <div class="aspect-header">
+        <div class="aspect-symbol">${a.symbol}</div>
+        <div class="aspect-name">${a.pair}</div>
+        <div class="aspect-tag">${a.tag}</div>
+      </div>
+      <div class="aspect-body">${a.body}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function renderCases(){
+  const grid=document.getElementById('cases-grid');
+  CASES_DATA.forEach(c=>{
+    const card=document.createElement('div');
+    card.className='case-card';
+    card.innerHTML=`
+      <div class="case-name">${c.name}</div>
+      <div class="case-mars">${c.mars}</div>
+      <div class="case-body">${c.body}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function renderGuide(){
+  const grid=document.getElementById('guide-grid');
+  GUIDE_DATA.forEach(g=>{
+    const card=document.createElement('div');
+    card.className='guide-card';
+    card.innerHTML=`
+      <div class="guide-icon">${g.icon}</div>
+      <div class="guide-title">${g.title}</div>
+      <ul class="guide-list">${g.items.map(i=>`<li>${i}</li>`).join('')}</ul>`;
+    grid.appendChild(card);
+  });
+}
+
+// ===== SCROLL =====
+function scrollToSection(id){
+  const el=document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth'});
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded',()=>{
+  renderHouses();
+  renderSigns();
+  renderAspects();
+  renderCases();
+  renderGuide();
+  updateHUD();
+  updateShareCard();
+  updateRadarPoly();
+  initRadarDrag();
+  initHeroParticles();
+
+  // Resize hero canvas
+  window.addEventListener('resize',()=>{
+    const c=document.getElementById('particle-canvas');
+    c.width=c.offsetWidth; c.height=c.offsetHeight;
+  });
+});
+</script>
+</body>
+</html>
