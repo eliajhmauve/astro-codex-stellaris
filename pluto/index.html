@@ -707,5 +707,47 @@ addEventListener('DOMContentLoaded',()=>{
   addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'))});
 });
 </script>
+<!-- ═══ V2 視覺增強層 — 黑洞吸積盤 × 50 BPM 心跳 × 火焰粒子 ═══ -->
+<div class="v2-hole"></div><div class="v2-disk"></div><div class="v2-heart"></div>
+<style>
+.v2-hole{position:fixed;top:50%;left:50%;width:80vw;height:80vw;max-width:1000px;max-height:1000px;transform:translate(-50%,-50%);z-index:-2;pointer-events:none;background:radial-gradient(circle at 50% 50%,#000 0%,#000 18%,rgba(89,2,2,.45) 30%,rgba(255,215,0,.25) 50%,rgba(57,255,20,.12) 65%,transparent 80%);filter:blur(20px);animation:holePulse 1.2s ease-in-out infinite}
+@keyframes holePulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.85}25%{transform:translate(-50%,-50%) scale(1.04);opacity:1}50%{transform:translate(-50%,-50%) scale(1);opacity:.7}}
+.v2-disk{position:fixed;top:50%;left:50%;width:80vw;height:80vw;max-width:900px;max-height:900px;transform:translate(-50%,-50%);z-index:-2;pointer-events:none;background:conic-gradient(from 0deg,transparent 0deg,rgba(57,255,20,.18) 60deg,rgba(255,215,0,.32) 90deg,rgba(255,215,0,.18) 120deg,transparent 180deg,rgba(89,2,2,.28) 240deg,rgba(255,215,0,.18) 300deg,transparent 360deg);mask:radial-gradient(circle at 50% 50%,transparent 22%,#000 32%,#000 55%,transparent 75%);-webkit-mask:radial-gradient(circle at 50% 50%,transparent 22%,#000 32%,#000 55%,transparent 75%);animation:diskSpin 60s linear infinite;mix-blend-mode:screen;filter:blur(8px)}
+@keyframes diskSpin{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+.v2-heart{position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 30%,rgba(89,2,2,.28) 100%);animation:plutoHeart 1.2s ease-in-out infinite;mix-blend-mode:multiply}
+@keyframes plutoHeart{0%,100%{opacity:.5;transform:scale(1)}25%{opacity:.85;transform:scale(1.03)}50%{opacity:.6;transform:scale(.98)}}
+[class*="card"],[class*="cell"],[class*="panel"],section,.boss-cell,.gen-mark{backdrop-filter:blur(var(--v2-blur,12px)) saturate(1.3);-webkit-backdrop-filter:blur(var(--v2-blur,12px)) saturate(1.3);transition:backdrop-filter .35s ease}
+.v2-ash{position:fixed;width:3px;height:3px;border-radius:50%;background:var(--ac,#FFD700);pointer-events:none;z-index:0;box-shadow:0 0 6px var(--ac,#FFD700)}
+@keyframes ashRise{0%{transform:translate(0,0);opacity:0}10%{opacity:.7}90%{opacity:.4}100%{transform:translate(var(--adx,8vw),-110vh);opacity:0}}
+.v2-vortex{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);animation:vortex 1.2s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes vortex{0%{transform:translate(-50%,-50%) scale(.4);opacity:1;box-shadow:0 0 0 0 #FFD700,0 0 0 0 rgba(57,255,20,.5)}45%{opacity:.95;box-shadow:0 0 60px 25px rgba(255,215,0,.55),0 0 160px 70px rgba(89,2,2,.5),0 0 280px 130px rgba(57,255,20,.18)}100%{transform:translate(-50%,-50%) scale(80) rotate(180deg);opacity:0;box-shadow:0 0 200px 200px rgba(255,215,0,0)}}
+@media(prefers-reduced-motion:reduce){.v2-hole,.v2-disk,.v2-heart{animation:none}.v2-ash,.v2-vortex{display:none}}
+</style>
+<script>
+(function(){
+  document.addEventListener('mousemove',e=>{
+    const cx=innerWidth/2,cy=innerHeight/2,d=Math.hypot(e.clientX-cx,e.clientY-cy),m=Math.hypot(cx,cy);
+    document.documentElement.style.setProperty('--v2-blur',(8+(d/m)*22).toFixed(1)+'px');
+  },{passive:true});
+  document.addEventListener('click',e=>{
+    const b=document.createElement('div');b.className='v2-vortex';
+    b.style.left=e.clientX+'px';b.style.top=e.clientY+'px';
+    document.body.appendChild(b);setTimeout(()=>b.remove(),1200);
+  });
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const colors=['#FFD700','#590202','#39FF14','#C49070'];
+    for(let i=0;i<32;i++){
+      const a=document.createElement('div');a.className='v2-ash';
+      a.style.left=Math.random()*100+'vw';a.style.top=(80+Math.random()*40)+'vh';
+      a.style.setProperty('--ac',colors[i%4]);
+      a.style.setProperty('--adx',(Math.random()*20-10)+'vw');
+      a.style.opacity=(.25+Math.random()*.5).toFixed(2);
+      a.style.animation=`ashRise ${(20+Math.random()*25).toFixed(1)}s linear ${(-Math.random()*40).toFixed(1)}s infinite`;
+      document.body.appendChild(a);
+    }
+  }
+})();
+</script>
+<!-- ═══ END V2 ═══ -->
 </body>
 </html>

@@ -1059,5 +1059,46 @@
 </footer>
 
 <script src="script.js"></script>
+<!-- ═══ V2 視覺增強層 — 琉璃月光散射 × 超現實夢境 × 動態玻璃擬態 ═══ -->
+<div class="v2-moon"></div><div class="v2-mist"></div><div class="v2-mist v2-mist2"></div>
+<svg class="v2-dream" viewBox="0 0 1200 800" preserveAspectRatio="none" aria-hidden="true">
+  <ellipse cx="200" cy="600" rx="80" ry="20" fill="rgba(192,198,216,.06)"><animate attributeName="cx" from="-100" to="1300" dur="80s" repeatCount="indefinite"/></ellipse>
+  <path d="M 800,200 Q 850,180 900,200 Q 920,210 880,230 Q 840,240 800,225 Z" fill="rgba(255,79,170,.08)"><animate attributeName="opacity" values=".4;.8;.4" dur="6s" repeatCount="indefinite"/></path>
+</svg>
+<style>
+.v2-moon{position:fixed;top:8%;right:8%;width:180px;height:180px;border-radius:50%;z-index:-2;pointer-events:none;background:radial-gradient(circle at 35% 35%,#F5F0E1,#C0C6D0 60%,#52483A);box-shadow:0 0 80px 20px rgba(192,198,216,.45),0 0 200px 60px rgba(11,29,58,.4);animation:moonPhase 90s linear infinite;filter:blur(.5px)}
+@keyframes moonPhase{
+  0%{box-shadow:0 0 40px rgba(192,198,216,.2),inset -90px 0 0 0 rgba(11,29,58,.95)}
+  25%{box-shadow:0 0 60px rgba(192,198,216,.4),inset -45px 0 0 0 rgba(11,29,58,.85)}
+  50%{box-shadow:0 0 120px 30px rgba(255,79,170,.3),0 0 200px 60px rgba(192,198,216,.45),inset 0 0 0 0 rgba(11,29,58,0)}
+  75%{box-shadow:0 0 60px rgba(192,198,216,.4),inset 45px 0 0 0 rgba(11,29,58,.85)}
+  100%{box-shadow:0 0 40px rgba(192,198,216,.2),inset 90px 0 0 0 rgba(11,29,58,.95)}
+}
+.v2-mist{position:fixed;inset:-10%;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 30% 80%,rgba(192,198,216,.18) 0%,transparent 50%),radial-gradient(ellipse at 70% 60%,rgba(255,79,170,.08) 0%,transparent 55%);filter:blur(40px);animation:mistTide 12s ease-in-out infinite}
+.v2-mist2{animation-duration:18s;animation-direction:alternate-reverse;background:radial-gradient(ellipse at 50% 100%,rgba(11,29,58,.4) 0%,transparent 60%)}
+@keyframes mistTide{0%,100%{transform:translate(-3%,0) scale(1);opacity:.7}50%{transform:translate(3%,-2%) scale(1.1);opacity:1}}
+.v2-dream{position:fixed;inset:0;z-index:-1;pointer-events:none;width:100%;height:100%;mix-blend-mode:screen}
+[class*="card"],[class*="panel"],.glass,section{backdrop-filter:blur(var(--v2-blur,18px)) saturate(1.5) hue-rotate(var(--v2-hue,0deg));-webkit-backdrop-filter:blur(var(--v2-blur,18px)) saturate(1.5) hue-rotate(var(--v2-hue,0deg));transition:backdrop-filter .35s ease}
+.v2-ripple{position:fixed;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);animation:moonRipple 1.4s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes moonRipple{0%{transform:translate(-50%,-50%) scale(.4);opacity:1;box-shadow:0 0 0 0 rgba(245,240,225,.9),0 0 0 0 rgba(255,79,170,.5)}50%{opacity:.7;box-shadow:0 0 60px 30px rgba(245,240,225,.45),0 0 160px 80px rgba(255,79,170,.25)}100%{transform:translate(-50%,-50%) scale(60);opacity:0;box-shadow:0 0 200px 200px rgba(245,240,225,0)}}
+@media(prefers-reduced-motion:reduce){.v2-moon,.v2-mist{animation:none}.v2-ripple{display:none}}
+</style>
+<script>
+(function(){
+  let lastT=Date.now();
+  document.addEventListener('mousemove',e=>{
+    const t=Date.now();if(t-lastT<16)return;lastT=t;
+    const cx=innerWidth/2,cy=innerHeight/2,d=Math.hypot(e.clientX-cx,e.clientY-cy),m=Math.hypot(cx,cy);
+    document.documentElement.style.setProperty('--v2-blur',(12+(d/m)*28).toFixed(1)+'px');
+    document.documentElement.style.setProperty('--v2-hue',Math.round((e.clientX/innerWidth-.5)*30)+'deg');
+  },{passive:true});
+  document.addEventListener('click',e=>{
+    const b=document.createElement('div');b.className='v2-ripple';
+    b.style.left=e.clientX+'px';b.style.top=e.clientY+'px';
+    document.body.appendChild(b);setTimeout(()=>b.remove(),1400);
+  });
+})();
+</script>
+<!-- ═══ END V2 ═══ -->
 </body>
 </html>

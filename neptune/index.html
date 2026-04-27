@@ -1708,5 +1708,42 @@ document.addEventListener('DOMContentLoaded', ()=>{
   }, 500);
 });
 </script>
+<!-- ═══ V2 視覺增強層 — 水下焦散 × 雲霧呼吸 4/6s × 漣漪 ═══ -->
+<div class="v2-caustic"></div><div class="v2-fog"></div><div class="v2-fog v2-fog2"></div>
+<svg class="v2-rainbow" viewBox="0 0 1200 800" preserveAspectRatio="none" aria-hidden="true">
+  <defs><filter id="vsoft"><feGaussianBlur stdDeviation="40"/></filter></defs>
+  <ellipse cx="200" cy="200" rx="100" ry="40" fill="rgba(157,143,194,.25)" filter="url(#vsoft)">
+    <animate attributeName="cx" values="200;1000;200" dur="60s" repeatCount="indefinite"/>
+  </ellipse>
+  <ellipse cx="900" cy="600" rx="120" ry="50" fill="rgba(133,209,184,.2)" filter="url(#vsoft)">
+    <animate attributeName="cx" values="900;100;900" dur="80s" repeatCount="indefinite"/>
+  </ellipse>
+</svg>
+<style>
+.v2-caustic{position:fixed;inset:-15%;z-index:-2;pointer-events:none;background:radial-gradient(ellipse at 30% 30%,rgba(29,78,137,.32) 0%,transparent 55%),radial-gradient(ellipse at 70% 70%,rgba(157,143,194,.28) 0%,transparent 55%),radial-gradient(ellipse at 50% 100%,rgba(133,209,184,.22) 0%,transparent 60%);filter:blur(35px);animation:causticDrift 24s ease-in-out infinite alternate;mix-blend-mode:screen}
+@keyframes causticDrift{0%{transform:translate(-3%,-2%) scale(1) rotate(0deg);filter:blur(35px) hue-rotate(0deg)}100%{transform:translate(3%,2%) scale(1.08) rotate(8deg);filter:blur(40px) hue-rotate(20deg)}}
+.v2-fog{position:fixed;inset:-10%;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,rgba(214,214,214,.15) 0%,transparent 60%);filter:blur(50px);animation:fogBreath 10s ease-in-out infinite}
+.v2-fog2{animation-duration:14s;animation-delay:-3s;background:radial-gradient(ellipse at 50% 50%,rgba(157,143,194,.18) 0%,transparent 65%)}
+@keyframes fogBreath{0%,100%{transform:scale(.95);opacity:.5}40%{transform:scale(1.05);opacity:.85}60%{transform:scale(1.1);opacity:.95}}
+.v2-rainbow{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;mix-blend-mode:screen}
+[class*="card"],[class*="panel"],section{backdrop-filter:blur(var(--v2-blur,20px)) saturate(1.4);-webkit-backdrop-filter:blur(var(--v2-blur,20px)) saturate(1.4);transition:backdrop-filter .4s ease}
+.v2-ripple{position:fixed;width:10px;height:10px;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);animation:waterRipple 1.6s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes waterRipple{0%{transform:translate(-50%,-50%) scale(.4);opacity:1;border:2px solid #D6D6D6;box-shadow:0 0 0 0 rgba(157,143,194,.7)}40%{opacity:.7;border-width:1.5px;box-shadow:0 0 60px 30px rgba(29,78,137,.35),0 0 160px 80px rgba(133,209,184,.22)}100%{transform:translate(-50%,-50%) scale(50);opacity:0;border-width:.3px;box-shadow:0 0 200px 200px rgba(157,143,194,0)}}
+@media(prefers-reduced-motion:reduce){.v2-caustic,.v2-fog{animation:none}.v2-ripple{display:none}}
+</style>
+<script>
+(function(){
+  document.addEventListener('mousemove',e=>{
+    const cx=innerWidth/2,cy=innerHeight/2,d=Math.hypot(e.clientX-cx,e.clientY-cy),m=Math.hypot(cx,cy);
+    document.documentElement.style.setProperty('--v2-blur',(14+(d/m)*30).toFixed(1)+'px');
+  },{passive:true});
+  document.addEventListener('click',e=>{
+    const b=document.createElement('div');b.className='v2-ripple';
+    b.style.left=e.clientX+'px';b.style.top=e.clientY+'px';
+    document.body.appendChild(b);setTimeout(()=>b.remove(),1600);
+  });
+})();
+</script>
+<!-- ═══ END V2 ═══ -->
 </body>
 </html>

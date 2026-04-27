@@ -701,5 +701,56 @@ addEventListener('DOMContentLoaded',()=>{
   addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'))});
 });
 </script>
+<!-- ═══ V2 視覺增強層 — Glitch 電流空間 × RGB 漂移 × 隨機雷電 × 撕裂重組 ═══ -->
+<div class="v2-noise"></div><div class="v2-bolt" id="v2-bolt"></div>
+<style>
+.v2-noise{position:fixed;inset:0;z-index:9996;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,rgba(255,255,255,.03) 2px,rgba(255,255,255,.03) 3px);mix-blend-mode:overlay;animation:noiseShift 8s steps(8) infinite;opacity:.6}
+@keyframes noiseShift{0%{transform:translateY(0)}100%{transform:translateY(-50px)}}
+.v2-bolt{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:0;background:linear-gradient(transparent 0%,rgba(0,255,240,.18) 25%,rgba(255,0,153,.12) 50%,rgba(255,238,0,.18) 75%,transparent 100%);mix-blend-mode:screen}
+.v2-bolt.go{animation:boltStrike .4s steps(2)}
+@keyframes boltStrike{0%,100%{opacity:0}30%{opacity:1}}
+[class*="card"],[class*="cell"],[class*="panel"],section,.bug-cell,.gen-cell{backdrop-filter:blur(var(--v2-blur,14px)) saturate(1.4) hue-rotate(var(--v2-hue,0deg));-webkit-backdrop-filter:blur(var(--v2-blur,14px)) saturate(1.4) hue-rotate(var(--v2-hue,0deg));transition:backdrop-filter .15s ease}
+body{animation:rgbDrift 8s ease-in-out infinite alternate}
+@keyframes rgbDrift{0%{text-shadow:1px 0 rgba(255,0,153,.15),-1px 0 rgba(0,255,240,.15)}50%{text-shadow:-1px 0 rgba(255,0,153,.2),1px 0 rgba(0,255,240,.2)}100%{text-shadow:0 1px rgba(255,238,0,.15),0 -1px rgba(255,0,153,.15)}}
+.v2-tear{animation:tearGlitch .3s steps(3)}
+@keyframes tearGlitch{0%{transform:translate(0,0);clip-path:none}25%{transform:translate(-4px,2px) skewX(-2deg);clip-path:polygon(0 0,100% 0,100% 30%,0 30%,0 60%,100% 60%,100% 100%,0 100%);filter:hue-rotate(60deg)}50%{transform:translate(4px,-1px);clip-path:polygon(0 10%,100% 10%,100% 40%,0 40%,0 70%,100% 70%,100% 90%,0 90%);filter:hue-rotate(-60deg)}100%{transform:translate(0,0);clip-path:none}}
+.v2-spark{position:fixed;width:6px;height:6px;background:var(--sc,#00FFF0);pointer-events:none;z-index:9999;border-radius:50%;animation:sparkFly .9s linear forwards;box-shadow:0 0 8px var(--sc,#00FFF0),0 0 16px var(--sc,#00FFF0)}
+@keyframes sparkFly{from{transform:translate(0,0) scale(1);opacity:1}to{transform:translate(var(--dx,40px),var(--dy,-40px)) scale(.1);opacity:0}}
+@media(prefers-reduced-motion:reduce){.v2-noise,.v2-bolt{animation:none}body{animation:none;text-shadow:none}.v2-tear,.v2-spark{display:none;animation:none!important}}
+</style>
+<script>
+(function(){
+  document.addEventListener('mousemove',e=>{
+    const cx=innerWidth/2,cy=innerHeight/2,d=Math.hypot(e.clientX-cx,e.clientY-cy),m=Math.hypot(cx,cy);
+    document.documentElement.style.setProperty('--v2-blur',(10+(d/m)*24).toFixed(1)+'px');
+    document.documentElement.style.setProperty('--v2-hue',Math.round((e.clientX/innerWidth-.5)*60)+'deg');
+  },{passive:true});
+  document.addEventListener('click',e=>{
+    const colors=['#00FFF0','#FF0099','#FFEE00','#FFFFFF'];
+    for(let i=0;i<12;i++){
+      const p=document.createElement('div');p.className='v2-spark';
+      p.style.left=e.clientX+'px';p.style.top=e.clientY+'px';
+      p.style.setProperty('--sc',colors[i%4]);
+      const a=Math.random()*Math.PI*2,r=50+Math.random()*70;
+      p.style.setProperty('--dx',Math.cos(a)*r+'px');
+      p.style.setProperty('--dy',Math.sin(a)*r+'px');
+      document.body.appendChild(p);setTimeout(()=>p.remove(),1100);
+    }
+    if(Math.random()<.18){
+      document.body.classList.add('v2-tear');
+      setTimeout(()=>document.body.classList.remove('v2-tear'),300);
+    }
+  });
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+    function bolt(){
+      const b=document.getElementById('v2-bolt');
+      b.classList.remove('go');void b.offsetWidth;b.classList.add('go');
+      setTimeout(bolt,4000+Math.random()*4000);
+    }
+    setTimeout(bolt,3000);
+  }
+})();
+</script>
+<!-- ═══ END V2 ═══ -->
 </body>
 </html>
