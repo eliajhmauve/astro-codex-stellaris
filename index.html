@@ -1009,6 +1009,12 @@ function setupSVG(){
 /* ── Keyboard shortcuts ── */
 function setupKeys(){
   addEventListener('keydown',e=>{
+    // 在輸入框內或 modal 開著時，不觸發行星跳轉快捷鍵
+    const tag=(e.target&&e.target.tagName)||'';
+    if(/^(INPUT|SELECT|TEXTAREA)$/.test(tag))return;
+    if(e.target&&e.target.isContentEditable)return;
+    if(document.querySelector('.natal-modal.show'))return;
+    if(e.metaKey||e.ctrlKey||e.altKey)return;
     const map={'1':'mercury','2':'venus','3':'mars','4':'jupiter','5':'saturn','6':'uranus','7':'neptune','8':'pluto','9':'moon','0':'sun'};
     if(map[e.key]){const p=PLANETS.find(x=>x.key===map[e.key]);if(p){setActivePlanet(p.key);navigateTo(p)}return}
     if(e.key.toLowerCase()==='o'){toggleOrbit();return}
