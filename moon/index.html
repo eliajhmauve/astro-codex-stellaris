@@ -1100,6 +1100,58 @@
 })();
 </script>
 <!-- ═══ END V2 ═══ -->
+<script>
+/* fix: 補上缺漏的 claimFullMoon 函數 + ESC / 點外部關閉 fallback */
+(function(){
+  function closeFullMoon(){
+    const m = document.getElementById('fullMoonModal');
+    if(m) m.style.display = 'none';
+  }
+  window.claimFullMoon = function(){
+    closeFullMoon();
+    try {
+      const today = new Date().toISOString().slice(0,10);
+      const claimedKey = 'astro_moon_fullmoon_' + today;
+      if(!localStorage.getItem(claimedKey)){
+        const cur = +localStorage.getItem('astro_moon_xp') || 0;
+        localStorage.setItem('astro_moon_xp', cur + 50);
+        localStorage.setItem(claimedKey, '1');
+        // 嘗試刷新 HUD（如果頁面有 refreshUI / updateUI 之類）
+        if(typeof refreshUI === 'function') try { refreshUI(); } catch(_){}
+        if(typeof updateUI === 'function') try { updateUI(); } catch(_){}
+      }
+    } catch(e){ console.warn('claimFullMoon localStorage failed', e); }
+  };
+  // ESC 關閉
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape') closeFullMoon();
+  });
+  // 點 modal 外部關閉
+  document.addEventListener('click', e => {
+    const m = document.getElementById('fullMoonModal');
+    if(m && m.style.display !== 'none' && e.target === m) closeFullMoon();
+  });
+  // 動態加右上角 × 按鈕（沒有就加）
+  function addCloseBtn(){
+    const m = document.getElementById('fullMoonModal');
+    if(!m || m.querySelector('.fm-close')) return;
+    const box = m.querySelector('.modal-box, .full-moon-modal') || m.firstElementChild;
+    if(!box) return;
+    if(getComputedStyle(box).position === 'static') box.style.position = 'relative';
+    const btn = document.createElement('button');
+    btn.className = 'fm-close';
+    btn.setAttribute('aria-label','關閉');
+    btn.textContent = '×';
+    btn.style.cssText = 'position:absolute;top:8px;right:14px;background:none;border:none;color:#E8E2D8;font-size:32px;line-height:1;cursor:pointer;padding:4px 10px;font-family:serif;opacity:.7;transition:opacity .2s';
+    btn.onmouseover = () => btn.style.opacity = '1';
+    btn.onmouseout = () => btn.style.opacity = '.7';
+    btn.onclick = closeFullMoon;
+    box.appendChild(btn);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addCloseBtn);
+  else addCloseBtn();
+})();
+</script>
 <script src="../natal-overlay.js" defer></script>
 </body>
 </html>
