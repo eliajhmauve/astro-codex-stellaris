@@ -363,7 +363,14 @@ body::after{
   content:"";position:absolute;left:0;right:0;top:0;height:2px;background:var(--planet-color,var(--gold));opacity:.6;
 }
 .cat-cell:hover{transform:translateY(-3px);background:rgba(212,175,55,.06);border-color:var(--planet-color,var(--gold));box-shadow:0 8px 24px -8px var(--planet-color,var(--gold))}
+.cat-cell.visited{background:rgba(212,175,55,.05);border-color:rgba(212,175,55,.55)}
+.cat-cell.visited::before{height:3px;opacity:.95}
+.cat-check{position:absolute;top:6px;right:8px;font-family:'Major Mono Display',monospace;font-size:14px;color:#FFE08A;text-shadow:0 0 8px rgba(255,224,138,.6);z-index:2}
 .cat-cell .glyph{font-family:var(--font-mono);font-size:1.6rem;color:var(--planet-color,var(--gold));line-height:1}
+.cat-progress{margin-top:14px;display:flex;align-items:center;gap:14px;justify-content:center;font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.2em;color:#C0C8D8;text-transform:uppercase}
+.cat-progress .cp-text{color:#FFE08A}
+.cat-progress .cp-bar{position:relative;width:200px;height:4px;background:rgba(212,175,55,.15);overflow:hidden;border:1px solid rgba(212,175,55,.3)}
+.cat-progress .cp-fill{display:block;height:100%;background:linear-gradient(90deg,#D4AF37,#FFE08A);transition:width .8s cubic-bezier(.16,1,.3,1);box-shadow:0 0 12px rgba(212,175,55,.5)}
 .cat-cell .key{font-family:var(--font-mono);font-size:9px;color:var(--silver-dim);letter-spacing:.3em;margin-top:6px;text-transform:uppercase}
 .cat-cell .name{font-family:var(--font-script);font-style:italic;color:var(--parchment);font-size:12px;margin-top:4px}
 @media(max-width:880px){.catalog-grid{grid-template-columns:repeat(5,1fr)}}
@@ -946,12 +953,20 @@ function renderRanking(){
 }
 
 /* ── Catalog ── */
+function loadVisited(){
+  try { return JSON.parse(localStorage.getItem('astro_progress_visited') || '[]'); }
+  catch(_){ return []; }
+}
 function renderCatalog(){
   const g=document.getElementById('catalog-grid');g.innerHTML='';
+  const visited=loadVisited();
   PLANETS.forEach((p,i)=>{
-    const c=document.createElement('div');c.className='cat-cell';
+    const c=document.createElement('div');
+    const done=visited.includes(p.key);
+    c.className='cat-cell'+(done?' visited':'');
     c.style.setProperty('--planet-color',p.color);
     c.innerHTML=`
+      ${done?'<div class="cat-check">✓</div>':''}
       <div class="glyph">${p.glyph}</div>
       <div class="key">${(i===9?0:i+1)} · ${p.en.toUpperCase().slice(0,3)}</div>
       <div class="name">${p.name}</div>`;
@@ -959,6 +974,20 @@ function renderCatalog(){
     c.addEventListener('mouseenter',()=>setActivePlanet(p.key));
     g.appendChild(c);
   });
+  // 顯示總進度
+  const headEl=document.querySelector('.catalog::before');
+  // ::before 不能改文字，改成在 catalog title 旁加進度
+  const cat=document.querySelector('.catalog');
+  if(cat){
+    let prog=cat.querySelector('.cat-progress');
+    if(!prog){
+      prog=document.createElement('div');
+      prog.className='cat-progress';
+      cat.appendChild(prog);
+    }
+    const pct=Math.round(visited.length/10*100);
+    prog.innerHTML=`<span class="cp-text">已訪問 ${visited.length} / 10</span><span class="cp-bar"><span class="cp-fill" style="width:${pct}%"></span></span>`;
+  }
 }
 
 /* ── Set active planet (in detail drawer) ── */
@@ -1070,7 +1099,7 @@ addEventListener('DOMContentLoaded',()=>{
   // re-read state on visibility return
   addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='visible'){
-      loadStates();renderTotals();renderRanking();
+      loadStates();renderTotals();renderRanking();renderCatalog();
       const cur=PLANETS.find(x=>x.key===ACTIVE);if(cur)setActivePlanet(cur.key);
     }
   });
@@ -1081,6 +1110,7 @@ addEventListener('DOMContentLoaded',()=>{
 <script src="./chart.js" defer></script>
 <script src="./natal-wheel.js" defer></script>
 <script src="./transit.js" defer></script>
+<script src="./big3-content.js" defer></script>
 
 <!-- 觸發按鈕（未輸入時顯示） / 結果 pill（已輸入後顯示） -->
 <button class="natal-fab" id="natal-fab" aria-label="解鎖你的本命盤">
@@ -1245,6 +1275,17 @@ addEventListener('DOMContentLoaded',()=>{
 .tr-row .tr-arrow{color:#7A8090}
 .tr-row .tr-name{flex:1;color:var(--parchment,#E8DCC4);font-family:var(--font-script,'Cormorant Garamond'),serif;font-style:italic;font-size:1.05em}
 .tr-row .tr-orb{color:#7A8090;font-size:.85em;flex-shrink:0}
+
+.big3-card{margin:0 0 22px;padding:20px;background:linear-gradient(135deg,rgba(212,175,55,.12),rgba(10,5,8,.4));border:1px solid var(--gold,#D4AF37);border-left-width:4px}
+.big3-card .natal-label{margin-bottom:14px}
+.big3-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.big3-cell{padding:14px;background:rgba(0,0,0,.4);border:1px solid rgba(212,175,55,.25)}
+.big3-cell-empty{opacity:.65;border-style:dashed}
+.big3-head{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px dashed rgba(212,175,55,.25)}
+.big3-glyph{font-family:'Cinzel',serif;font-size:2rem;color:var(--gold,#D4AF37);text-shadow:0 0 12px rgba(212,175,55,.4);line-height:1;flex-shrink:0}
+.big3-tag{font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.3em;color:#C0C8D8;text-transform:uppercase;margin-bottom:2px}
+.big3-sign{font-family:'Cinzel',serif;font-size:1.1rem;color:#FFE08A;font-weight:700}
+.big3-desc{font-family:'Cormorant Garamond','Times New Roman',serif;color:var(--parchment,#E8DCC4);font-size:14px;line-height:1.65;margin:0;font-style:italic}
 
 .natal-aspects{max-height:240px;overflow:auto;font-family:var(--font-tech,'Space Mono'),monospace;font-size:12px;border:1px solid rgba(212,175,55,.2);padding:10px}
 .natal-aspects div{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dotted rgba(212,175,55,.12)}
@@ -1513,7 +1554,51 @@ function renderDetail(){
        <div class="natal-aspects">${d.aspects.map(a => `<div><span class="ap-pair">${a.p1Glyph} ${a.p1Name} × ${a.p2Glyph} ${a.p2Name}</span><span class="ap-type">${a.name} ${a.angle}°</span><span class="ap-orb">orb ${a.orbDelta}°</span></div>`).join('')}</div>`
     : '';
 
-  body.innerHTML = hdr + `
+  // Big 3：太陽 / 月亮 / 上升
+  const sun  = d.planets.find(p => p.key === 'sun');
+  const moon = d.planets.find(p => p.key === 'moon');
+  const asc  = d.ascendant;
+  const big3 = window.Big3Content;
+  const big3Html = (sun && moon && big3) ? `
+    <div class="big3-card">
+      <span class="natal-label">// big 3 — 你的核心人格三角</span>
+      <div class="big3-grid">
+        <div class="big3-cell">
+          <div class="big3-head">
+            <span class="big3-glyph">☉</span>
+            <div><div class="big3-tag">太陽 · 核心身分</div><div class="big3-sign">${sun.signGlyph} ${sun.sign}座</div></div>
+          </div>
+          <p class="big3-desc">${big3.SUN_DESC[sun.sign] || ''}</p>
+        </div>
+        <div class="big3-cell">
+          <div class="big3-head">
+            <span class="big3-glyph">☽</span>
+            <div><div class="big3-tag">月亮 · 情緒底色</div><div class="big3-sign">${moon.signGlyph} ${moon.sign}座</div></div>
+          </div>
+          <p class="big3-desc">${big3.MOON_DESC[moon.sign] || ''}</p>
+        </div>
+        ${asc ? `
+        <div class="big3-cell">
+          <div class="big3-head">
+            <span class="big3-glyph">⏃</span>
+            <div><div class="big3-tag">上升 · 對外形象</div><div class="big3-sign">${asc.glyph} ${asc.sign}座</div></div>
+          </div>
+          <p class="big3-desc">${big3.ASC_DESC[asc.sign] || ''}</p>
+        </div>
+        ` : `
+        <div class="big3-cell big3-cell-empty">
+          <div class="big3-head">
+            <span class="big3-glyph">⏃</span>
+            <div><div class="big3-tag">上升 · 對外形象</div><div class="big3-sign" style="color:#C49097">需要出生時間</div></div>
+          </div>
+          <p class="big3-desc" style="color:#7A8090;font-style:italic">找到出生時間後可以看到 ─ 上升星座決定別人第一眼看到的你。</p>
+        </div>
+        `}
+      </div>
+    </div>
+  ` : '';
+
+  body.innerHTML = hdr + big3Html + `
     <div class="natal-wheel-wrap" id="natal-wheel-wrap"></div>
     <div class="natal-detail-grid">
       <div class="natal-section">
