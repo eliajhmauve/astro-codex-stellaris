@@ -1474,8 +1474,9 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .mc-cell:hover{transform:scale(1.05);background:rgba(212,175,55,.1);box-shadow:0 0 8px var(--sc,#D4AF37);z-index:2;position:relative}
 .mc-cell.mc-today{background:rgba(255,224,138,.18);border-color:#FFE08A;box-shadow:0 0 12px rgba(255,224,138,.4)}
 .mc-cell.mc-enter{border-top-width:3px;border-top-style:solid;border-top-color:var(--sc,#FFE08A)}
-.mc-cell .mc-num{font-size:11px;color:#C0C8D8;margin-bottom:2px}
-.mc-cell .mc-glyph{font-family:'Cinzel',serif;font-size:1.3em;font-weight:700;color:var(--sc,#D4AF37);line-height:1}
+.mc-cell .mc-num{font-size:11px;color:#C0C8D8;margin-bottom:1px}
+.mc-cell .mc-phase{font-size:1em;line-height:1;margin-bottom:1px}
+.mc-cell .mc-glyph{font-family:'Cinzel',serif;font-size:1.1em;font-weight:700;color:var(--sc,#D4AF37);line-height:1}
 .mc-cell.mc-today .mc-num{color:#FFE08A;font-weight:700}
 .mc-cell.mc-today .mc-glyph{color:#FFE08A}
 
@@ -2582,16 +2583,17 @@ function renderTransit(){
       const cal = window.AstroTransit.calcMonthMoonCalendar();
       if(cal && cal.days){
         const SIGN_COLOR = { '牡羊':'#E8634C','獅子':'#E8634C','射手':'#E8634C','金牛':'#7AA84B','處女':'#7AA84B','摩羯':'#7AA84B','雙子':'#E5C282','天秤':'#E5C282','水瓶':'#E5C282','巨蟹':'#5BA9D6','天蠍':'#5BA9D6','雙魚':'#5BA9D6' };
-        const cells = cal.days.map(d => `<div class="mc-cell ${d.isToday?'mc-today':''} ${d.enteredNewSign?'mc-enter':''}" style="--sc:${SIGN_COLOR[d.sign]||'#D4AF37'}" title="${cal.year}-${String(cal.month).padStart(2,'0')}-${String(d.date).padStart(2,'0')} 月亮在${d.sign}座${d.enteredNewSign?'（進入新星座）':''}">
+        const cells = cal.days.map(d => `<div class="mc-cell ${d.isToday?'mc-today':''} ${d.enteredNewSign?'mc-enter':''}" style="--sc:${SIGN_COLOR[d.sign]||'#D4AF37'}" title="${cal.year}-${String(cal.month).padStart(2,'0')}-${String(d.date).padStart(2,'0')} 月亮在${d.sign}座${d.enteredNewSign?'（進入新星座）':''} · ${d.moonPhase}">
           <div class="mc-num">${d.date}</div>
+          <div class="mc-phase">${d.moonPhaseGlyph}</div>
           <div class="mc-glyph">${d.glyph}</div>
         </div>`).join('');
         const todayMoon = cal.days.find(d => d.isToday);
         calHtml = `
           <h3 style="font-family:var(--font-display,Cinzel),serif;font-size:1rem;letter-spacing:.18em;color:var(--gold);margin:24px 0 10px;border-bottom:1px solid rgba(212,175,55,.25);padding-bottom:6px;text-transform:uppercase">本月月相日曆 · ${cal.year}.${String(cal.month).padStart(2,'0')}</h3>
-          <p class="natal-hint">月亮每 2-3 天進入新星座 ─ 這是占星「最快的天象變化」。${todayMoon ? `今日月亮：<strong style="color:${SIGN_COLOR[todayMoon.sign]||'#D4AF37'}">${todayMoon.glyph} ${todayMoon.sign}座</strong>` : ''}</p>
+          <p class="natal-hint">月亮每 2-3 天進入新星座、每 29.5 天走一個盈虧週期。${todayMoon ? `今日：<strong style="color:${SIGN_COLOR[todayMoon.sign]||'#D4AF37'}">${todayMoon.glyph} ${todayMoon.sign}座 · ${todayMoon.moonPhaseGlyph} ${todayMoon.moonPhase}</strong>${todayMoon.waxing ? '（盈月期 ─ 適合啟動新事）' : '（虧月期 ─ 適合收尾與釋放）'}` : ''}</p>
           <div class="mc-grid">${cells}</div>
-          <p style="font-size:11px;color:#7A8090;margin-top:8px;font-family:'Major Mono Display',monospace;letter-spacing:.18em">★ 高亮邊框 = 月亮進入新星座當天</p>
+          <p style="font-size:11px;color:#7A8090;margin-top:8px;font-family:'Major Mono Display',monospace;letter-spacing:.18em">★ 高亮邊框 = 進入新星座 · 上排月相 / 下排星座符號</p>
         `;
       }
     } catch(_){}

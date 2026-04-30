@@ -298,7 +298,31 @@ function calcSolarReturn(natalChart){
   };
 }
 
-// 本月月相日曆：每天 12:00 的月亮位置
+// 月相階段計算（用 太陽 - 月亮 黃經差）
+function calcMoonPhase(date){
+  if(!global.Astronomy) return null;
+  const A = global.Astronomy;
+  const dt = date || new Date();
+  const sunV = A.GeoVector(A.Body.Sun, dt, true);
+  const moonV = A.GeoVector(A.Body.Moon, dt, true);
+  const sunLon = A.Ecliptic(sunV).elon;
+  const moonLon = A.Ecliptic(moonV).elon;
+  let phase = ((moonLon - sunLon) % 360 + 360) % 360;
+  let name, glyph, illuminated;
+  // 0 = 新月、90 = 上弦、180 = 滿月、270 = 下弦
+  if(phase < 22.5)        { name = '新月';   glyph = '🌑'; illuminated = 0; }
+  else if(phase < 67.5)   { name = '眉月';   glyph = '🌒'; illuminated = .25; }
+  else if(phase < 112.5)  { name = '上弦月'; glyph = '🌓'; illuminated = .5; }
+  else if(phase < 157.5)  { name = '盈凸月'; glyph = '🌔'; illuminated = .75; }
+  else if(phase < 202.5)  { name = '滿月';   glyph = '🌕'; illuminated = 1; }
+  else if(phase < 247.5)  { name = '虧凸月'; glyph = '🌖'; illuminated = .75; }
+  else if(phase < 292.5)  { name = '下弦月'; glyph = '🌗'; illuminated = .5; }
+  else if(phase < 337.5)  { name = '殘月';   glyph = '🌘'; illuminated = .25; }
+  else                    { name = '新月';   glyph = '🌑'; illuminated = 0; }
+  return { phase, name, glyph, illuminated, waxing: phase < 180 };
+}
+
+// 本月月相日曆：每天 12:00 的月亮位置 + 月相
 function calcMonthMoonCalendar(){
   if(!global.Astronomy) return [];
   const A = global.Astronomy;
@@ -313,6 +337,7 @@ function calcMonthMoonCalendar(){
     const v = A.GeoVector(A.Body.Moon, dt, true);
     const e = A.Ecliptic(v);
     const s = lonToSign(e.elon);
+    const phase = calcMoonPhase(dt);
     const isToday = dt.toDateString() === now.toDateString();
     const enteredNewSign = s.idx !== prevSign;
     days.push({
@@ -323,12 +348,16 @@ function calcMonthMoonCalendar(){
       idx: s.idx,
       isToday,
       enteredNewSign,
+      moonPhase: phase ? phase.name : '',
+      moonPhaseGlyph: phase ? phase.glyph : '',
+      illuminated: phase ? phase.illuminated : 0,
+      waxing: phase ? phase.waxing : true,
     });
     prevSign = s.idx;
   }
   return { year, month: month + 1, days };
 }
 
-global.AstroTransit = { calcToday, findActiveTransits, forecastDays, calcLifecycleMilestones, calcSolarReturn, calcMonthMoonCalendar, PLANETS };
+global.AstroTransit = { calcToday, findActiveTransits, forecastDays, calcLifecycleMilestones, calcSolarReturn, calcMoonPhase, calcMonthMoonCalendar, PLANETS };
 
 })(typeof window !== 'undefined' ? window : globalThis);
