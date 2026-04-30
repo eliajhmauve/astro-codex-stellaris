@@ -202,6 +202,93 @@ function flashHighlight(el){
   el.classList.add('natal-target-glow');
 }
 
+// 該行星形成的所有相位（從 chart.aspects 過濾）
+function getMyAspects(planetKey, chart){
+  if(!chart || !chart.aspects) return [];
+  return chart.aspects.filter(a => a.p1 === planetKey || a.p2 === planetKey).map(a => {
+    // 統一為「我這顆行星 vs 對方」
+    if(a.p1 === planetKey) {
+      return { other: a.p2, otherName: a.p2Name, otherGlyph: a.p2Glyph, type: a.type, name: a.name, angle: a.angle, orbDelta: a.orbDelta };
+    } else {
+      return { other: a.p1, otherName: a.p1Name, otherGlyph: a.p1Glyph, type: a.type, name: a.name, angle: a.angle, orbDelta: a.orbDelta };
+    }
+  });
+}
+
+const ASPECT_VIBE = {
+  con: { color:'#FFE08A', tag:'融合', tone:'+'},
+  opp: { color:'#E8634C', tag:'拉扯', tone:'⚡'},
+  sqr: { color:'#E8A04C', tag:'衝突', tone:'⚡'},
+  tri: { color:'#7AC48E', tag:'流暢', tone:'~'},
+  sex: { color:'#7DA8D9', tag:'機會', tone:'~'},
+};
+
+function buildMyAspectsCard(planetKey, me, chart){
+  const myAspects = getMyAspects(planetKey, chart);
+  if(!myAspects.length) return null;
+
+  const planetName = PLANET_NAMES[planetKey];
+  const wrap = document.createElement('div');
+  wrap.className = 'natal-my-aspects';
+
+  const counts = { con:0, opp:0, sqr:0, tri:0, sex:0 };
+  myAspects.forEach(a => counts[a.type]++);
+
+  const summary = Object.entries(counts).filter(([,v]) => v > 0)
+    .map(([k,v]) => `<span class="ma-count" style="color:${ASPECT_VIBE[k].color}">${v} 個 ${ASPECT_VIBE[k].tag}</span>`)
+    .join(' · ');
+
+  const items = myAspects.map(a => {
+    const v = ASPECT_VIBE[a.type];
+    return `<div class="ma-row" style="border-left-color:${v.color}">
+      <span class="ma-pair"><span class="ma-glyph">${me.glyph}</span><span class="ma-arrow" style="color:${v.color}">${v.tone}</span><span class="ma-glyph">${a.otherGlyph}</span></span>
+      <span class="ma-name"><strong>${planetName} ${a.name} ${a.otherName}</strong> <span class="ma-tag" style="color:${v.color}">${v.tag} ${a.angle}°</span></span>
+      <span class="ma-orb">orb ${a.orbDelta}°</span>
+    </div>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div class="natal-my-aspects-card">
+      <div class="ma-head">
+        <span class="ma-tag-strip">// MY ASPECTS</span>
+        <h2>你的 ${planetName} 形成的 ${myAspects.length} 個主要相位</h2>
+        <p class="ma-summary">${summary}</p>
+      </div>
+      <div class="ma-list">${items}</div>
+      <p class="ma-note">這裡列出的是<strong>你實際擁有</strong>的相位。下方「45 相位矩陣」是所有可能的組合，可以把這裡的相位當作學習起點。</p>
+    </div>
+  `;
+  return wrap;
+}
+
+function injectMyAspectsStyles(){
+  if(document.getElementById('natal-my-aspects-style')) return;
+  const css = `
+.natal-my-aspects{margin:36px auto 18px;max-width:1100px;padding:0 24px;font-family:'Cormorant Garamond',serif}
+.natal-my-aspects-card{padding:28px 32px;background:linear-gradient(135deg,rgba(212,175,55,.14),rgba(10,5,8,.5));border:1px solid #D4AF37;border-left-width:4px;box-shadow:0 18px 40px -16px rgba(0,0,0,.7)}
+.ma-tag-strip{display:inline-block;font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.5em;color:#D4AF37;text-transform:uppercase;padding:3px 10px;border:1px solid #D4AF37;background:rgba(0,0,0,.4);margin-bottom:10px}
+.ma-head h2{font-family:'Cinzel',serif;font-weight:900;font-size:clamp(1.3rem,2.4vw,1.9rem);color:#FFE08A;letter-spacing:.04em;margin-bottom:8px}
+.ma-summary{font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.18em;color:#C0C8D8;margin-bottom:18px}
+.ma-summary .ma-count{margin-right:14px}
+.ma-list{display:flex;flex-direction:column;gap:8px;margin:14px 0}
+.ma-row{display:flex;align-items:center;gap:14px;padding:10px 14px;background:rgba(0,0,0,.4);border-left:3px solid #D4AF37;font-size:14px}
+.ma-row .ma-pair{display:flex;align-items:center;gap:6px;flex-shrink:0;min-width:80px}
+.ma-row .ma-glyph{font-family:'Cinzel',serif;font-size:1.5em;font-weight:700;color:#FFE08A}
+.ma-row .ma-arrow{font-weight:700;font-size:1.2em}
+.ma-row .ma-name{flex:1;color:#E8DCC4;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:1.1em}
+.ma-row .ma-name strong{font-style:normal;color:#FFE08A;font-weight:700}
+.ma-row .ma-name .ma-tag{font-style:normal;font-family:'Major Mono Display',monospace;font-size:.8em;letter-spacing:.15em;margin-left:8px;text-transform:uppercase}
+.ma-row .ma-orb{color:#7A8090;font-size:.85em;flex-shrink:0;font-family:'Major Mono Display',monospace}
+.ma-note{margin-top:14px;padding-top:12px;border-top:1px dashed rgba(212,175,55,.3);font-style:italic;color:#C0C8D8;font-size:13px;line-height:1.55}
+.ma-note strong{color:#FFE08A;font-style:normal}
+@media(max-width:600px){.natal-my-aspects-card{padding:20px 18px}.ma-row{flex-wrap:wrap;font-size:13px}.ma-row .ma-orb{margin-left:auto}}
+  `;
+  const s = document.createElement('style');
+  s.id = 'natal-my-aspects-style';
+  s.textContent = css;
+  document.head.appendChild(s);
+}
+
 function buildBanner(planetKey, me, neighbors){
   const planetName = PLANET_NAMES[planetKey];
   const banner = document.createElement('div');
@@ -349,11 +436,26 @@ function init(){
     }, 600);
   }
 
-  // 3. 底部下一堂課（appended at body end）
+  // 3. 我的相位網絡（如果有 chart）
+  if(me && chart && chart.aspects){
+    injectMyAspectsStyles();
+    const myAsp = buildMyAspectsCard(planetKey, me, chart);
+    if(myAsp){
+      // 嘗試插到「45 相位矩陣」section 之前；找不到就 append 到 body 尾
+      const aspectSection = Array.from(document.querySelectorAll('section')).find(s => /45\s*相位|aspect.*matrix/i.test(s.textContent || ''));
+      if(aspectSection && aspectSection.parentNode){
+        aspectSection.parentNode.insertBefore(myAsp, aspectSection);
+      } else {
+        document.body.appendChild(myAsp);
+      }
+    }
+  }
+
+  // 4. 底部下一堂課（appended at body end）
   const nextLesson = buildNextLesson(planetKey, me, neighbors);
   document.body.appendChild(nextLesson);
 
-  // 4. 標記已訪問
+  // 5. 標記已訪問
   markVisited(planetKey);
 }
 
