@@ -1481,6 +1481,20 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .dt-tag-warn{background:#E8A04C;color:#0A0508}
 .dt-rx{margin-top:10px;padding:8px 12px;background:rgba(194,68,56,.12);border-left:3px solid #C24438;color:#FFC0B5;font-size:13px;font-family:'Cormorant Garamond',serif;font-style:italic}
 
+.qa-card{margin:18px 0;padding:20px 24px;background:linear-gradient(135deg,rgba(125,168,217,.08),rgba(10,5,8,.4));border:1px solid #7DA8D9;border-left:4px solid #7DA8D9}
+.qa-card .natal-label{margin-bottom:14px}
+.qa-list{display:flex;flex-direction:column;gap:8px}
+.qa-item{background:rgba(0,0,0,.35);border:1px solid rgba(125,168,217,.25);transition:all .25s ease}
+.qa-item[open]{border-color:#7DA8D9;background:rgba(125,168,217,.06)}
+.qa-item summary{cursor:pointer;padding:12px 16px;font-family:'Cinzel',serif;font-size:14px;color:#E8DCC4;letter-spacing:.04em;list-style:none;position:relative;padding-right:42px;transition:color .2s}
+.qa-item summary::-webkit-details-marker{display:none}
+.qa-item summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);color:#7DA8D9;font-size:1.4em;font-weight:700;font-family:'Major Mono Display',monospace;transition:transform .25s ease}
+.qa-item[open] summary::after{content:'−';transform:translateY(-50%) rotate(0deg)}
+.qa-item summary:hover{color:#FFE08A}
+.qa-answer{padding:0 18px 16px;font-family:'Cormorant Garamond',serif;font-size:14px;line-height:1.7;color:#C0C8D8;font-style:italic;animation:qaOpen .35s ease}
+.qa-answer strong{color:#FFE08A;font-weight:700;font-style:normal}
+@keyframes qaOpen{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+
 .balance-card{margin:0 0 22px;padding:20px;background:linear-gradient(135deg,rgba(157,143,194,.1),rgba(10,5,8,.4));border:1px solid rgba(212,175,55,.4);border-left:4px solid #9D8FC2}
 .balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @media(max-width:600px){.balance-grid{grid-template-columns:1fr}}
@@ -2294,6 +2308,38 @@ function renderDetail(){
     }
   } catch(_){}
 
+  // 快問快答
+  const qaItems = [
+    { q:`我的太陽${sun?sun.sign:''}代表什麼？`, a: sun && big3 ? big3.SUN_DESC[sun.sign] : '需要本命盤' },
+    { q:`我的月亮${moon?moon.sign:''}代表什麼？`, a: moon && big3 ? big3.MOON_DESC[moon.sign] : '需要本命盤' },
+    { q: asc ? `我的上升${asc.sign}代表什麼？` : '我為什麼看不到上升星座？', a: asc && big3 ? big3.ASC_DESC[asc.sign] : '上升需要精確的出生時間。如果你不知道時間 ─ 戶口名簿 / 醫院出生紀錄 / 問家人都可以找到，找到後用 EDIT_INPUT 補上。' },
+    { q:'什麼是元素平衡？我缺什麼元素？', a: (() => {
+        const ELE2 = { '牡羊':'火','獅子':'火','射手':'火','金牛':'土','處女':'土','摩羯':'土','雙子':'風','天秤':'風','水瓶':'風','巨蟹':'水','天蠍':'水','雙魚':'水' };
+        const cnt = { '火':0,'土':0,'風':0,'水':0 };
+        d.planets.forEach(p => cnt[ELE2[p.sign]]++);
+        const sorted = Object.entries(cnt).sort((a,b) => b[1] - a[1]);
+        const dom = sorted[0], lack = sorted[3];
+        return `你的 10 行星分布：火${cnt['火']} 土${cnt['土']} 風${cnt['風']} 水${cnt['水']}。<br>${dom[0]}元素最強（${dom[1]} 顆）${lack[1] === 0 ? `<br>缺：${lack[0]}元素 ─ 這部分能量你需要刻意培養（找對應星座的人合作 / 接觸該元素的活動）。` : ''}`;
+      })() },
+    { q:'什麼叫水星逆行？我該注意什麼？', a:'水星逆行 = 從地球視角看水星好像在倒退（其實是視覺錯位）。每年 3-4 次、每次約 3 週。期間：<strong>不適合</strong>簽合約、買 3C、開新項目；<strong>適合</strong>修舊文件、見舊朋友、整理舊資料。' },
+    { q:'土星回歸是什麼？我什麼時候會遇到？', a:`土星回歸 = 土星每 29.5 年回到你出生位置 ─ 占星最重要的「成年禮」。第一次在 27-30 歲會問「我這一生要做什麼？」很多婚姻、事業、城市決定都在這時候定下。第二次在 58-60 歲，最後一次重組。${chartData ? '在「生命週期里程碑」區塊查看你的精確日期。' : ''}` },
+    { q:'合盤跟本命盤有什麼不同？', a:'本命盤 = 你一個人的星圖（一輩子不變）。合盤 = 把兩個人的盤疊在一起，看 100 組行星交叉相位 ─ 顯示你們互動的化學反應。最近婚紗業、紅娘都在玩這個。點 COMPARE_PERSON 試試。' },
+    { q:'這個 App 算盤的精度如何？', a:'用 Astronomy Engine（NASA 級天文計算庫，MIT 授權），精度跟 Astro.com / Co-Star 同級。宮位採用 Whole Sign（整宮制）─ 最古老穩定的系統。如果你習慣 Placidus 的話，行星位置一致，只有宮位邊界不同。' },
+  ];
+  const qaHtml = `
+    <div class="qa-card">
+      <span class="natal-label">// quick answers · 占星快問快答</span>
+      <div class="qa-list">
+        ${qaItems.map((item, i) => `
+          <details class="qa-item">
+            <summary>${item.q}</summary>
+            <div class="qa-answer">${item.a}</div>
+          </details>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
   body.innerHTML = hdr + dailyTipHtml + big3Html + balanceHtml + `
     <div class="natal-wheel-wrap" id="natal-wheel-wrap"></div>
     <div class="natal-detail-grid">
@@ -2304,6 +2350,7 @@ function renderDetail(){
       ${ascHtml}
     </div>
     ${aspectsHtml}
+    ${qaHtml}
     <div class="natal-transit" id="natal-transit-block"></div>
   `;
   // 渲染輪盤（含今日行運外圈）
