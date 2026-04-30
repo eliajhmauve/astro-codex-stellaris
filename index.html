@@ -1165,6 +1165,8 @@ addEventListener('DOMContentLoaded',()=>{
     <div id="natal-detail-body"></div>
     <div class="natal-form-actions" style="margin-top:24px">
       <button type="button" class="natal-btn-ghost" id="natal-edit">$ EDIT_INPUT</button>
+      <button type="button" class="natal-btn-ghost" id="natal-share">$ COPY_SHARE_LINK</button>
+      <button type="button" class="natal-btn-ghost" id="natal-print">$ PRINT</button>
       <button type="button" class="natal-btn-ghost" id="natal-clear" style="color:#C49097;border-color:#C49097">清除我的盤</button>
     </div>
   </div>
@@ -1287,6 +1289,22 @@ addEventListener('DOMContentLoaded',()=>{
 .big3-sign{font-family:'Cinzel',serif;font-size:1.1rem;color:#FFE08A;font-weight:700}
 .big3-desc{font-family:'Cormorant Garamond','Times New Roman',serif;color:var(--parchment,#E8DCC4);font-size:14px;line-height:1.65;margin:0;font-style:italic}
 
+/* ─── 列印樣式：只印詳情 modal，黑白配紙質白底 ─── */
+@media print{
+  body > *{display:none!important}
+  .natal-modal#natal-detail-modal{display:flex!important;position:static!important;background:#fff!important;color:#0A0508!important;backdrop-filter:none!important;padding:0!important;animation:none!important}
+  .natal-modal#natal-detail-modal .natal-modal-card{max-width:none!important;max-height:none!important;background:#fff!important;color:#0A0508!important;border:1px solid #999!important;box-shadow:none!important;overflow:visible!important;padding:24px!important}
+  .natal-modal h2,.natal-section h3,.big3-tag,.big3-sign,.natal-label,.ma-tag-strip,.ma-head h2,.tr-row .tr-glyph.tr-now,.nnl-title,.nnl-tag,.cat-progress .cp-text,.brand-text h1{color:#3A1A0A!important;text-shadow:none!important;animation:none!important}
+  .natal-section li,.tr-row,.ma-row,.big3-cell{background:#FAF6E8!important;color:#0A0508!important;border-color:#999!important}
+  .natal-section li .name,.natal-section li .val,.tr-row .tr-name,.ma-row .ma-name{color:#0A0508!important}
+  .natal-section li .val .deg,.tr-row .tr-orb,.ma-row .ma-orb{color:#666!important}
+  .natal-close,.natal-form-actions,.natal-fab,.natal-jump,.natal-next-step{display:none!important}
+  .natal-wheel-wrap{break-inside:avoid;background:#fff!important;border:1px solid #999!important}
+  .natal-wheel-wrap svg{filter:none!important}
+  .natal-section,.natal-aspects,.natal-transit,.natal-my-aspects-card,.big3-card{break-inside:avoid;background:#fff!important;border:1px solid #999!important;box-shadow:none!important}
+  @page{size:A4 portrait;margin:1.2cm}
+}
+
 .natal-aspects{max-height:240px;overflow:auto;font-family:var(--font-tech,'Space Mono'),monospace;font-size:12px;border:1px solid rgba(212,175,55,.2);padding:10px}
 .natal-aspects div{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dotted rgba(212,175,55,.12)}
 .natal-aspects .ap-pair{color:var(--parchment,#E8DCC4)}
@@ -1335,6 +1353,9 @@ ready(function(){
 
   // 綁事件
   bindEvents();
+
+  // URL 參數匯入（覆蓋 localStorage，因為這是分享連結）
+  tryUrlParamsImport();
 });
 
 function populateCities(){
@@ -1412,6 +1433,62 @@ function bindEvents(){
     detailModal.classList.remove('show');
     refreshFab();
   });
+
+  $('#natal-share').addEventListener('click', () => {
+    if(!chartData) return;
+    const u = new URL(location.href);
+    u.searchParams.set('dob', chartData.input.dateStr);
+    if(chartData.input.timeStr) u.searchParams.set('time', chartData.input.timeStr);
+    else u.searchParams.delete('time');
+    u.searchParams.set('city', chartData.input.city);
+    const link = u.toString();
+    const btn = $('#natal-share');
+    const orig = btn.textContent;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(link).then(() => {
+        btn.textContent = '✓ 已複製到剪貼簿';
+        setTimeout(() => { btn.textContent = orig; }, 1800);
+      }).catch(() => fallbackCopy(link, btn, orig));
+    } else fallbackCopy(link, btn, orig);
+  });
+
+  $('#natal-print').addEventListener('click', () => {
+    window.print();
+  });
+}
+
+function fallbackCopy(text, btn, orig){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position='fixed';ta.style.left='-9999px';
+  document.body.appendChild(ta);ta.select();
+  try{ document.execCommand('copy'); btn.textContent = '✓ 已複製'; }
+  catch(_){ prompt('複製這個連結：', text); }
+  document.body.removeChild(ta);
+  setTimeout(() => { btn.textContent = orig; }, 1800);
+}
+
+// URL 參數模式：?dob=1997-07-31&time=11:42&city=taipei
+function tryUrlParamsImport(){
+  try {
+    const u = new URL(location.href);
+    const dob = u.searchParams.get('dob');
+    const time = u.searchParams.get('time');
+    const city = u.searchParams.get('city');
+    if(!dob || !city) return false;
+    waitForLib(() => !!(window.Astronomy && window.AstroNatal), function(loaded){
+      if(!loaded) return;
+      try {
+        const data = window.AstroNatal.calcChart({ dateStr: dob, timeStr: time || null, city });
+        chartData = data;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        refreshFab();
+        // 自動打開詳情 modal 顯示給訪客看
+        setTimeout(() => openDetail(), 400);
+      } catch(e){ console.warn('URL import failed', e); }
+    }, 8000);
+    return true;
+  } catch(_){ return false; }
 }
 
 function openInput(){
