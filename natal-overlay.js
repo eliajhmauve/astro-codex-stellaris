@@ -172,6 +172,29 @@ function injectStyles(){
 @media(prefers-reduced-motion:reduce){
   .natal-target-glow,.nob-next.is-finish,.nnl-finish{animation:none}
 }
+
+/* 今日影響卡 */
+.natal-today-influence{margin:24px auto 18px;max-width:1100px;padding:0 24px;font-family:'Cormorant Garamond',serif}
+.ti-card{padding:22px 28px;background:linear-gradient(135deg,rgba(255,224,138,.18) 0%,rgba(10,5,8,.45) 100%);border:1px solid #FFE08A;border-left:4px solid #FFE08A;box-shadow:0 12px 32px -12px rgba(255,224,138,.25)}
+.ti-tag{display:inline-block;font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.5em;color:#FFE08A;text-transform:uppercase;padding:3px 10px;border:1px solid #FFE08A;background:rgba(0,0,0,.4);margin-bottom:14px}
+.ti-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;margin-bottom:14px}
+.ti-side{padding:14px 18px;background:rgba(0,0,0,.4);border:1px solid rgba(255,224,138,.35)}
+.ti-now{border-color:#7DA8D9;border-left:3px solid #7DA8D9}
+.ti-natal{border-right:3px solid #FFE08A}
+.ti-side-label{font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.3em;color:#C0C8D8;text-transform:uppercase;margin-bottom:8px}
+.ti-side-sign{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;color:#FFE08A;margin-bottom:4px}
+.ti-side-deg{font-family:'Major Mono Display','VT323',monospace;font-size:13px;color:#C0C8D8}
+.ti-rx{display:inline-block;background:#C24438;color:#FFE08A;padding:1px 5px;font-size:.85em;font-family:'Cinzel',serif;border-radius:2px;margin-left:4px}
+.ti-vs{text-align:center}
+.ti-aspect{display:inline-flex;flex-direction:column;align-items:center;padding:10px 18px;background:rgba(255,224,138,.18);border:1px solid #FFE08A}
+.ti-aspect.ti-aspect-quiet{background:rgba(192,200,216,.08);border-color:rgba(192,200,216,.4);color:#C0C8D8}
+.ti-aspect-name{font-family:'Cinzel',serif;font-weight:700;color:#FFE08A;font-size:1.1rem;letter-spacing:.04em}
+.ti-aspect-quiet .ti-aspect-name{color:#C0C8D8}
+.ti-aspect-orb{font-family:'Major Mono Display','VT323',monospace;font-size:11px;color:#7A8090;letter-spacing:.18em;margin-top:4px}
+.ti-tip{margin:12px 0 0;color:#E8DCC4;font-size:14px;line-height:1.6;font-style:italic}
+.ti-sub-note{display:block;margin-top:8px;padding:8px 12px;background:rgba(255,224,138,.15);border-left:3px solid #FFE08A;color:#FFE08A;font-style:italic;font-size:13px}
+.ti-sub-note strong{color:#FFF6D8;font-weight:700;font-style:normal}
+@media(max-width:680px){.ti-grid{grid-template-columns:1fr;gap:10px}.ti-vs{order:1}.ti-now{order:0}.ti-natal{order:2}}
   `;
   const s = document.createElement('style');
   s.id = 'natal-overlay-style';
@@ -451,12 +474,91 @@ function init(){
     }
   }
 
-  // 4. 底部下一堂課（appended at body end）
+  // 4. 今日該行星 vs 本命的影響卡
+  if(me && window.AstroTransit){
+    try {
+      const today = window.AstroTransit.calcToday();
+      const todayThis = today.find(p => p.key === planetKey);
+      if(todayThis){
+        const card = buildTodayInfluenceCard(planetKey, me, todayThis, today);
+        if(card){
+          // 插到 banner 後面
+          const banner = document.querySelector('.natal-overlay-banner');
+          if(banner && banner.parentNode){
+            banner.parentNode.insertBefore(card, banner.nextSibling);
+          } else {
+            document.body.appendChild(card);
+          }
+        }
+      }
+    } catch(e){ console.warn('today influence card failed', e); }
+  }
+
+  // 5. 底部下一堂課（appended at body end）
   const nextLesson = buildNextLesson(planetKey, me, neighbors);
   document.body.appendChild(nextLesson);
 
-  // 5. 標記已訪問
+  // 6. 標記已訪問
   markVisited(planetKey);
+}
+
+function buildTodayInfluenceCard(planetKey, me, todayThis, today){
+  const planetName = PLANET_NAMES[planetKey];
+  // 算今日該行星 vs 本命該行星的差距
+  let diff = Math.abs(todayThis.lon - me.lon) % 360;
+  if(diff > 180) diff = 360 - diff;
+  const ASPECTS = [
+    {key:'con', name:'合相',   angle:0,   orb:5},
+    {key:'opp', name:'對分相', angle:180, orb:5},
+    {key:'sqr', name:'四分相', angle:90,  orb:4},
+    {key:'tri', name:'三分相', angle:120, orb:4},
+    {key:'sex', name:'六分相', angle:60,  orb:3},
+  ];
+  let activeAspect = null;
+  for(const a of ASPECTS){
+    if(Math.abs(diff - a.angle) <= a.orb){
+      activeAspect = { ...a, orbDelta: Math.abs(diff - a.angle) };
+      break;
+    }
+  }
+
+  const ASPECT_TIPS = {
+    con: '行星能量加強，今日感受最直接。適合表達或執行跟這顆行星有關的事。',
+    opp: '今日內外拉扯感最強，需要平衡兩端的張力。',
+    sqr: '今日感受到摩擦或挑戰，這是推著你成長的衝突。',
+    tri: '今日順流時刻，相關事項自然推進。',
+    sex: '今日有一個微小的機會在等你主動把握。',
+  };
+
+  const sameSignNote = todayThis.sign === me.sign
+    ? `<span class="ti-sub-note">★ 今日 ${planetName} 跟你的本命 ${planetName} <strong>同在 ${me.sign}座</strong> ─ 能量會被特別放大。</span>`
+    : '';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'natal-today-influence';
+  wrap.innerHTML = `
+    <div class="ti-card">
+      <span class="ti-tag">// today's influence</span>
+      <div class="ti-grid">
+        <div class="ti-side ti-now">
+          <div class="ti-side-label">今日 ${planetName}</div>
+          <div class="ti-side-sign">${todayThis.signGlyph} ${todayThis.sign}座</div>
+          <div class="ti-side-deg">${todayThis.degree.toFixed(1)}° ${todayThis.retrograde ? '<span class="ti-rx">℞</span>' : ''}</div>
+        </div>
+        <div class="ti-vs">
+          ${activeAspect ? `<div class="ti-aspect"><span class="ti-aspect-name">${activeAspect.name}</span><span class="ti-aspect-orb">orb ${activeAspect.orbDelta.toFixed(1)}°</span></div>` : '<div class="ti-aspect ti-aspect-quiet">無緊密相位</div>'}
+        </div>
+        <div class="ti-side ti-natal">
+          <div class="ti-side-label">你的本命 ${planetName}</div>
+          <div class="ti-side-sign">${me.signGlyph} ${me.sign}座</div>
+          <div class="ti-side-deg">${me.degree.toFixed(1)}°${me.house ? ` · 第 ${me.house} 宮` : ''}</div>
+        </div>
+      </div>
+      ${activeAspect ? `<p class="ti-tip">${ASPECT_TIPS[activeAspect.key]}</p>` : '<p class="ti-tip">今日該行星跟你的本命位置沒有形成主要相位，是相對「不影響」的一天。</p>'}
+      ${sameSignNote}
+    </div>
+  `;
+  return wrap;
 }
 
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
