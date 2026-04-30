@@ -898,13 +898,39 @@ function paintStarsSvg(){
 
 function drawZodiac(){
   const g=document.getElementById('zodiac-ticks');
+  g.innerHTML='';
+  // 找用戶 Big 3 對應的星座 idx
+  const SIGN_NAMES = ['牡羊','金牛','雙子','巨蟹','獅子','處女','天秤','天蠍','射手','摩羯','水瓶','雙魚'];
+  const idxMap = {};
+  try {
+    const c = JSON.parse(localStorage.getItem('astro_natal_chart') || 'null');
+    if(c && c.planets){
+      const sun = c.planets.find(p => p.key === 'sun');
+      const moon = c.planets.find(p => p.key === 'moon');
+      if(sun){ const i = SIGN_NAMES.indexOf(sun.sign); if(i>=0) (idxMap[i]=idxMap[i]||[]).push('☉'); }
+      if(moon){ const i = SIGN_NAMES.indexOf(moon.sign); if(i>=0) (idxMap[i]=idxMap[i]||[]).push('☽'); }
+      if(c.ascendant){ const i = SIGN_NAMES.indexOf(c.ascendant.sign); if(i>=0) (idxMap[i]=idxMap[i]||[]).push('⏃'); }
+    }
+  } catch(_){}
+
   for(let i=0;i<12;i++){
     const a=(i*30-90)*Math.PI/180;
     const x1=Math.cos(a)*270,y1=Math.sin(a)*270;
     const x2=Math.cos(a)*290,y2=Math.sin(a)*290;
-    g.innerHTML+=`<line class="zodiac-tick" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+    const isMine = idxMap[i] && idxMap[i].length;
+    if(isMine){
+      g.innerHTML+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#FFE08A" stroke-width="2.5" filter="drop-shadow(0 0 4px #FFE08A)"/>`;
+    } else {
+      g.innerHTML+=`<line class="zodiac-tick" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+    }
     const lx=Math.cos(a+Math.PI/12)*280,ly=Math.sin(a+Math.PI/12)*280+3;
-    g.innerHTML+=`<text class="zodiac-label" x="${lx}" y="${ly}">${ZODIAC[i]}</text>`;
+    if(isMine){
+      g.innerHTML+=`<text x="${lx}" y="${ly}" text-anchor="middle" font-family="Cinzel,serif" font-size="16" font-weight="900" fill="#FFE08A" filter="drop-shadow(0 0 8px #FFE08A)">${ZODIAC[i]}</text>`;
+      const tagY = ly - 16;
+      g.innerHTML += `<text x="${lx}" y="${tagY}" text-anchor="middle" font-family="Cinzel,serif" font-size="11" font-weight="700" fill="#FFE08A">${idxMap[i].join(' ')}</text>`;
+    } else {
+      g.innerHTML+=`<text class="zodiac-label" x="${lx}" y="${ly}">${ZODIAC[i]}</text>`;
+    }
   }
 }
 
