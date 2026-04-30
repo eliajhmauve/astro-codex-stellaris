@@ -358,6 +358,50 @@ function calcMonthMoonCalendar(){
   return { year, month: month + 1, days };
 }
 
-global.AstroTransit = { calcToday, findActiveTransits, forecastDays, calcLifecycleMilestones, calcSolarReturn, calcMoonPhase, calcMonthMoonCalendar, PLANETS };
+// 太陽下次進入新星座的日期（節氣 / Sign Ingress）
+function calcSunNextIngress(){
+  if(!global.Astronomy) return null;
+  const A = global.Astronomy;
+  const now = new Date();
+  const SOLAR_TERM = ['春分(牡羊)','穀雨(金牛)','小滿(雙子)','夏至(巨蟹)','大暑(獅子)','處暑(處女)','秋分(天秤)','霜降(天蠍)','小雪(射手)','冬至(摩羯)','大寒(水瓶)','雨水(雙魚)'];
+  // 從今天開始往後找最多 35 天，每天 12:00 看太陽星座
+  const v0 = A.GeoVector(A.Body.Sun, now, true);
+  const lon0 = A.Ecliptic(v0).elon;
+  const sign0 = Math.floor(lon0 / 30);
+  for(let d = 1; d <= 35; d++){
+    const dt = new Date(now.getTime() + d * 86400000);
+    const v = A.GeoVector(A.Body.Sun, dt, true);
+    const lon = A.Ecliptic(v).elon;
+    const sign = Math.floor(lon / 30);
+    if(sign !== sign0){
+      // 二分搜尋找精確進入時刻
+      let lo = new Date(now.getTime() + (d-1) * 86400000);
+      let hi = dt;
+      for(let i = 0; i < 24; i++){
+        const mid = new Date((lo.getTime() + hi.getTime()) / 2);
+        const vm = A.GeoVector(A.Body.Sun, mid, true);
+        const lonM = A.Ecliptic(vm).elon;
+        const sM = Math.floor(lonM / 30);
+        if(sM === sign0) lo = mid;
+        else hi = mid;
+      }
+      const SIGNS = ['牡羊','金牛','雙子','巨蟹','獅子','處女','天秤','天蠍','射手','摩羯','水瓶','雙魚'];
+      const GLYPHS = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+      return {
+        date: hi.toISOString(),
+        dateLocal: hi.toLocaleString('zh-TW', { timeZone:'Asia/Taipei', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }),
+        signFrom: SIGNS[sign0],
+        signFromGlyph: GLYPHS[sign0],
+        signTo: SIGNS[sign],
+        signToGlyph: GLYPHS[sign],
+        solarTerm: SOLAR_TERM[sign],
+        daysFromNow: Math.ceil((hi - now) / 86400000),
+      };
+    }
+  }
+  return null;
+}
+
+global.AstroTransit = { calcToday, findActiveTransits, forecastDays, calcLifecycleMilestones, calcSolarReturn, calcMoonPhase, calcMonthMoonCalendar, calcSunNextIngress, PLANETS };
 
 })(typeof window !== 'undefined' ? window : globalThis);

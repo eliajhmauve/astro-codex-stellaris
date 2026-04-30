@@ -1497,6 +1497,17 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .mc-cell.mc-today .mc-num{color:#FFE08A;font-weight:700}
 .mc-cell.mc-today .mc-glyph{color:#FFE08A}
 
+.ingress-card{padding:18px 22px;background:linear-gradient(135deg,rgba(255,224,138,.1),rgba(10,5,8,.5));border:1px solid #D4AF37;border-left:4px solid #FFE08A;margin-top:8px}
+.ingress-tag{display:inline-block;font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.4em;color:#FFE08A;text-transform:uppercase;padding:2px 8px;border:1px solid #FFE08A;background:rgba(0,0,0,.4);margin-bottom:14px}
+.ingress-body{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.ingress-pair{display:flex;align-items:center;gap:14px;font-family:'Cinzel',serif;font-weight:900;font-size:1.4rem}
+.ingress-from{color:#7A8090}
+.ingress-arrow{color:#D4AF37;font-size:1.2em}
+.ingress-to{color:#FFE08A;text-shadow:0 0 16px rgba(255,224,138,.4)}
+.ingress-meta{font-family:'Cormorant Garamond',serif;font-style:italic;color:#E8DCC4;font-size:14px;line-height:1.6;text-align:right}
+.ingress-meta strong{color:#FFE08A;font-style:normal;font-weight:700}
+@media(max-width:600px){.ingress-meta{text-align:left;width:100%}}
+
 .lc-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .lc-row{display:flex;gap:14px;padding:14px 16px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.3);border-left-width:4px;border-left-color:#FFE08A}
 .lc-row.lc-passed{opacity:.65;border-left-color:#7A8090}
@@ -1681,7 +1692,60 @@ ready(function(){
   if(!localStorage.getItem('astro_onboarded')){
     setTimeout(startOnboarding, 1200);
   }
+
+  // hash routing — 直接連到某個區塊
+  setTimeout(handleHash, 600);
+  window.addEventListener('hashchange', handleHash);
 });
+
+const HASH_TO_SECTION = {
+  '#chart':    () => { if(chartData) openDetail(); else openInput(); },
+  '#input':    () => openInput(),
+  '#tarot':    () => openDetail(),
+  '#wheel':    () => openDetail(),
+  '#big3':     () => openDetail(),
+  '#today':    () => openDetail(),
+  '#forecast': () => openDetail(),
+  '#milestones': () => openDetail(),
+  '#moon-cal': () => openDetail(),
+  '#sun':      () => location.href='./sun/',
+  '#moon':     () => location.href='./moon/',
+  '#mercury':  () => location.href='./mercury/',
+  '#venus':    () => location.href='./venus/',
+  '#mars':     () => location.href='./mars/',
+  '#jupiter':  () => location.href='./jupiter/',
+  '#saturn':   () => location.href='./saturn/',
+  '#uranus':   () => location.href='./uranus/',
+  '#neptune':  () => location.href='./neptune/',
+  '#pluto':    () => location.href='./pluto/',
+  '#glossary': () => document.getElementById('glossary-modal').classList.add('show'),
+  '#tour':     () => startOnboarding(),
+};
+
+function handleHash(){
+  const h = location.hash;
+  if(!h) return;
+  const action = HASH_TO_SECTION[h];
+  if(action){
+    action();
+    // 對於詳情 modal 內的錨點，等 modal 開了再 scroll
+    if(['#tarot','#wheel','#big3','#today','#forecast','#milestones','#moon-cal'].includes(h)){
+      const targetMap = {
+        '#tarot':'.tarot-card',
+        '#wheel':'.natal-wheel-wrap',
+        '#big3':'.big3-card',
+        '#today':'.dt-card',
+        '#forecast':'.fc-grid',
+        '#milestones':'.lc-list',
+        '#moon-cal':'.mc-grid',
+      };
+      setTimeout(() => {
+        const el = document.querySelector(targetMap[h]);
+        if(el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+      }, 600);
+    }
+  }
+}
 
 const OB_STEPS = [
   {
@@ -2058,6 +2122,58 @@ function renderSynastry(name, otherChart, synList){
     <h4 style="font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.3em;color:#D4AF37;margin:18px 0 10px;text-transform:uppercase">前 12 強相位（共 ${synList.length} 組）</h4>
     <div class="syn-list">${rows}</div>
   `;
+}
+
+// SVG 月相（取代 emoji，全平台穩定顯示）
+function moonPhaseSVG(illuminated, waxing, size){
+  size = size || 18;
+  // illuminated: 0~1, waxing: true=盈/false=虧
+  const r = size / 2 - 1;
+  const cx = size / 2;
+  // 用 ellipse 模擬陰影
+  // 0% = 全暗、100% = 全亮、50% = 半月、25/75% = 四分之一
+  const ill = Math.max(0, Math.min(1, illuminated));
+  let bright = '';
+  if(ill < 0.02){
+    // 新月 — 全暗（畫個輪廓）
+    bright = `<circle cx="${cx}" cy="${cx}" r="${r}" fill="#1A0F0A" stroke="#7A8090" stroke-width=".8"/>`;
+  } else if(ill > 0.98){
+    // 滿月
+    bright = `<circle cx="${cx}" cy="${cx}" r="${r}" fill="#FFE08A" stroke="#FFE08A" stroke-width=".5"/>`;
+  } else {
+    // 一半 + ellipse 控制亮面
+    const dark = `<circle cx="${cx}" cy="${cx}" r="${r}" fill="#1A0F0A"/>`;
+    // 用 ellipse 在中間畫陰影面 — rx 由 illuminated 控制
+    // ill 0.5 = 半月 = ellipse rx=0（直線分割）
+    // ill < 0.5: 凹陷遮亮面 (ellipse 在亮面側)
+    // ill > 0.5: 弧出遮亮面 (ellipse 在暗面側)
+    const ellipseRx = Math.abs(ill - 0.5) * 2 * r;
+    if(waxing){
+      // 盈月：右半亮，由細到滿
+      const rect = `<rect x="${cx}" y="${cx-r}" width="${r}" height="${r*2}" fill="#FFE08A"/>`;
+      // 補弧線
+      let extra;
+      if(ill < 0.5){
+        // 細眉月 — ellipse 蓋掉亮面
+        extra = `<ellipse cx="${cx}" cy="${cx}" rx="${ellipseRx}" ry="${r}" fill="#1A0F0A"/>`;
+      } else {
+        // 凸月 — ellipse 補亮
+        extra = `<ellipse cx="${cx}" cy="${cx}" rx="${ellipseRx}" ry="${r}" fill="#FFE08A"/>`;
+      }
+      bright = `${dark}<g><clipPath id="mc${size}${Math.floor(ill*100)}"><circle cx="${cx}" cy="${cx}" r="${r}"/></clipPath><g clip-path="url(#mc${size}${Math.floor(ill*100)})">${rect}${extra}</g></g><circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="#7A8090" stroke-width=".5"/>`;
+    } else {
+      // 虧月：左半亮
+      const rect = `<rect x="${cx-r}" y="${cx-r}" width="${r}" height="${r*2}" fill="#FFE08A"/>`;
+      let extra;
+      if(ill < 0.5){
+        extra = `<ellipse cx="${cx}" cy="${cx}" rx="${ellipseRx}" ry="${r}" fill="#1A0F0A"/>`;
+      } else {
+        extra = `<ellipse cx="${cx}" cy="${cx}" rx="${ellipseRx}" ry="${r}" fill="#FFE08A"/>`;
+      }
+      bright = `${dark}<g><clipPath id="mc${size}${Math.floor(ill*100)}"><circle cx="${cx}" cy="${cx}" r="${r}"/></clipPath><g clip-path="url(#mc${size}${Math.floor(ill*100)})">${rect}${extra}</g></g><circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="#7A8090" stroke-width=".5"/>`;
+    }
+  }
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" style="vertical-align:middle">${bright}</svg>`;
 }
 
 async function generatePoster(){
@@ -2645,6 +2761,30 @@ function renderTransit(){
       }
     } catch(_){}
 
+    // 太陽下次入新星座（節氣）
+    let ingressHtml = '';
+    try {
+      const ing = window.AstroTransit.calcSunNextIngress();
+      if(ing){
+        ingressHtml = `
+          <div class="ingress-card">
+            <span class="ingress-tag">// next solar ingress</span>
+            <div class="ingress-body">
+              <div class="ingress-pair">
+                <span class="ingress-from">${ing.signFromGlyph} ${ing.signFrom}</span>
+                <span class="ingress-arrow">→</span>
+                <span class="ingress-to">${ing.signToGlyph} ${ing.signTo}</span>
+              </div>
+              <div class="ingress-meta">
+                <strong>${ing.dateLocal}</strong>（${ing.daysFromNow} 天後）<br>
+                節氣對應：${ing.solarTerm}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    } catch(_){}
+
     // 太陽回歸（年盤）
     let srHtml = '';
     try {
@@ -2669,7 +2809,7 @@ function renderTransit(){
         const SIGN_COLOR = { '牡羊':'#E8634C','獅子':'#E8634C','射手':'#E8634C','金牛':'#7AA84B','處女':'#7AA84B','摩羯':'#7AA84B','雙子':'#E5C282','天秤':'#E5C282','水瓶':'#E5C282','巨蟹':'#5BA9D6','天蠍':'#5BA9D6','雙魚':'#5BA9D6' };
         const cells = cal.days.map(d => `<div class="mc-cell ${d.isToday?'mc-today':''} ${d.enteredNewSign?'mc-enter':''}" style="--sc:${SIGN_COLOR[d.sign]||'#D4AF37'}" title="${cal.year}-${String(cal.month).padStart(2,'0')}-${String(d.date).padStart(2,'0')} 月亮在${d.sign}座${d.enteredNewSign?'（進入新星座）':''} · ${d.moonPhase}">
           <div class="mc-num">${d.date}</div>
-          <div class="mc-phase">${d.moonPhaseGlyph}</div>
+          <div class="mc-phase">${moonPhaseSVG(d.illuminated, d.waxing, 16)}</div>
           <div class="mc-glyph">${d.glyph}</div>
         </div>`).join('');
         const todayMoon = cal.days.find(d => d.isToday);
@@ -2692,6 +2832,7 @@ function renderTransit(){
       <div class="tr-today-pills">${todayHtml}</div>
       <div class="tr-list">${trHtml}</div>
       ${forecastHtml}
+      ${ingressHtml}
       ${srHtml}
       ${calHtml}
       ${lcHtml}
