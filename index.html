@@ -1995,16 +1995,49 @@ function bindEvents(){
     if(chartData.input.timeStr) u.searchParams.set('time', chartData.input.timeStr);
     else u.searchParams.delete('time');
     u.searchParams.set('city', chartData.input.city);
+    u.hash = '#chart';
     const link = u.toString();
     const btn = $('#natal-share');
     const orig = btn.textContent;
+
+    const sun = chartData.planets.find(p => p.key === 'sun');
+    const moon = chartData.planets.find(p => p.key === 'moon');
+    const asc = chartData.ascendant;
+    const big3Text = [
+      sun ? `☉ ${sun.sign}` : '',
+      moon ? `☽ ${moon.sign}` : '',
+      asc ? `⏃ ${asc.sign}` : '',
+    ].filter(Boolean).join(' · ');
+    const shareText = `我的本命盤 ${big3Text} ─ 來算你的？`;
+
+    // 優先用 Web Share API（手機原生分享菜單）
+    if(navigator.share){
+      navigator.share({
+        title: 'Codex Stellaris · 我的本命盤',
+        text: shareText,
+        url: link,
+      }).then(() => {
+        btn.textContent = '✓ 已分享';
+        setTimeout(() => { btn.textContent = orig; }, 1800);
+      }).catch(err => {
+        if(err.name !== 'AbortError'){
+          // fallback to copy
+          copyToClipboard(link, btn, orig);
+        }
+      });
+    } else {
+      copyToClipboard(link, btn, orig);
+    }
+  });
+
+  function copyToClipboard(link, btn, orig){
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(link).then(() => {
         btn.textContent = '✓ 已複製到剪貼簿';
         setTimeout(() => { btn.textContent = orig; }, 1800);
       }).catch(() => fallbackCopy(link, btn, orig));
     } else fallbackCopy(link, btn, orig);
-  });
+  }
 
   $('#natal-print').addEventListener('click', () => {
     window.print();
@@ -2920,12 +2953,52 @@ function renderTransit(){
 </script>
 <!-- ═══ END NATAL CHART ═══ -->
 
-<!-- ═══ PWA Service Worker 註冊 ═══ -->
+<!-- ═══ PWA Service Worker 註冊 + 安裝提示 ═══ -->
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW failed', err));
   });
+}
+
+let _deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _deferredInstallPrompt = e;
+  // 已安裝過或拒絕過 → 不顯示
+  if(localStorage.getItem('astro_install_dismissed')) return;
+  // 訪問 30 秒後才顯示（避免太擾人）
+  setTimeout(showInstallPrompt, 30000);
+});
+
+window.addEventListener('appinstalled', () => {
+  _deferredInstallPrompt = null;
+  localStorage.setItem('astro_install_dismissed', 'installed');
+});
+
+function showInstallPrompt(){
+  if(!_deferredInstallPrompt || localStorage.getItem('astro_install_dismissed')) return;
+  const bar = document.createElement('div');
+  bar.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:65;padding:14px 22px;background:linear-gradient(135deg,#0A0508,#1A0F0A);border:1px solid #D4AF37;color:#FFE08A;font-family:Cinzel,serif;font-size:13px;display:flex;align-items:center;gap:14px;box-shadow:0 16px 40px -12px rgba(0,0,0,.85),0 0 24px -6px rgba(212,175,55,.55);backdrop-filter:blur(12px);animation:tipSlide .5s cubic-bezier(.34,1.56,.64,1)';
+  bar.innerHTML = `
+    <span>★ 想加到手機桌面像 App 一樣使用？</span>
+    <button id="ip-yes" style="padding:6px 14px;background:#D4AF37;color:#0A0508;border:none;font-family:Cinzel,serif;font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:700;cursor:pointer">安裝</button>
+    <button id="ip-no" style="padding:6px 12px;background:transparent;border:1px solid rgba(212,175,55,.3);color:#7A8090;font-family:Cinzel,serif;font-size:11px;cursor:pointer">不要了</button>
+  `;
+  document.body.appendChild(bar);
+  document.getElementById('ip-yes').addEventListener('click', async () => {
+    if(_deferredInstallPrompt){
+      _deferredInstallPrompt.prompt();
+      await _deferredInstallPrompt.userChoice;
+      _deferredInstallPrompt = null;
+    }
+    bar.remove();
+  });
+  document.getElementById('ip-no').addEventListener('click', () => {
+    localStorage.setItem('astro_install_dismissed', 'declined');
+    bar.remove();
+  });
+  setTimeout(() => { if(bar.parentNode){ bar.style.opacity = '0'; bar.style.transition = 'opacity .4s'; setTimeout(() => bar.remove(), 500); } }, 18000);
 }
 </script>
 </body>
