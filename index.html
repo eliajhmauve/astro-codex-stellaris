@@ -1351,6 +1351,18 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .fc-event .fc-arrow{color:#7A8090;font-style:normal}
 .fc-event .fc-name{flex:1;font-size:1em}
 
+.lc-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.lc-row{display:flex;gap:14px;padding:14px 16px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.3);border-left-width:4px;border-left-color:#FFE08A}
+.lc-row.lc-passed{opacity:.65;border-left-color:#7A8090}
+.lc-age{flex-shrink:0;font-family:'Cinzel',serif;font-size:1.4em;font-weight:900;color:#FFE08A;min-width:60px;text-shadow:0 0 12px rgba(255,224,138,.3)}
+.lc-row.lc-passed .lc-age{color:#7A8090;text-shadow:none}
+.lc-tag{flex-shrink:0;font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;align-self:center}
+.lc-meta{flex:1}
+.lc-label{font-family:'Cinzel',serif;font-size:1.05rem;color:#E8DCC4;font-weight:700;margin-bottom:4px;letter-spacing:.04em}
+.lc-desc{font-family:'Cormorant Garamond',serif;font-style:italic;color:#C0C8D8;font-size:13px;line-height:1.6;margin-bottom:6px}
+.lc-date{font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.15em;color:#7A8090}
+@media(max-width:600px){.lc-row{flex-wrap:wrap;gap:8px}.lc-age{min-width:auto;font-size:1.2em}}
+
 .big3-card{margin:0 0 22px;padding:20px;background:linear-gradient(135deg,rgba(212,175,55,.12),rgba(10,5,8,.4));border:1px solid var(--gold,#D4AF37);border-left-width:4px}
 .big3-card .natal-label{margin-bottom:14px}
 .big3-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
@@ -1872,6 +1884,41 @@ function renderTransit(){
       }
     } catch(_){}
 
+    // 生命週期里程碑
+    let lcHtml = '';
+    try {
+      const milestones = window.AstroTransit.calcLifecycleMilestones(chartData);
+      if(milestones.length){
+        // 找最近 1 個過去 + 未來 4 個事件（共 5 個）+ next milestone 突顯
+        const past = milestones.filter(m => m.passed).slice(-1);
+        const future = milestones.filter(m => !m.passed).slice(0, 4);
+        const all = [...past, ...future];
+        const SEV_COLOR = { high:'#FFE08A', mid:'#D4AF37', low:'#9D8FC2' };
+        const SEV_TAG = { high:'★ MAJOR', mid:'⚡ MID', low:'○ MINOR' };
+        const rows = all.map(m => {
+          const yr = m.yearsFromNow;
+          const dist = yr < 0 ? `${Math.abs(yr).toFixed(1)} 年前` : yr < 1 ? `${Math.round(yr * 12)} 個月後` : `${yr.toFixed(1)} 年後`;
+          const cls = m.passed ? 'lc-row lc-passed' : 'lc-row';
+          return `<div class="${cls}">
+            <span class="lc-age">${m.ageAtEvent.toFixed(1)} 歲</span>
+            <span class="lc-tag" style="color:${SEV_COLOR[m.severity]}">${SEV_TAG[m.severity]}</span>
+            <div class="lc-meta">
+              <div class="lc-label">${m.label}</div>
+              <div class="lc-desc">${m.desc}</div>
+              <div class="lc-date">${m.eventDate} · ${dist}</div>
+            </div>
+          </div>`;
+        }).join('');
+        lcHtml = `
+          <h3 style="font-family:var(--font-display,Cinzel),serif;font-size:1rem;letter-spacing:.18em;color:var(--gold);margin:24px 0 10px;border-bottom:1px solid rgba(212,175,55,.25);padding-bottom:6px;text-transform:uppercase">生命週期里程碑</h3>
+          <p class="natal-hint" style="margin-bottom:10px">
+            占星預設的「人生過運轉折點」 ─ 用行星公轉週期估算，誤差約 ±3 個月。<br>
+            <em style="color:#FFE08A">★ 標記是占星最有名的人生轉折期。</em>
+          </p>
+          <div class="lc-list">${rows}</div>`;
+      }
+    } catch(_){}
+
     box.innerHTML = `
       <h3 style="font-family:var(--font-display,Cinzel),serif;font-size:1rem;letter-spacing:.18em;color:var(--gold);margin:24px 0 10px;border-bottom:1px solid rgba(212,175,55,.25);padding-bottom:6px;text-transform:uppercase">今日行運 · ${dateStr}</h3>
       <p class="natal-hint" style="margin-bottom:10px">
@@ -1881,6 +1928,7 @@ function renderTransit(){
       <div class="tr-today-pills">${todayHtml}</div>
       <div class="tr-list">${trHtml}</div>
       ${forecastHtml}
+      ${lcHtml}
     `;
   } catch(e){
     console.warn('transit render failed', e);

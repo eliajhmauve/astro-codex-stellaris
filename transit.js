@@ -141,6 +141,96 @@ function forecastDays(natalChart, days){
   return events.sort((a, b) => a.dayOffset - b.dayOffset || a.orbDelta - b.orbDelta);
 }
 
-global.AstroTransit = { calcToday, findActiveTransits, forecastDays, PLANETS };
+// 生命週期里程碑（用近似週期估算，誤差約 ±3 個月）
+function calcLifecycleMilestones(natalChart){
+  if(!natalChart || !natalChart.input || !natalChart.input.dateStr) return [];
+  const birthDate = new Date(natalChart.input.dateStr + 'T12:00:00');
+  if(isNaN(birthDate)) return [];
+
+  // 各行星公轉週期（年）
+  const PERIODS = {
+    jupiter: 11.86,
+    saturn:  29.46,
+    uranus:  84.01,
+    neptune: 164.79,
+    pluto:   248.0,
+  };
+
+  const now = new Date();
+  const ageYears = (now - birthDate) / (365.25 * 24 * 3600 * 1000);
+
+  const milestones = [];
+
+  function addAt(years, label, planet, type, desc, severity){
+    const eventDate = new Date(birthDate.getTime() + years * 365.25 * 24 * 3600 * 1000);
+    milestones.push({
+      ageAtEvent: years,
+      eventDate: eventDate.toISOString().slice(0,10),
+      label, planet, type, desc, severity,
+      passed: eventDate < now,
+      yearsFromNow: ((eventDate - now) / (365.25 * 24 * 3600 * 1000)),
+    });
+  }
+
+  // 木星回歸（每 12 年）
+  for(let n = 1; n <= 8; n++){
+    const y = n * PERIODS.jupiter;
+    if(y > 100) break;
+    addAt(y, `第 ${n} 次木星回歸`, 'jupiter', 'return',
+      n === 1 ? '12 歲：擴張、機會、視野第一次打開。' :
+      n === 2 ? '24 歲：人生方向首次大轉折，常伴隨重大決定。' :
+      n === 3 ? '36 歲：成熟版本的木星 ─ 知道自己要什麼了。' :
+      `48+ 歲：再次的擴張機會。`,
+      'low');
+  }
+
+  // 土星半相位（~7.5 歲、~22 歲、~36.75 歲）— 四分相
+  [PERIODS.saturn / 4, PERIODS.saturn * 3 / 4, PERIODS.saturn * 5 / 4].forEach((y, i) => {
+    addAt(y,
+      i === 0 ? '土星首次四分（~7 歲）' :
+      i === 1 ? '土星首次對分（~14-15 歲）' :
+      '土星二次四分（~22 歲）',
+      'saturn', 'square',
+      i === 0 ? '童年第一次「現實感」衝擊 ─ 被體制規範。' :
+      i === 1 ? '青春期叛逆期高峰 ─ 第一次認真懷疑成人世界。' :
+      '社會新鮮人挫折期 ─ 學校外的世界比想像殘酷。',
+      'mid');
+  });
+
+  // 土星回歸（每 29.5 年）— 占星最重要的成年禮
+  for(let n = 1; n <= 3; n++){
+    const y = n * PERIODS.saturn;
+    if(y > 100) break;
+    addAt(y, `第 ${n} 次土星回歸`, 'saturn', 'return',
+      n === 1 ? '★ 27-30 歲：占星最重要的人生轉折。你會問「我這一生要做什麼？」很多婚姻、事業、城市都在這時候定下。' :
+      n === 2 ? '58-60 歲：第二次土星回歸 ─ 退休前的最後一次大重組。' :
+      '88+ 歲：智慧長者。',
+      n === 1 ? 'high' : 'mid');
+  }
+
+  // 天王星對分（~42 歲）— 經典「中年危機」
+  addAt(PERIODS.uranus / 2, '★ 天王星對分（~42 歲）', 'uranus', 'opposition',
+    '中年危機的占星本質。你會突然想辭職、離婚、重新發明自己 ─ 不是危機是覺醒。', 'high');
+
+  // 天王星四分（~21 歲、~63 歲）
+  addAt(PERIODS.uranus / 4, '天王星首次四分（~21 歲）', 'uranus', 'square',
+    '大學末期的身分動搖 ─ 「我真的要走這條路嗎？」', 'mid');
+  addAt(PERIODS.uranus * 3 / 4, '天王星三次四分（~63 歲）', 'uranus', 'square',
+    '退休前後的最後一次自我革命機會。', 'mid');
+
+  // 海王星四分（~41-42 歲）
+  addAt(PERIODS.neptune / 4, '海王星四分（~41 歲）', 'neptune', 'square',
+    '中年靈性覺醒 ─ 質疑物質成就的意義。常引發藝術/宗教/瑜珈的轉向。', 'mid');
+
+  // 冥王星四分（依世代不同 ~37-43 歲）
+  // 因為冥王星橢圓軌道，世代差異大；這裡用平均值
+  addAt(38, '冥王星四分（~37-43 歲）', 'pluto', 'square',
+    '深度蛻變期 ─ 一段不重要的東西會徹底死去（一段關係、一個工作、一個自我認同）才能重生。', 'high');
+
+  // 按時間排序
+  return milestones.sort((a, b) => a.ageAtEvent - b.ageAtEvent);
+}
+
+global.AstroTransit = { calcToday, findActiveTransits, forecastDays, calcLifecycleMilestones, PLANETS };
 
 })(typeof window !== 'undefined' ? window : globalThis);
