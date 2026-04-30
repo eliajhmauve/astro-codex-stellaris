@@ -1126,6 +1126,7 @@ addEventListener('DOMContentLoaded',()=>{
 <script src="./natal-wheel.js" defer></script>
 <script src="./transit.js" defer></script>
 <script src="./big3-content.js" defer></script>
+<script src="./daily-tip.js" defer></script>
 
 <!-- 觸發按鈕（未輸入時顯示） / 結果 pill（已輸入後顯示） -->
 <button class="natal-fab" id="natal-fab" aria-label="解鎖你的本命盤">
@@ -1463,6 +1464,20 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .big3-tag{font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.3em;color:#C0C8D8;text-transform:uppercase;margin-bottom:2px}
 .big3-sign{font-family:'Cinzel',serif;font-size:1.1rem;color:#FFE08A;font-weight:700}
 .big3-desc{font-family:'Cormorant Garamond','Times New Roman',serif;color:var(--parchment,#E8DCC4);font-size:14px;line-height:1.65;margin:0;font-style:italic}
+
+.dt-card{margin:0 0 22px;padding:24px;background:linear-gradient(135deg,rgba(255,224,138,.18),rgba(10,5,8,.5));border:1px solid #FFE08A;border-left:4px solid #FFE08A;box-shadow:0 12px 32px -12px rgba(255,224,138,.3)}
+.dt-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px dashed rgba(212,175,55,.3)}
+.dt-pills{display:flex;gap:8px}
+.dt-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;background:rgba(255,224,138,.1);border:1px solid #D4AF37;color:#FFE08A;font-family:'Cinzel',serif;font-size:13px;font-weight:700}
+.dt-pill span:first-child{font-size:1.2em}
+.dt-body{font-family:'Cormorant Garamond',serif;line-height:1.7}
+.dt-mood{color:#E8DCC4;font-size:15px;margin:0 0 12px}
+.dt-mood strong{color:#FFE08A;font-weight:700;font-style:normal}
+.dt-action,.dt-avoid{margin:8px 0;font-size:15px;line-height:1.7;color:#E8DCC4;display:flex;gap:10px;align-items:flex-start}
+.dt-tag{flex-shrink:0;display:inline-block;padding:3px 10px;font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;font-weight:700;font-style:normal}
+.dt-tag-good{background:#7AC48E;color:#0A0508}
+.dt-tag-warn{background:#E8A04C;color:#0A0508}
+.dt-rx{margin-top:10px;padding:8px 12px;background:rgba(194,68,56,.12);border-left:3px solid #C24438;color:#FFC0B5;font-size:13px;font-family:'Cormorant Garamond',serif;font-style:italic}
 
 .balance-card{margin:0 0 22px;padding:20px;background:linear-gradient(135deg,rgba(157,143,194,.1),rgba(10,5,8,.4));border:1px solid rgba(212,175,55,.4);border-left:4px solid #9D8FC2}
 .balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
@@ -2162,7 +2177,36 @@ function renderDetail(){
     </div>
   `;
 
-  body.innerHTML = hdr + big3Html + balanceHtml + `
+  // 今日建議卡
+  let dailyTipHtml = '';
+  try {
+    if(window.AstroTransit && window.DailyTip){
+      const today = window.AstroTransit.calcToday();
+      const tip = window.DailyTip.getTip(today);
+      if(tip){
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const rxList = tip.rxHints.map(r => `<div class="dt-rx">${r.hint}</div>`).join('');
+        dailyTipHtml = `
+          <div class="dt-card">
+            <div class="dt-head">
+              <span class="natal-label">// today's vibe · ${todayStr}</span>
+              <div class="dt-pills">
+                <span class="dt-pill"><span>☉</span> ${tip.sunGlyph} ${tip.sunSign}</span>
+                <span class="dt-pill"><span>☽</span> ${tip.moonGlyph} ${tip.moonSign}</span>
+              </div>
+            </div>
+            <div class="dt-body">
+              <p class="dt-mood">今日心情：<strong>${tip.mood}</strong></p>
+              <p class="dt-action"><span class="dt-tag dt-tag-good">適合</span> ${tip.action}</p>
+              <p class="dt-avoid"><span class="dt-tag dt-tag-warn">避免</span> ${tip.avoid}</p>
+              ${rxList}
+            </div>
+          </div>`;
+      }
+    }
+  } catch(_){}
+
+  body.innerHTML = hdr + dailyTipHtml + big3Html + balanceHtml + `
     <div class="natal-wheel-wrap" id="natal-wheel-wrap"></div>
     <div class="natal-detail-grid">
       <div class="natal-section">
