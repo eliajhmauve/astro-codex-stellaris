@@ -1079,6 +1079,8 @@ addEventListener('DOMContentLoaded',()=>{
 <!-- ═══ NATAL CHART — 本命盤輸入 + 計算 + 顯示 ═══ -->
 <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js" defer></script>
 <script src="./chart.js" defer></script>
+<script src="./natal-wheel.js" defer></script>
+<script src="./transit.js" defer></script>
 
 <!-- 觸發按鈕（未輸入時顯示） / 結果 pill（已輸入後顯示） -->
 <button class="natal-fab" id="natal-fab" aria-label="解鎖你的本命盤">
@@ -1214,6 +1216,35 @@ addEventListener('DOMContentLoaded',()=>{
 .natal-next-step .nns-text{flex:1;font-size:13px;line-height:1.6;color:var(--silver,#C0C8D8);font-family:var(--font-script,'Cormorant Garamond'),serif;min-width:200px}
 .natal-next-step .nns-text strong{color:var(--gold,#D4AF37);font-family:var(--font-mono,'Major Mono Display'),monospace;font-size:1.1em;padding:0 4px}
 .natal-btn-inline{flex-shrink:0;padding:10px 18px!important;font-size:12px!important;text-decoration:none;letter-spacing:.18em!important}
+
+.natal-wheel-wrap{
+  width:100%;max-width:440px;margin:0 auto 24px;padding:14px;
+  background:radial-gradient(circle at 50% 50%,rgba(212,175,55,.06) 0%,transparent 70%);
+  border:1px solid rgba(212,175,55,.18);
+  position:relative;
+}
+.natal-wheel-wrap svg{filter:drop-shadow(0 8px 24px rgba(212,175,55,.18))}
+.natal-wheel-legend{
+  display:flex;flex-wrap:wrap;gap:14px;justify-content:center;
+  margin-top:12px;padding-top:12px;border-top:1px dashed rgba(212,175,55,.25);
+  font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.18em;color:#C0C8D8;text-transform:uppercase;
+}
+.natal-wheel-legend span{display:inline-flex;align-items:center;gap:6px}
+.natal-wheel-legend .lg-line{display:inline-block;width:24px;height:2px;background:#fff}
+
+.natal-transit{margin-top:18px}
+.tr-today-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tr-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.3);font-family:var(--font-tech,'Space Mono'),monospace;font-size:11px;color:var(--silver,#C0C8D8);letter-spacing:.05em}
+.tr-pill .tr-glyph{color:var(--gold,#D4AF37);font-size:1.2em}
+.tr-pill small{opacity:.7;font-size:.85em}
+.tr-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow:auto;border:1px solid rgba(212,175,55,.18);padding:10px;background:rgba(0,0,0,.3)}
+.tr-row{display:flex;align-items:center;gap:12px;padding:8px 10px;background:rgba(212,175,55,.04);border-left:2px solid rgba(212,175,55,.4);font-family:var(--font-tech,'Space Mono'),monospace;font-size:12px}
+.tr-row .tr-pair{display:flex;align-items:center;gap:6px;flex-shrink:0;min-width:80px}
+.tr-row .tr-glyph{color:var(--gold,#D4AF37);font-size:1.4em;font-family:'Cinzel',serif;font-weight:700}
+.tr-row .tr-glyph.tr-now{color:#FFE08A;text-shadow:0 0 8px rgba(255,224,138,.6)}
+.tr-row .tr-arrow{color:#7A8090}
+.tr-row .tr-name{flex:1;color:var(--parchment,#E8DCC4);font-family:var(--font-script,'Cormorant Garamond'),serif;font-style:italic;font-size:1.05em}
+.tr-row .tr-orb{color:#7A8090;font-size:.85em;flex-shrink:0}
 
 .natal-aspects{max-height:240px;overflow:auto;font-family:var(--font-tech,'Space Mono'),monospace;font-size:12px;border:1px solid rgba(212,175,55,.2);padding:10px}
 .natal-aspects div{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dotted rgba(212,175,55,.12)}
@@ -1483,6 +1514,7 @@ function renderDetail(){
     : '';
 
   body.innerHTML = hdr + `
+    <div class="natal-wheel-wrap" id="natal-wheel-wrap"></div>
     <div class="natal-detail-grid">
       <div class="natal-section">
         <h3>10 行星位置</h3>
@@ -1491,7 +1523,50 @@ function renderDetail(){
       ${ascHtml}
     </div>
     ${aspectsHtml}
+    <div class="natal-transit" id="natal-transit-block"></div>
   `;
+  // 渲染輪盤
+  if(window.NatalWheel){
+    NatalWheel.render(document.getElementById('natal-wheel-wrap'), d, { size: 400, linkPrefix: './' });
+  }
+  // 渲染今日行運
+  renderTransit();
+}
+
+function renderTransit(){
+  const box = document.getElementById('natal-transit-block');
+  if(!box) return;
+  if(!window.AstroTransit){ box.innerHTML = ''; return; }
+  if(!chartData || !chartData.planets){ box.innerHTML = ''; return; }
+  try {
+    const { today, transits } = window.AstroTransit.findActiveTransits(chartData);
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const todayHtml = today.map(t =>
+      `<span class="tr-pill"><span class="tr-glyph">${t.glyph}</span> ${t.signGlyph} <small>${t.degree.toFixed(1)}°</small></span>`
+    ).join('');
+    const top5 = transits.slice(0, 8);
+    const trHtml = top5.length
+      ? top5.map(a => `
+          <div class="tr-row">
+            <span class="tr-pair"><span class="tr-glyph tr-now">${a.transitGlyph}</span><span class="tr-arrow">→</span><span class="tr-glyph">${a.natalGlyph}</span></span>
+            <span class="tr-name">行運 ${a.transitName} ${a.aspectName} 本命 ${a.natalName}</span>
+            <span class="tr-orb">orb ${a.orbDelta.toFixed(2)}°</span>
+          </div>
+        `).join('')
+      : '<p style="color:#7A8090;font-style:italic;font-family:var(--font-script,Cormorant Garamond),serif;text-align:center;padding:14px">今日無緊密相位（orb &lt; 3°）— 是相對平靜的一天。</p>';
+    box.innerHTML = `
+      <h3 style="font-family:var(--font-display,Cinzel),serif;font-size:1rem;letter-spacing:.18em;color:var(--gold);margin:24px 0 10px;border-bottom:1px solid rgba(212,175,55,.25);padding-bottom:6px;text-transform:uppercase">今日行運 · ${dateStr}</h3>
+      <p class="natal-hint" style="margin-bottom:10px">
+        ☉ 此刻太陽運行至：${today[0].signGlyph} ${today[0].sign}座 ${today[0].degree.toFixed(1)}°
+        <br>下方列出今日對你本命盤形成的緊密相位（orb &lt; 3°），按精準度排序：
+      </p>
+      <div class="tr-today-pills">${todayHtml}</div>
+      <div class="tr-list">${trHtml}</div>
+    `;
+  } catch(e){
+    console.warn('transit render failed', e);
+    box.innerHTML = '';
+  }
 }
 
 })();
