@@ -1198,6 +1198,14 @@ addEventListener('DOMContentLoaded',()=>{
       </div>
       <p class="natal-status" id="natal-status"></p>
     </form>
+
+    <div class="demo-divider"><span>或先看示範盤</span></div>
+    <div class="demo-grid">
+      <button type="button" class="demo-btn" data-demo="jobs">史蒂夫·賈伯斯<small>1955-02-24 · 19:15 · 舊金山</small></button>
+      <button type="button" class="demo-btn" data-demo="taylor">泰勒絲<small>1989-12-13 · 05:17 · 西雷丁</small></button>
+      <button type="button" class="demo-btn" data-demo="obama">歐巴馬<small>1961-08-04 · 19:24 · 火奴魯魯</small></button>
+      <button type="button" class="demo-btn" data-demo="einstein">愛因斯坦<small>1879-03-14 · 11:30 · 巴黎近似</small></button>
+    </div>
   </div>
 </div>
 
@@ -1398,6 +1406,14 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .natal-status{font-family:var(--font-mono,'Major Mono Display'),monospace;font-size:11px;letter-spacing:.2em;color:var(--silver-dim,#7A8090);min-height:1.4em;margin-top:4px}
 .natal-status.error{color:#C2384C}
 .natal-status.success{color:#7DC4C9}
+
+.demo-divider{display:flex;align-items:center;gap:14px;margin:20px 0 14px;font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.4em;color:#7A8090;text-transform:uppercase}
+.demo-divider::before,.demo-divider::after{content:"";flex:1;height:1px;background:rgba(212,175,55,.25)}
+.demo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.demo-btn{padding:10px 12px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.3);color:#E8DCC4;font-family:'Cinzel',serif;font-size:13px;text-align:left;cursor:pointer;transition:all .25s ease;display:flex;flex-direction:column;gap:3px}
+.demo-btn:hover{background:rgba(212,175,55,.14);border-color:#D4AF37;transform:translateY(-2px);box-shadow:0 6px 16px -6px rgba(212,175,55,.4)}
+.demo-btn small{font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.1em;color:#7A8090;font-weight:400}
+@media(max-width:520px){.demo-grid{grid-template-columns:1fr}}
 
 /* 詳情面板 */
 .natal-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:14px}
@@ -1867,6 +1883,28 @@ function bindEvents(){
   $('#natal-replay-tour').addEventListener('click', () => {
     $('#natal-detail-modal').classList.remove('show');
     setTimeout(startOnboarding, 300);
+  });
+
+  // 示範盤
+  const DEMOS = {
+    jobs:     { dob:'1955-02-24', time:'19:15', city:'los',     name:'史蒂夫·賈伯斯' },
+    taylor:   { dob:'1989-12-13', time:'05:17', city:'newyork', name:'泰勒絲' },
+    obama:    { dob:'1961-08-04', time:'19:24', city:'tokyo',   name:'歐巴馬（夏威夷以東京近似）' },
+    einstein: { dob:'1879-03-14', time:'11:30', city:'paris',   name:'愛因斯坦' },
+  };
+  document.querySelectorAll('.demo-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      const d = DEMOS[b.dataset.demo];
+      if(!d) return;
+      $('#natal-date').value = d.dob;
+      $('#natal-time').value = d.time;
+      $('#natal-no-time').checked = false;
+      $('#natal-time').disabled = false;
+      $('#natal-city').value = d.city;
+      // 直接 submit
+      setStatus(`已載入「${d.name}」示範資料 → 計算中 ...`);
+      setTimeout(() => $('#natal-form').requestSubmit(), 200);
+    });
   });
 
   $('#natal-export').addEventListener('click', () => {
