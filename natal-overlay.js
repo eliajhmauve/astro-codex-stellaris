@@ -278,6 +278,14 @@ function injectStyles(){
 .ti-sub-note{display:block;margin-top:8px;padding:8px 12px;background:rgba(255,224,138,.15);border-left:3px solid #FFE08A;color:#FFE08A;font-style:italic;font-size:13px}
 .ti-sub-note strong{color:#FFF6D8;font-weight:700;font-style:normal}
 @media(max-width:680px){.ti-grid{grid-template-columns:1fr;gap:10px}.ti-vs{order:1}.ti-now{order:0}.ti-natal{order:2}}
+
+/* 鍵盤提示 */
+.natal-keynav-tip{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:60;padding:10px 18px;background:rgba(10,5,8,.95);border:1px solid #D4AF37;color:#E8DCC4;font-family:'Cinzel',serif;font-size:13px;display:flex;align-items:center;gap:14px;box-shadow:0 12px 32px -8px rgba(0,0,0,.7),0 0 16px -4px rgba(212,175,55,.4);animation:tipSlide .5s cubic-bezier(.34,1.56,.64,1);transition:opacity .4s ease;backdrop-filter:blur(8px)}
+@keyframes tipSlide{from{transform:translate(-50%,40px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+.natal-keynav-tip kbd{display:inline-block;padding:2px 8px;background:#D4AF37;color:#0A0508;font-family:'Major Mono Display','VT323',monospace;font-size:11px;border-radius:3px;font-weight:700;margin:0 2px}
+.natal-keynav-tip button{padding:5px 12px;background:transparent;border:1px solid #D4AF37;color:#D4AF37;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:all .25s}
+.natal-keynav-tip button:hover{background:#D4AF37;color:#0A0508}
+@media(max-width:600px){.natal-keynav-tip{font-size:11px;padding:8px 14px;flex-wrap:wrap;justify-content:center;text-align:center}}
   `;
   const s = document.createElement('style');
   s.id = 'natal-overlay-style';
@@ -583,6 +591,56 @@ function init(){
 
   // 6. 標記已訪問
   markVisited(planetKey);
+
+  // 7. 鍵盤導航
+  setupKeyNav(planetKey, neighbors);
+}
+
+function setupKeyNav(planetKey, neighbors){
+  document.addEventListener('keydown', e => {
+    // 在輸入框內或對話框開時不觸發
+    const tag = (e.target && e.target.tagName) || '';
+    if(/^(INPUT|SELECT|TEXTAREA)$/.test(tag)) return;
+    if(e.target && e.target.isContentEditable) return;
+    if(document.querySelector('.modal.show, .modal-overlay[style*="block"], .natal-complete-overlay')) return;
+    if(e.metaKey || e.ctrlKey || e.altKey) return;
+
+    if(e.key === 'ArrowLeft' && neighbors.prev){
+      e.preventDefault();
+      location.href = '../' + neighbors.prev + '/';
+    } else if(e.key === 'ArrowRight'){
+      e.preventDefault();
+      if(neighbors.next) location.href = '../' + neighbors.next + '/';
+      else location.href = '../index.html'; // 最後一個 → 回入口
+    } else if(e.key === 'Escape'){
+      e.preventDefault();
+      location.href = '../index.html';
+    } else if(e.key === '/'){
+      // 打開搜尋（暫無）
+    }
+  });
+
+  // 顯示快捷鍵提示（首次）
+  if(!localStorage.getItem('astro_keynav_shown')){
+    setTimeout(() => {
+      const tip = document.createElement('div');
+      tip.className = 'natal-keynav-tip';
+      tip.innerHTML = `<span><kbd>←</kbd> 上一星 · <kbd>→</kbd> 下一星 · <kbd>Esc</kbd> 回入口</span><button>知道了</button>`;
+      tip.querySelector('button').addEventListener('click', () => {
+        tip.style.opacity = '0';
+        setTimeout(() => tip.remove(), 300);
+        localStorage.setItem('astro_keynav_shown', '1');
+      });
+      document.body.appendChild(tip);
+      setTimeout(() => {
+        if(tip.parentNode){
+          tip.style.opacity = '0';
+          setTimeout(() => tip.remove(), 400);
+          localStorage.setItem('astro_keynav_shown', '1');
+        }
+      }, 8000);
+    }, 2500);
+  }
 }
 
 function buildTodayInfluenceCard(planetKey, me, todayThis, today){
