@@ -1627,6 +1627,11 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .tc-note{font-size:11px;color:#7A8090;font-family:'Major Mono Display','VT323',monospace;letter-spacing:.15em}
 @media(max-width:600px){.tarot-grid{grid-template-columns:1fr;justify-items:center}.tarot-img{width:160px}}
 
+.cloud-card{margin:0 0 22px;padding:24px;background:linear-gradient(135deg,rgba(125,168,217,.1),rgba(10,5,8,.4));border:1px solid #7DA8D9;border-left:4px solid #7DA8D9;text-align:center}
+.cloud-body{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:14px 18px;margin-top:14px;padding:14px}
+.cloud-tag{font-family:'Noto Serif TC','Songti SC',serif;font-weight:700;letter-spacing:.05em;line-height:1.4;text-shadow:0 0 12px currentColor;transition:transform .25s ease;display:inline-block;cursor:default}
+.cloud-tag:hover{transform:scale(1.15) rotate(-2deg)}
+
 .qa-card{margin:18px 0;padding:20px 24px;background:linear-gradient(135deg,rgba(125,168,217,.08),rgba(10,5,8,.4));border:1px solid #7DA8D9;border-left:4px solid #7DA8D9}
 .qa-card .natal-label{margin-bottom:14px}
 .qa-list{display:flex;flex-direction:column;gap:8px}
@@ -1730,7 +1735,74 @@ ready(function(){
 
   // Logo 連點彩蛋
   setupLogoEasterEgg();
+
+  // Konami Code 終極彩蛋
+  setupKonamiCode();
 });
+
+const KONAMI_SEQ = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiBuf = [];
+function setupKonamiCode(){
+  document.addEventListener('keydown', e => {
+    const tag = (e.target && e.target.tagName) || '';
+    if(/^(INPUT|SELECT|TEXTAREA)$/.test(tag)) return;
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    konamiBuf.push(k);
+    if(konamiBuf.length > KONAMI_SEQ.length) konamiBuf.shift();
+    if(konamiBuf.join(',') === KONAMI_SEQ.map(x => x.toLowerCase()).join(',') ||
+       konamiBuf.join(',') === KONAMI_SEQ.join(',')){
+      konamiBuf = [];
+      triggerKonami();
+    }
+  });
+}
+
+function triggerKonami(){
+  // 全屏彩虹漸變 + 隨機位置爆發 60 顆星
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;pointer-events:none;background:radial-gradient(circle,rgba(255,224,138,.3),transparent 70%);animation:konamiBg 3s ease forwards';
+  if(!document.getElementById('konami-style')){
+    const s = document.createElement('style');
+    s.id = 'konami-style';
+    s.textContent = `
+      @keyframes konamiBg{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+      @keyframes konamiStar{0%{transform:translate(0,0) scale(0) rotate(0);opacity:0}20%{opacity:1}50%{transform:translate(var(--kx),var(--ky)) scale(1.5) rotate(360deg);opacity:1}100%{transform:translate(var(--kx),var(--ky)) scale(0) rotate(720deg);opacity:0}}
+      .konami-star{position:fixed;font-family:'Cinzel',serif;font-size:32px;color:var(--kc,#FFE08A);text-shadow:0 0 16px var(--kc,#FFE08A);animation:konamiStar 2.5s ease-out forwards;pointer-events:none;z-index:10000}
+      .konami-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10001;padding:30px 50px;background:linear-gradient(135deg,#0A0508,#1A0F0A);border:2px solid #FFE08A;color:#FFE08A;font-family:'Cinzel',serif;font-size:1.6rem;letter-spacing:.18em;text-align:center;box-shadow:0 0 80px -8px #FFE08A;animation:konamiMsg 3.5s ease forwards;pointer-events:none}
+      @keyframes konamiMsg{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}20%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.1)}}
+    `;
+    document.head.appendChild(s);
+  }
+  document.body.appendChild(overlay);
+
+  // 60 顆飛舞的星
+  const SYMBOLS = ['☉','☽','☿','♀','♂','♃','♄','♅','♆','♇','✦','✧','★','☄'];
+  const COLORS = ['#FFE08A','#D4AF37','#E8634C','#7DA8D9','#7AC48E','#9D8FC2','#FFCBA4'];
+  for(let i = 0; i < 60; i++){
+    const star = document.createElement('div');
+    star.className = 'konami-star';
+    star.textContent = SYMBOLS[i % SYMBOLS.length];
+    star.style.left = (Math.random() * 100) + 'vw';
+    star.style.top = (Math.random() * 100) + 'vh';
+    star.style.setProperty('--kx', (Math.random() * 600 - 300) + 'px');
+    star.style.setProperty('--ky', (Math.random() * 600 - 300) + 'px');
+    star.style.setProperty('--kc', COLORS[i % COLORS.length]);
+    star.style.animationDelay = (Math.random() * 0.6) + 's';
+    document.body.appendChild(star);
+    setTimeout(() => star.remove(), 3500);
+  }
+
+  // 訊息卡
+  const msg = document.createElement('div');
+  msg.className = 'konami-msg';
+  msg.innerHTML = '✦ KONAMI ACTIVATED ✦<br><span style="font-size:.7em;color:#9D8FC2;font-style:italic;letter-spacing:.04em;font-family:Cormorant Garamond,serif">「占星不是為了預測未來，<br>是為了更深地活在當下。」</span>';
+  document.body.appendChild(msg);
+
+  setTimeout(() => { overlay.remove(); msg.remove(); }, 3500);
+
+  // 標記為 Konami 達人
+  localStorage.setItem('astro_konami_unlocked', '1');
+}
 
 let logoClicks = 0;
 let logoTimer = null;
@@ -2247,6 +2319,48 @@ function renderSynastry(name, otherChart, synList){
   `;
 }
 
+// 個人化標籤雲生成器
+function generateTagCloud(chart){
+  if(!chart || !chart.planets) return [];
+  const tags = [];
+  const sun = chart.planets.find(p => p.key === 'sun');
+  const moon = chart.planets.find(p => p.key === 'moon');
+  const asc = chart.ascendant;
+  // 太陽 / 月亮 / 上升 標籤
+  const SIGN_TAG = {'牡羊':['衝勁','直率','先鋒'],'金牛':['踏實','美感','耐性'],'雙子':['機智','多元','輕巧'],
+    '巨蟹':['溫柔','記憶','護家'],'獅子':['光芒','戲劇','慷慨'],'處女':['細節','服務','精準'],
+    '天秤':['平衡','和諧','美學'],'天蠍':['深度','穿透','蛻變'],'射手':['遠方','信念','自由'],
+    '摩羯':['紀律','時間','成就'],'水瓶':['前衛','創新','獨立'],'雙魚':['夢境','慈悲','感性']};
+  const COLORS = ['#FFE08A','#E8634C','#7DA8D9','#7AC48E','#9D8FC2','#FFCBA4','#D4AF37','#E5C282'];
+
+  if(sun){ SIGN_TAG[sun.sign].forEach((t,i) => tags.push({ text:t, size:1.4 - i*0.1, color:COLORS[0], src:'sun' })); }
+  if(moon){ SIGN_TAG[moon.sign].slice(0,2).forEach((t,i) => tags.push({ text:t, size:1.2 - i*0.1, color:COLORS[2], src:'moon' })); }
+  if(asc){ SIGN_TAG[asc.sign].slice(0,1).forEach(t => tags.push({ text:t, size:1.1, color:COLORS[3], src:'asc' })); }
+
+  // 主導元素
+  const ELE = { '牡羊':'火','獅子':'火','射手':'火','金牛':'土','處女':'土','摩羯':'土','雙子':'風','天秤':'風','水瓶':'風','巨蟹':'水','天蠍':'水','雙魚':'水' };
+  const eleC = { '火':0,'土':0,'風':0,'水':0 };
+  chart.planets.forEach(p => eleC[ELE[p.sign]]++);
+  const ELE_TAG = { '火':['熱烈','行動派'], '土':['務實','可靠'], '風':['思考者','善溝通'], '水':['感性','直覺強'] };
+  Object.entries(eleC).sort((a,b) => b[1] - a[1]).slice(0,1).forEach(([k]) => {
+    ELE_TAG[k].forEach((t,i) => tags.push({ text:t, size:1.0 - i*0.1, color:COLORS[5+i], src:'ele' }));
+  });
+
+  // 缺元素
+  const missing = Object.entries(eleC).filter(([,v]) => v === 0).map(([k]) => k);
+  if(missing.length){
+    const LACK_TAG = {'火':'欠勇氣','土':'欠落地','風':'欠抽離','水':'欠感受'};
+    missing.slice(0,1).forEach(m => tags.push({ text:LACK_TAG[m], size:0.85, color:'#7A8090', src:'lack' }));
+  }
+
+  // 逆行
+  const rxList = chart.planets.filter(p => p.retrograde);
+  if(rxList.length >= 3) tags.push({ text:'內省型', size:0.95, color:COLORS[4], src:'rx' });
+
+  // 隨機洗牌讓視覺更動態
+  return tags.sort(() => Math.random() - 0.5);
+}
+
 // SVG 月相（取代 emoji，全平台穩定顯示）
 function moonPhaseSVG(illuminated, waxing, size){
   size = size || 18;
@@ -2734,6 +2848,20 @@ function renderDetail(){
     </div>
   `;
 
+  // 個人化標籤雲
+  let cloudHtml = '';
+  try {
+    const tags = generateTagCloud(d);
+    if(tags.length){
+      cloudHtml = `
+        <div class="cloud-card">
+          <span class="natal-label">// keyword cloud · 你的本命標籤</span>
+          <div class="cloud-body">${tags.map(t => `<span class="cloud-tag" style="font-size:${t.size}rem;color:${t.color}">${t.text}</span>`).join('')}</div>
+        </div>
+      `;
+    }
+  } catch(_){}
+
   // 詩意自介
   let poeticHtml = '';
   if(window.PoeticIntro){
@@ -2781,6 +2909,7 @@ function renderDetail(){
         <a href="#sec-tip">今日</a>
         <a href="#sec-tarot">塔羅</a>
         <a href="#sec-seal">印章</a>
+        <a href="#sec-cloud">標籤</a>
         <a href="#sec-poetic">自介</a>
         <a href="#sec-big3">Big 3</a>
         <a href="#sec-balance">元素</a>
@@ -2802,6 +2931,7 @@ function renderDetail(){
     `<div id="sec-tip">${dailyTipHtml}</div>` +
     `<div id="sec-tarot">${tarotHtml}</div>` +
     `<div id="sec-seal">${sealHtml}</div>` +
+    `<div id="sec-cloud">${cloudHtml}</div>` +
     `<div id="sec-poetic">${poeticHtml}</div>` +
     `<div id="sec-big3">${big3Html}</div>` +
     `<div id="sec-balance">${balanceHtml}</div>` + `
