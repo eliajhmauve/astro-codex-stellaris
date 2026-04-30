@@ -1525,6 +1525,18 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .dt-tag-warn{background:#E8A04C;color:#0A0508}
 .dt-rx{margin-top:10px;padding:8px 12px;background:rgba(194,68,56,.12);border-left:3px solid #C24438;color:#FFC0B5;font-size:13px;font-family:'Cormorant Garamond',serif;font-style:italic}
 
+.seal-card{margin:0 0 22px;padding:24px;background:linear-gradient(135deg,rgba(232,99,76,.1),rgba(10,5,8,.5));border:1px solid #E8634C;border-left:4px solid #E8634C;text-align:center}
+.seal-card .natal-label{margin-bottom:8px}
+.seal-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:18px auto;max-width:600px}
+@media(max-width:520px){.seal-grid{grid-template-columns:repeat(5,1fr);gap:6px}}
+.seal-cell{display:flex;flex-direction:column;align-items:center;gap:6px}
+.seal-char{display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;background:linear-gradient(180deg,#7C2418 0%,#5A1808 50%,#7C2418 100%);color:#FFE08A;font-family:'Noto Serif TC','Songti SC',serif;font-size:38px;font-weight:900;border:3px solid #FFE08A;box-shadow:0 8px 24px -6px rgba(124,36,24,.7),inset 0 0 12px rgba(0,0,0,.5);text-shadow:0 0 12px rgba(255,224,138,.4);position:relative}
+.seal-char::before{content:"";position:absolute;inset:-1px;border:1px solid rgba(255,224,138,.4);pointer-events:none}
+@media(max-width:520px){.seal-char{width:48px;height:48px;font-size:28px;border-width:2px}}
+.seal-lbl{font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.15em;color:#C0C8D8;text-transform:uppercase}
+.seal-line{font-family:'Cormorant Garamond',serif;font-style:italic;color:#E8DCC4;font-size:1.2rem;margin-top:14px}
+.seal-line strong{font-family:'Noto Serif TC','Songti SC',serif;font-style:normal;color:#FFE08A;font-size:1.6rem;font-weight:900;letter-spacing:.2em;margin:0 4px;text-shadow:0 0 18px rgba(255,224,138,.4)}
+
 .qa-card{margin:18px 0;padding:20px 24px;background:linear-gradient(135deg,rgba(125,168,217,.08),rgba(10,5,8,.4));border:1px solid #7DA8D9;border-left:4px solid #7DA8D9}
 .qa-card .natal-label{margin-bottom:14px}
 .qa-list{display:flex;flex-direction:column;gap:8px}
@@ -2384,7 +2396,36 @@ function renderDetail(){
     </div>
   `;
 
-  body.innerHTML = hdr + dailyTipHtml + big3Html + balanceHtml + `
+  // 5 字關鍵字印章
+  const SIGN_KW = {'牡羊':'衝','金牛':'穩','雙子':'靈','巨蟹':'柔','獅子':'光','處女':'細','天秤':'和','天蠍':'深','射手':'遠','摩羯':'硬','水瓶':'異','雙魚':'溶'};
+  const ELE_KW = {'火':'猛','土':'實','風':'思','水':'感'};
+  const MODE_KW = {'開創':'啟','固定':'守','變動':'變'};
+  const ELE_MAP = {'牡羊':'火','獅子':'火','射手':'火','金牛':'土','處女':'土','摩羯':'土','雙子':'風','天秤':'風','水瓶':'風','巨蟹':'水','天蠍':'水','雙魚':'水'};
+  const MODE_MAP = {'牡羊':'開創','巨蟹':'開創','天秤':'開創','摩羯':'開創','金牛':'固定','獅子':'固定','天蠍':'固定','水瓶':'固定','雙子':'變動','處女':'變動','射手':'變動','雙魚':'變動'};
+  const eleC2 = {'火':0,'土':0,'風':0,'水':0};
+  const modeC2 = {'開創':0,'固定':0,'變動':0};
+  d.planets.forEach(p => { eleC2[ELE_MAP[p.sign]]++; modeC2[MODE_MAP[p.sign]]++; });
+  const domEle = Object.entries(eleC2).sort((a,b)=>b[1]-a[1])[0][0];
+  const domMode = Object.entries(modeC2).sort((a,b)=>b[1]-a[1])[0][0];
+  const seal = [
+    sun ? { c:SIGN_KW[sun.sign], lbl:'☉ '+sun.sign } : null,
+    moon ? { c:SIGN_KW[moon.sign], lbl:'☽ '+moon.sign } : null,
+    asc ? { c:SIGN_KW[asc.sign], lbl:'⏃ '+asc.sign } : { c:'?', lbl:'缺時間' },
+    { c:ELE_KW[domEle], lbl:domEle+'元素主導' },
+    { c:MODE_KW[domMode], lbl:domMode+'模式' },
+  ].filter(Boolean);
+  const sealHtml = `
+    <div class="seal-card">
+      <span class="natal-label">// 5-character seal · 你的本命印章</span>
+      <p class="natal-hint" style="margin-bottom:14px">用 5 個字濃縮你的人格底層 ─ 太陽 / 月亮 / 上升 / 主導元素 / 主導模式</p>
+      <div class="seal-grid">
+        ${seal.map(s => `<div class="seal-cell"><div class="seal-char">${s.c}</div><div class="seal-lbl">${s.lbl}</div></div>`).join('')}
+      </div>
+      <p class="seal-line">「<strong>${seal.map(s=>s.c).join('')}</strong>」── 這就是你</p>
+    </div>
+  `;
+
+  body.innerHTML = hdr + dailyTipHtml + sealHtml + big3Html + balanceHtml + `
     <div class="natal-wheel-wrap" id="natal-wheel-wrap"></div>
     <div class="natal-detail-grid">
       <div class="natal-section">
