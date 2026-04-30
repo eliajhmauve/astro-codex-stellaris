@@ -1522,6 +1522,14 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .ingress-meta strong{color:#FFE08A;font-style:normal;font-weight:700}
 @media(max-width:600px){.ingress-meta{text-align:left;width:100%}}
 
+.ump-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.ump-row{display:grid;grid-template-columns:36px 1fr 1.5fr;gap:14px;align-items:center;padding:10px 14px;background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.2);border-left:3px solid #FFE08A}
+.ump-icon{display:flex;align-items:center;justify-content:center}
+.ump-meta .ump-name{font-family:'Cinzel',serif;font-weight:700;color:#FFE08A;font-size:1.1rem;letter-spacing:.04em}
+.ump-meta .ump-date{font-family:'Major Mono Display','VT323',monospace;font-size:11px;color:#C0C8D8;letter-spacing:.1em;margin-top:2px}
+.ump-tip{font-family:'Cormorant Garamond',serif;font-style:italic;color:#E8DCC4;font-size:13px;line-height:1.55}
+@media(max-width:600px){.ump-row{grid-template-columns:36px 1fr;gap:10px}.ump-tip{grid-column:1/-1;padding-top:6px;border-top:1px dashed rgba(212,175,55,.2)}}
+
 .lc-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .lc-row{display:flex;gap:14px;padding:14px 16px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.3);border-left-width:4px;border-left-color:#FFE08A}
 .lc-row.lc-passed{opacity:.65;border-left-color:#7A8090}
@@ -2925,6 +2933,30 @@ function renderTransit(){
           <div class="mc-grid">${cells}</div>
           <p style="font-size:11px;color:#7A8090;margin-top:8px;font-family:'Major Mono Display',monospace;letter-spacing:.18em">★ 高亮邊框 = 進入新星座 · 上排月相 / 下排星座符號</p>
         `;
+        // 未來 4 個月相
+        try {
+          const upcoming = window.AstroTransit.calcUpcomingMoonPhases();
+          if(upcoming && upcoming.length){
+            const PHASE_TARGET_TO_ILL = {0:0, 90:0.5, 180:1, 270:0.5};
+            const PHASE_TARGET_TO_WAX = {0:true, 90:true, 180:false, 270:false};
+            const upHtml = upcoming.map(u => {
+              const ill = PHASE_TARGET_TO_ILL[u.target];
+              const wax = PHASE_TARGET_TO_WAX[u.target];
+              return `<div class="ump-row">
+                <div class="ump-icon">${moonPhaseSVG(ill, wax, 28)}</div>
+                <div class="ump-meta">
+                  <div class="ump-name">${u.name}</div>
+                  <div class="ump-date">${u.dateLocal} · ${u.daysFromNow} 天後</div>
+                </div>
+                <div class="ump-tip">${u.tip}</div>
+              </div>`;
+            }).join('');
+            calHtml += `
+              <h4 style="font-family:'Cinzel',serif;color:#FFE08A;font-size:.9rem;letter-spacing:.18em;margin:18px 0 10px;text-transform:uppercase">未來 4 個月相時刻</h4>
+              <div class="ump-list">${upHtml}</div>
+            `;
+          }
+        } catch(_){}
       }
     } catch(_){}
 

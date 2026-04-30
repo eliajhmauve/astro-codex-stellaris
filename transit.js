@@ -358,6 +358,74 @@ function calcMonthMoonCalendar(){
   return { year, month: month + 1, days };
 }
 
+// 找下次月相精準時刻（target = 0/90/180/270）
+function findNextMoonPhase(target, fromDate){
+  if(!global.Astronomy) return null;
+  const A = global.Astronomy;
+  const start = fromDate || new Date();
+  const TWO_PI = 360;
+  // 月相每 29.5 天循環，每天約 12.2°
+  // 從今天開始，每 6 小時取一次，找跨過 target 的點
+  function getPhase(dt){
+    const sun = A.GeoVector(A.Body.Sun, dt, true);
+    const moon = A.GeoVector(A.Body.Moon, dt, true);
+    return ((A.Ecliptic(moon).elon - A.Ecliptic(sun).elon) % 360 + 360) % 360;
+  }
+  function diff(a, b){
+    let d = (a - b) % 360;
+    if(d > 180) d -= 360;
+    if(d < -180) d += 360;
+    return d;
+  }
+  const STEP_HOURS = 6;
+  let prev = start;
+  let prevPhase = getPhase(prev);
+  for(let h = STEP_HOURS; h <= 30 * 24; h += STEP_HOURS){
+    const cur = new Date(start.getTime() + h * 3600000);
+    const curPhase = getPhase(cur);
+    // 跨過 target 點（差值號變了）
+    const dPrev = diff(prevPhase, target);
+    const dCur = diff(curPhase, target);
+    if(dPrev < 0 && dCur >= 0){
+      // 二分搜尋
+      let lo = prev, hi = cur;
+      for(let i = 0; i < 20; i++){
+        const mid = new Date((lo.getTime() + hi.getTime()) / 2);
+        const dM = diff(getPhase(mid), target);
+        if(dM < 0) lo = mid; else hi = mid;
+      }
+      return hi;
+    }
+    prev = cur; prevPhase = curPhase;
+  }
+  return null;
+}
+
+function calcUpcomingMoonPhases(){
+  if(!global.Astronomy) return null;
+  const start = new Date();
+  const targets = [
+    { name:'新月',   target:0,   tip:'適合許願、啟動新計畫、播下意圖種子' },
+    { name:'上弦月', target:90,  tip:'行動推進期，遇到阻礙正常 ─ 推過去就對了' },
+    { name:'滿月',   target:180, tip:'高峰收成期，但情緒會被放大；不要在這天做重大決定' },
+    { name:'下弦月', target:270, tip:'釋放期，適合斷捨離、結束一段關係或習慣' },
+  ];
+  const results = [];
+  targets.forEach(t => {
+    const dt = findNextMoonPhase(t.target, start);
+    if(dt){
+      results.push({
+        ...t,
+        date: dt,
+        dateLocal: dt.toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }),
+        daysFromNow: Math.ceil((dt - start) / 86400000),
+      });
+    }
+  });
+  // 按時間排序
+  return results.sort((a, b) => a.date - b.date);
+}
+
 // 太陽下次進入新星座的日期（節氣 / Sign Ingress）
 function calcSunNextIngress(){
   if(!global.Astronomy) return null;
@@ -402,6 +470,6 @@ function calcSunNextIngress(){
   return null;
 }
 
-global.AstroTransit = { calcToday, findActiveTransits, forecastDays, calcLifecycleMilestones, calcSolarReturn, calcMoonPhase, calcMonthMoonCalendar, calcSunNextIngress, PLANETS };
+global.AstroTransit = { calcToday, findActiveTransits, forecastDays, calcLifecycleMilestones, calcSolarReturn, calcMoonPhase, calcMonthMoonCalendar, calcSunNextIngress, calcUpcomingMoonPhases, PLANETS };
 
 })(typeof window !== 'undefined' ? window : globalThis);
