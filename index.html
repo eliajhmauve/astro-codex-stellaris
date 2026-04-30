@@ -1460,6 +1460,24 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .fc-event .fc-arrow{color:#7A8090;font-style:normal}
 .fc-event .fc-name{flex:1;font-size:1em}
 
+.sr-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;padding:10px;border:1px solid rgba(212,175,55,.18);background:rgba(0,0,0,.3)}
+.sr-row{display:flex;align-items:center;gap:12px;padding:7px 10px;background:rgba(212,175,55,.06);border-left:2px solid #FFE08A;font-family:'Space Mono',monospace;font-size:12px}
+.sr-row .sr-pair{display:flex;align-items:center;gap:5px;flex-shrink:0;min-width:70px}
+.sr-row .sr-glyph{font-family:'Cinzel',serif;font-size:1.3em;color:#FFE08A;font-weight:700}
+.sr-row .sr-arrow{color:#7A8090}
+.sr-row .sr-name{flex:1;color:#E8DCC4;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.05em}
+.sr-row .sr-orb{color:#7A8090;font-size:.85em;flex-shrink:0;font-family:'Major Mono Display',monospace}
+
+.mc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.mc-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.15);border-left:3px solid var(--sc,#D4AF37);font-family:'Space Mono',monospace;cursor:default;transition:all .25s}
+.mc-cell:hover{transform:scale(1.05);background:rgba(212,175,55,.1);box-shadow:0 0 8px var(--sc,#D4AF37);z-index:2;position:relative}
+.mc-cell.mc-today{background:rgba(255,224,138,.18);border-color:#FFE08A;box-shadow:0 0 12px rgba(255,224,138,.4)}
+.mc-cell.mc-enter{border-top-width:3px;border-top-style:solid;border-top-color:var(--sc,#FFE08A)}
+.mc-cell .mc-num{font-size:11px;color:#C0C8D8;margin-bottom:2px}
+.mc-cell .mc-glyph{font-family:'Cinzel',serif;font-size:1.3em;font-weight:700;color:var(--sc,#D4AF37);line-height:1}
+.mc-cell.mc-today .mc-num{color:#FFE08A;font-weight:700}
+.mc-cell.mc-today .mc-glyph{color:#FFE08A}
+
 .lc-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .lc-row{display:flex;gap:14px;padding:14px 16px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.3);border-left-width:4px;border-left-color:#FFE08A}
 .lc-row.lc-passed{opacity:.65;border-left-color:#7A8090}
@@ -2476,6 +2494,42 @@ function renderTransit(){
       }
     } catch(_){}
 
+    // 太陽回歸（年盤）
+    let srHtml = '';
+    try {
+      const sr = window.AstroTransit.calcSolarReturn(chartData);
+      if(sr){
+        const top = sr.aspects.slice(0, 5);
+        const rows = top.map(a => `<div class="sr-row"><span class="sr-pair"><span class="sr-glyph">${a.transitGlyph}</span><span class="sr-arrow">→</span><span class="sr-glyph">${a.natalGlyph}</span></span><span class="sr-name">回歸 ${a.transitName} ${a.aspectName} 本命 ${a.natalName}</span><span class="sr-orb">orb ${a.orbDelta.toFixed(1)}°</span></div>`).join('');
+        const sun = sr.planets.find(p => p.key === 'sun');
+        srHtml = `
+          <h3 style="font-family:var(--font-display,Cinzel),serif;font-size:1rem;letter-spacing:.18em;color:var(--gold);margin:24px 0 10px;border-bottom:1px solid rgba(212,175,55,.25);padding-bottom:6px;text-transform:uppercase">太陽回歸 · 你的 ${sr.age} 歲年盤</h3>
+          <p class="natal-hint">下一次太陽回到出生位置：<strong style="color:#FFE08A">${sr.returnDate}</strong>（${sr.daysFromNow > 0 ? sr.daysFromNow + ' 天後' : '今天'}） ─ 占星上你那一年的「能量主軸」</p>
+          ${top.length ? `<p class="natal-hint" style="margin-bottom:10px">回歸盤對你本命形成的最強 5 個相位：</p><div class="sr-list">${rows}</div>` : ''}
+        `;
+      }
+    } catch(_){}
+
+    // 本月月相日曆
+    let calHtml = '';
+    try {
+      const cal = window.AstroTransit.calcMonthMoonCalendar();
+      if(cal && cal.days){
+        const SIGN_COLOR = { '牡羊':'#E8634C','獅子':'#E8634C','射手':'#E8634C','金牛':'#7AA84B','處女':'#7AA84B','摩羯':'#7AA84B','雙子':'#E5C282','天秤':'#E5C282','水瓶':'#E5C282','巨蟹':'#5BA9D6','天蠍':'#5BA9D6','雙魚':'#5BA9D6' };
+        const cells = cal.days.map(d => `<div class="mc-cell ${d.isToday?'mc-today':''} ${d.enteredNewSign?'mc-enter':''}" style="--sc:${SIGN_COLOR[d.sign]||'#D4AF37'}" title="${cal.year}-${String(cal.month).padStart(2,'0')}-${String(d.date).padStart(2,'0')} 月亮在${d.sign}座${d.enteredNewSign?'（進入新星座）':''}">
+          <div class="mc-num">${d.date}</div>
+          <div class="mc-glyph">${d.glyph}</div>
+        </div>`).join('');
+        const todayMoon = cal.days.find(d => d.isToday);
+        calHtml = `
+          <h3 style="font-family:var(--font-display,Cinzel),serif;font-size:1rem;letter-spacing:.18em;color:var(--gold);margin:24px 0 10px;border-bottom:1px solid rgba(212,175,55,.25);padding-bottom:6px;text-transform:uppercase">本月月相日曆 · ${cal.year}.${String(cal.month).padStart(2,'0')}</h3>
+          <p class="natal-hint">月亮每 2-3 天進入新星座 ─ 這是占星「最快的天象變化」。${todayMoon ? `今日月亮：<strong style="color:${SIGN_COLOR[todayMoon.sign]||'#D4AF37'}">${todayMoon.glyph} ${todayMoon.sign}座</strong>` : ''}</p>
+          <div class="mc-grid">${cells}</div>
+          <p style="font-size:11px;color:#7A8090;margin-top:8px;font-family:'Major Mono Display',monospace;letter-spacing:.18em">★ 高亮邊框 = 月亮進入新星座當天</p>
+        `;
+      }
+    } catch(_){}
+
     box.innerHTML = `
       <h3 style="font-family:var(--font-display,Cinzel),serif;font-size:1rem;letter-spacing:.18em;color:var(--gold);margin:24px 0 10px;border-bottom:1px solid rgba(212,175,55,.25);padding-bottom:6px;text-transform:uppercase">今日行運 · ${dateStr}</h3>
       <p class="natal-hint" style="margin-bottom:10px">
@@ -2486,6 +2540,8 @@ function renderTransit(){
       <div class="tr-today-pills">${todayHtml}</div>
       <div class="tr-list">${trHtml}</div>
       ${forecastHtml}
+      ${srHtml}
+      ${calHtml}
       ${lcHtml}
     `;
   } catch(e){

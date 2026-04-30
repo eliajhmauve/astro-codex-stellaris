@@ -244,6 +244,91 @@ function calcLifecycleMilestones(natalChart){
   return milestones.sort((a, b) => a.ageAtEvent - b.ageAtEvent);
 }
 
-global.AstroTransit = { calcToday, findActiveTransits, forecastDays, calcLifecycleMilestones, PLANETS };
+// 太陽回歸：找下一個生日當天的盤（你的「年運」基準）
+function calcSolarReturn(natalChart){
+  if(!natalChart || !natalChart.input || !natalChart.input.dateStr) return null;
+  if(!global.Astronomy) return null;
+  const A = global.Astronomy;
+
+  const birth = new Date(natalChart.input.dateStr + 'T12:00:00');
+  if(isNaN(birth)) return null;
+  const now = new Date();
+
+  // 找今年或明年生日（哪個還沒到）
+  let returnDate = new Date(now.getFullYear(), birth.getMonth(), birth.getDate(), 12, 0, 0);
+  if(returnDate < now){
+    returnDate = new Date(now.getFullYear() + 1, birth.getMonth(), birth.getDate(), 12, 0, 0);
+  }
+
+  // 算回歸當天 10 行星位置
+  const planets = PLANETS.map(p => {
+    const v = A.GeoVector(A.Body[p.body], returnDate, true);
+    const e = A.Ecliptic(v);
+    const s = lonToSign(e.elon);
+    return { ...p, lon:e.elon, sign:s.name, signGlyph:s.glyph, degree:s.deg };
+  });
+
+  // 對本命的所有相位（用 4° orb，介於 transit 與 natal 之間）
+  const aspectsList = [];
+  planets.forEach(t => {
+    natalChart.planets.forEach(n => {
+      const diff = angleDiff(t.lon, n.lon);
+      for(const asp of ASPECTS){
+        if(Math.abs(diff - asp.angle) <= 4){
+          aspectsList.push({
+            transitKey:t.key, transitName:t.name, transitGlyph:t.glyph,
+            natalKey:n.key, natalName:n.name, natalGlyph:n.glyph,
+            type:asp.key, aspectName:asp.name, angle:asp.angle,
+            orbDelta: Math.abs(diff - asp.angle),
+          });
+          break;
+        }
+      }
+    });
+  });
+  aspectsList.sort((a,b) => a.orbDelta - b.orbDelta);
+
+  const daysFromNow = Math.ceil((returnDate - now) / (24*3600*1000));
+  return {
+    returnDate: returnDate.toISOString().slice(0,10),
+    daysFromNow,
+    age: returnDate.getFullYear() - birth.getFullYear(),
+    planets,
+    aspects: aspectsList,
+  };
+}
+
+// 本月月相日曆：每天 12:00 的月亮位置
+function calcMonthMoonCalendar(){
+  if(!global.Astronomy) return [];
+  const A = global.Astronomy;
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const lastDay = new Date(year, month + 1, 0).getDate();
+  const days = [];
+  let prevSign = -1;
+  for(let d = 1; d <= lastDay; d++){
+    const dt = new Date(year, month, d, 12, 0, 0);
+    const v = A.GeoVector(A.Body.Moon, dt, true);
+    const e = A.Ecliptic(v);
+    const s = lonToSign(e.elon);
+    const isToday = dt.toDateString() === now.toDateString();
+    const enteredNewSign = s.idx !== prevSign;
+    days.push({
+      date: d,
+      weekday: ['日','一','二','三','四','五','六'][dt.getDay()],
+      sign: s.name,
+      glyph: s.glyph,
+      idx: s.idx,
+      isToday,
+      enteredNewSign,
+    });
+    prevSign = s.idx;
+  }
+  return { year, month: month + 1, days };
+}
+
+global.AstroTransit = { calcToday, findActiveTransits, forecastDays, calcLifecycleMilestones, calcSolarReturn, calcMonthMoonCalendar, PLANETS };
 
 })(typeof window !== 'undefined' ? window : globalThis);
