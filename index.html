@@ -1315,6 +1315,16 @@ addEventListener('DOMContentLoaded',()=>{
 .big3-sign{font-family:'Cinzel',serif;font-size:1.1rem;color:#FFE08A;font-weight:700}
 .big3-desc{font-family:'Cormorant Garamond','Times New Roman',serif;color:var(--parchment,#E8DCC4);font-size:14px;line-height:1.65;margin:0;font-style:italic}
 
+.balance-card{margin:0 0 22px;padding:20px;background:linear-gradient(135deg,rgba(157,143,194,.1),rgba(10,5,8,.4));border:1px solid rgba(212,175,55,.4);border-left:4px solid #9D8FC2}
+.balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:600px){.balance-grid{grid-template-columns:1fr}}
+.balance-block .bal-title{font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.3em;color:#C0C8D8;text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px dashed rgba(212,175,55,.25)}
+.bal-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;font-family:'Cinzel',serif;font-size:13px}
+.bal-label{flex-shrink:0;width:36px;font-weight:700;font-size:14px}
+.bal-bar{flex:1;height:8px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.2);position:relative;overflow:hidden}
+.bal-fill{display:block;height:100%;transition:width .8s cubic-bezier(.16,1,.3,1);box-shadow:0 0 8px currentColor}
+.bal-count{flex-shrink:0;font-family:'Major Mono Display','VT323',monospace;font-size:11px;color:#C0C8D8;letter-spacing:.1em;min-width:40px;text-align:right}
+
 /* ─── 列印樣式：只印詳情 modal，黑白配紙質白底 ─── */
 @media print{
   body > *{display:none!important}
@@ -1701,7 +1711,49 @@ function renderDetail(){
     </div>
   ` : '';
 
-  body.innerHTML = hdr + big3Html + `
+  // 元素 / 模式平衡度
+  const ELEMENT = { '牡羊':'火','獅子':'火','射手':'火','金牛':'土','處女':'土','摩羯':'土','雙子':'風','天秤':'風','水瓶':'風','巨蟹':'水','天蠍':'水','雙魚':'水' };
+  const MODE = { '牡羊':'開創','巨蟹':'開創','天秤':'開創','摩羯':'開創','金牛':'固定','獅子':'固定','天蠍':'固定','水瓶':'固定','雙子':'變動','處女':'變動','射手':'變動','雙魚':'變動' };
+  const ELE_COLOR = { '火':'#E8634C', '土':'#7AA84B', '風':'#E5C282', '水':'#5BA9D6' };
+  const MODE_COLOR = { '開創':'#FFE08A', '固定':'#D4AF37', '變動':'#9D8FC2' };
+  const eleCount = { '火':0,'土':0,'風':0,'水':0 };
+  const modeCount = { '開創':0,'固定':0,'變動':0 };
+  d.planets.forEach(p => { eleCount[ELEMENT[p.sign]]++; modeCount[MODE[p.sign]]++; });
+  const total = d.planets.length;
+  const eleBar = ['火','土','風','水'].map(k => {
+    const c = eleCount[k];
+    const pct = (c/total*100).toFixed(0);
+    return `<div class="bal-row"><span class="bal-label" style="color:${ELE_COLOR[k]}">${k}</span><span class="bal-bar"><span class="bal-fill" style="width:${pct}%;background:${ELE_COLOR[k]}"></span></span><span class="bal-count">${c} / ${total}</span></div>`;
+  }).join('');
+  const modeBar = ['開創','固定','變動'].map(k => {
+    const c = modeCount[k];
+    const pct = (c/total*100).toFixed(0);
+    return `<div class="bal-row"><span class="bal-label" style="color:${MODE_COLOR[k]}">${k}</span><span class="bal-bar"><span class="bal-fill" style="width:${pct}%;background:${MODE_COLOR[k]}"></span></span><span class="bal-count">${c} / ${total}</span></div>`;
+  }).join('');
+  // 簡短診斷
+  const eleEntries = Object.entries(eleCount).sort((a,b) => b[1] - a[1]);
+  const modeEntries = Object.entries(modeCount).sort((a,b) => b[1] - a[1]);
+  const dominant = `${eleEntries[0][0]}元素主導（${eleEntries[0][1]} 顆）· ${modeEntries[0][0]}模式為主（${modeEntries[0][1]} 顆）`;
+  const missing = eleEntries.filter(([,v]) => v === 0).map(([k]) => k);
+  const missingHint = missing.length ? `<br><span style="color:#C49097">缺：${missing.join(' / ')} ─ 這部分能量需要刻意培養</span>` : '';
+  const balanceHtml = `
+    <div class="balance-card">
+      <span class="natal-label">// elemental balance · 你的元素配方</span>
+      <h3 style="font-family:'Cinzel',serif;color:#FFE08A;margin:8px 0 14px;font-size:1.05rem;letter-spacing:.06em">${dominant}${missingHint}</h3>
+      <div class="balance-grid">
+        <div class="balance-block">
+          <div class="bal-title">四元素</div>
+          ${eleBar}
+        </div>
+        <div class="balance-block">
+          <div class="bal-title">三模式</div>
+          ${modeBar}
+        </div>
+      </div>
+    </div>
+  `;
+
+  body.innerHTML = hdr + big3Html + balanceHtml + `
     <div class="natal-wheel-wrap" id="natal-wheel-wrap"></div>
     <div class="natal-detail-grid">
       <div class="natal-section">
