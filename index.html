@@ -1127,6 +1127,7 @@ addEventListener('DOMContentLoaded',()=>{
 <script src="./transit.js" defer></script>
 <script src="./big3-content.js" defer></script>
 <script src="./daily-tip.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
 
 <!-- 觸發按鈕（未輸入時顯示） / 結果 pill（已輸入後顯示） -->
 <button class="natal-fab" id="natal-fab" aria-label="解鎖你的本命盤">
@@ -1270,6 +1271,7 @@ addEventListener('DOMContentLoaded',()=>{
       <button type="button" class="natal-btn-ghost" id="natal-share">$ COPY_SHARE_LINK</button>
       <button type="button" class="natal-btn-ghost" id="natal-print">$ PRINT</button>
       <button type="button" class="natal-btn-ghost" id="natal-synastry">$ COMPARE_PERSON</button>
+      <button type="button" class="natal-btn-ghost" id="natal-poster">$ DOWNLOAD_POSTER</button>
       <button type="button" class="natal-btn-ghost" id="natal-export">$ EXPORT_JSON</button>
       <button type="button" class="natal-btn-ghost" id="natal-import">$ IMPORT_JSON</button>
       <button type="button" class="natal-btn-ghost" id="natal-replay-tour">$ REPLAY_TOUR</button>
@@ -1785,6 +1787,8 @@ function bindEvents(){
     $('#natal-import-file').click();
   });
 
+  $('#natal-poster').addEventListener('click', generatePoster);
+
   $('#natal-import-file').addEventListener('change', async (e) => {
     const f = e.target.files[0];
     if(!f) return;
@@ -1914,6 +1918,90 @@ function renderSynastry(name, otherChart, synList){
     <h4 style="font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.3em;color:#D4AF37;margin:18px 0 10px;text-transform:uppercase">前 12 強相位（共 ${synList.length} 組）</h4>
     <div class="syn-list">${rows}</div>
   `;
+}
+
+async function generatePoster(){
+  if(!chartData){ alert('請先輸入本命盤'); return; }
+  if(typeof html2canvas === 'undefined'){ alert('html2canvas 載入中，請稍候再試'); return; }
+
+  const sun  = chartData.planets.find(p => p.key === 'sun');
+  const moon = chartData.planets.find(p => p.key === 'moon');
+  const asc  = chartData.ascendant;
+  const big3 = window.Big3Content;
+
+  // 元素平衡
+  const ELEMENT = { '牡羊':'火','獅子':'火','射手':'火','金牛':'土','處女':'土','摩羯':'土','雙子':'風','天秤':'風','水瓶':'風','巨蟹':'水','天蠍':'水','雙魚':'水' };
+  const ELE_COLOR = { '火':'#E8634C','土':'#7AA84B','風':'#E5C282','水':'#5BA9D6' };
+  const eleCount = { '火':0,'土':0,'風':0,'水':0 };
+  chartData.planets.forEach(p => eleCount[ELEMENT[p.sign]]++);
+  const eleBar = ['火','土','風','水'].map(k => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="width:24px;color:${ELE_COLOR[k]};font-family:Cinzel;font-weight:700;font-size:18px">${k}</span><span style="flex:1;height:8px;background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.3)"><span style="display:block;height:100%;background:${ELE_COLOR[k]};width:${eleCount[k]/10*100}%"></span></span><span style="width:32px;text-align:right;font-family:Major Mono Display,monospace;color:#C0C8D8;font-size:13px">${eleCount[k]}/10</span></div>`).join('');
+
+  // 海報臨時容器
+  const poster = document.createElement('div');
+  poster.style.cssText = 'position:fixed;top:-99999px;left:-99999px;width:1080px;height:1920px;background:linear-gradient(180deg,#020103 0%,#0A0508 30%,#1A0F0A 70%,#020103 100%);color:#E8DCC4;font-family:\'Cinzel\',serif;padding:80px 70px;box-sizing:border-box;overflow:hidden';
+  poster.innerHTML = `
+    <div style="text-align:center;margin-bottom:50px">
+      <div style="font-family:'Major Mono Display',monospace;font-size:14px;letter-spacing:.5em;color:#D4AF37;margin-bottom:14px">// CODEX STELLARIS</div>
+      <div style="font-family:'Cinzel',serif;font-size:72px;color:#FFE08A;font-weight:900;letter-spacing:.04em;text-shadow:0 0 30px rgba(212,175,55,.5);margin-bottom:8px">我的本命盤</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;color:#C0C8D8;font-size:24px">${chartData.input.dateStr}${chartData.input.timeStr ? ' · ' + chartData.input.timeStr : ''} · ${chartData.input.cityName}</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:50px">
+      ${[
+        { tag:'太陽 · 核心', glyph:'☉', sign:sun?sun.sign:'-', sgly:sun?sun.signGlyph:'', desc:sun&&big3?big3.SUN_DESC[sun.sign]:'' },
+        { tag:'月亮 · 內在', glyph:'☽', sign:moon?moon.sign:'-', sgly:moon?moon.signGlyph:'', desc:moon&&big3?big3.MOON_DESC[moon.sign]:'' },
+        { tag:'上升 · 外顯', glyph:'⏃', sign:asc?asc.sign:'缺時間', sgly:asc?asc.glyph:'?', desc:asc&&big3?big3.ASC_DESC[asc.sign]:'需要出生時間才能算出' },
+      ].map(b => `
+        <div style="padding:24px 20px;background:rgba(212,175,55,.08);border:1.5px solid #D4AF37;border-left:4px solid #D4AF37">
+          <div style="font-family:'Major Mono Display',monospace;font-size:11px;letter-spacing:.3em;color:#C0C8D8;text-transform:uppercase;margin-bottom:8px">${b.tag}</div>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+            <span style="font-family:'Cinzel',serif;font-size:54px;color:#D4AF37;text-shadow:0 0 16px rgba(212,175,55,.4);line-height:1">${b.glyph}</span>
+            <div>
+              <div style="font-family:'Cinzel',serif;font-size:24px;color:#FFE08A;font-weight:700">${b.sgly} ${b.sign}</div>
+            </div>
+          </div>
+          <div style="font-family:'Cormorant Garamond',serif;font-style:italic;color:#E8DCC4;font-size:16px;line-height:1.55">${b.desc}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div style="padding:32px;background:rgba(157,143,194,.08);border:1.5px solid #9D8FC2;border-left:4px solid #9D8FC2;margin-bottom:50px">
+      <div style="font-family:'Major Mono Display',monospace;font-size:12px;letter-spacing:.3em;color:#C0C8D8;text-transform:uppercase;margin-bottom:18px">// 元素平衡 · ELEMENTAL BALANCE</div>
+      <div style="font-family:'Cormorant Garamond',serif">${eleBar}</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px 30px;margin-bottom:50px">
+      ${chartData.planets.map(p => `
+        <div style="display:flex;align-items:baseline;justify-content:space-between;padding:10px 16px;background:rgba(0,0,0,.4);border:1px solid rgba(212,175,55,.25);font-family:'Space Mono',monospace;font-size:18px">
+          <span style="color:#D4AF37;font-family:'Cinzel',serif;font-size:24px;font-weight:700">${p.glyph}${p.retrograde?' <span style="color:#FFE08A;background:#C24438;font-size:.5em;padding:1px 4px;vertical-align:middle">℞</span>':''}</span>
+          <span style="color:#E8DCC4;flex:1;margin-left:14px">${p.name}</span>
+          <span style="color:#FFE08A;font-family:'Cinzel',serif;font-style:italic">${p.signGlyph} ${p.sign}</span>
+          <span style="color:#7A8090;font-size:.85em;margin-left:8px">${p.degree.toFixed(1)}°</span>
+        </div>
+      `).join('')}
+    </div>
+
+    <div style="position:absolute;bottom:60px;left:70px;right:70px;text-align:center;border-top:1px solid rgba(212,175,55,.3);padding-top:24px">
+      <div style="font-family:'Cinzel',serif;font-size:18px;color:#D4AF37;letter-spacing:.18em;margin-bottom:6px">CODEX · STELLARIS</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-style:italic;color:#C0C8D8;font-size:14px">"As above, so below — the planets are mirrors of you."</div>
+      <div style="font-family:'Major Mono Display',monospace;font-size:11px;color:#7A8090;letter-spacing:.2em;margin-top:8px">eliajhmauve.github.io/astro-codex-stellaris</div>
+    </div>
+  `;
+  document.body.appendChild(poster);
+
+  try {
+    const canvas = await html2canvas(poster, {
+      backgroundColor:'#020103', scale:1, width:1080, height:1920, useCORS:true,
+    });
+    const link = document.createElement('a');
+    link.download = `codex-stellaris-poster-${chartData.input.dateStr}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch(err){
+    console.error(err);
+    alert('海報生成失敗：' + (err.message || err));
+  }
+  setTimeout(() => document.body.removeChild(poster), 100);
 }
 
 function fallbackCopy(text, btn, orig){
