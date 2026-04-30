@@ -46,7 +46,90 @@ function markVisited(planetKey){
   if(!list.includes(planetKey)){
     list.push(planetKey);
     localStorage.setItem(STORAGE_PROGRESS, JSON.stringify(list));
+    // 全部 10 顆完成 → 觸發證書（一次性）
+    if(list.length === 10 && !localStorage.getItem('astro_completion_celebrated')){
+      localStorage.setItem('astro_completion_celebrated', new Date().toISOString());
+      setTimeout(triggerCompletion, 1500);
+    }
   }
+}
+
+function triggerCompletion(){
+  // 注入 confetti + 證書 modal
+  const overlay = document.createElement('div');
+  overlay.className = 'natal-complete-overlay';
+  overlay.innerHTML = `
+    <div class="nc-confetti" id="nc-confetti"></div>
+    <div class="nc-card">
+      <div class="nc-crest">✦</div>
+      <div class="nc-tag">// COMPLETION CERTIFICATE</div>
+      <h2 class="nc-title">你已遊歷十大星體</h2>
+      <p class="nc-sub">從太陽到冥王星 ─ 你完成了西洋占星完整入門。</p>
+      <p class="nc-quote">"As above, so below ─ the planets are mirrors of you."</p>
+      <p class="nc-meta">完成日期：<strong>${new Date().toISOString().slice(0,10)}</strong></p>
+      <div class="nc-actions">
+        <button type="button" class="nc-btn-primary" id="nc-back">回入口看完整本命盤</button>
+        <button type="button" class="nc-btn-ghost" id="nc-close">繼續閱讀本頁</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // 注入 styles
+  if(!document.getElementById('nc-style')){
+    const css = `
+.natal-complete-overlay{position:fixed;inset:0;z-index:9990;background:rgba(2,1,3,.92);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:24px;animation:ncFade .6s ease}
+@keyframes ncFade{from{opacity:0}to{opacity:1}}
+.nc-card{position:relative;max-width:560px;width:100%;padding:60px 40px 40px;background:linear-gradient(180deg,#0A0508 0%,#1A0F0A 50%,#0A0508 100%);border:2px solid #FFE08A;text-align:center;box-shadow:0 0 80px -16px rgba(255,224,138,.6),0 32px 80px -20px rgba(0,0,0,.95);animation:ncRise .8s cubic-bezier(.34,1.56,.64,1)}
+@keyframes ncRise{from{transform:translateY(40px) scale(.85);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.nc-crest{font-family:'Cinzel',serif;font-size:80px;color:#FFE08A;text-shadow:0 0 40px rgba(255,224,138,.8);line-height:1;animation:ncSpin 8s linear infinite;margin-bottom:14px}
+@keyframes ncSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.nc-tag{font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.5em;color:#D4AF37;text-transform:uppercase;margin-bottom:12px}
+.nc-title{font-family:'Cinzel',serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;color:#FFE08A;letter-spacing:.06em;margin-bottom:14px;text-shadow:0 0 32px rgba(255,224,138,.5)}
+.nc-sub{font-family:'Cormorant Garamond',serif;font-style:italic;color:#E8DCC4;font-size:1.1rem;line-height:1.6;margin-bottom:14px}
+.nc-quote{font-family:'Cormorant Garamond',serif;font-style:italic;color:#D4AF37;font-size:1rem;border-top:1px solid rgba(212,175,55,.3);border-bottom:1px solid rgba(212,175,55,.3);padding:18px 0;margin:18px 0}
+.nc-meta{font-family:'Major Mono Display','VT323',monospace;font-size:12px;letter-spacing:.2em;color:#C0C8D8;margin-bottom:24px}
+.nc-meta strong{color:#FFE08A;font-weight:700}
+.nc-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.nc-btn-primary,.nc-btn-ghost{padding:12px 24px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.2em;text-transform:uppercase;font-weight:700;cursor:pointer;border:1px solid #FFE08A;transition:all .3s ease;text-decoration:none;display:inline-block}
+.nc-btn-primary{background:#FFE08A;color:#0A0508}
+.nc-btn-primary:hover{background:#FFF6D8;box-shadow:0 0 24px -4px #FFE08A}
+.nc-btn-ghost{background:transparent;color:#FFE08A}
+.nc-btn-ghost:hover{background:rgba(255,224,138,.15)}
+.nc-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.nc-piece{position:absolute;width:8px;height:14px;background:var(--c,#FFE08A);animation:ncFall var(--d,3s) linear forwards;top:-20px;transform-origin:center}
+@keyframes ncFall{0%{transform:translate3d(0,0,0) rotate(0)}100%{transform:translate3d(var(--x,0),105vh,0) rotate(720deg)}}
+@media(prefers-reduced-motion:reduce){.nc-crest{animation:none}.nc-piece{display:none}}
+    `;
+    const s = document.createElement('style');
+    s.id = 'nc-style';
+    s.textContent = css;
+    document.head.appendChild(s);
+  }
+
+  // 撒 confetti
+  const confettiBox = document.getElementById('nc-confetti');
+  const COLORS = ['#FFE08A','#D4AF37','#E8634C','#7DA8D9','#7AC48E','#9D8FC2','#FFCBA4'];
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+    for(let i = 0; i < 80; i++){
+      const piece = document.createElement('div');
+      piece.className = 'nc-piece';
+      piece.style.left = Math.random() * 100 + 'vw';
+      piece.style.setProperty('--c', COLORS[i % COLORS.length]);
+      piece.style.setProperty('--x', (Math.random() * 200 - 100) + 'px');
+      piece.style.setProperty('--d', (2.5 + Math.random() * 2.5) + 's');
+      piece.style.animationDelay = (Math.random() * 1.2) + 's';
+      // 隨機形狀（圓 / 方）
+      if(Math.random() < 0.4) piece.style.borderRadius = '50%';
+      confettiBox.appendChild(piece);
+    }
+  }
+
+  // 綁事件
+  document.getElementById('nc-back').addEventListener('click', () => location.href = '../index.html');
+  document.getElementById('nc-close').addEventListener('click', () => overlay.remove());
+  // 點外部關閉
+  overlay.addEventListener('click', e => { if(e.target === overlay) overlay.remove(); });
 }
 
 function getNeighbors(planetKey){
