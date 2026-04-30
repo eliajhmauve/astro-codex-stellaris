@@ -51,7 +51,20 @@ function calcToday(){
     const v = A.GeoVector(A.Body[p.body], now, true);
     const e = A.Ecliptic(v);
     const s = lonToSign(e.elon);
-    return { ...p, lon:e.elon, sign:s.name, signGlyph:s.glyph, degree:s.deg };
+    // 逆行偵測
+    let retrograde = false;
+    if(p.body !== 'Sun' && p.body !== 'Moon'){
+      try {
+        const later = new Date(now.getTime() + 86400000);
+        const vL = A.GeoVector(A.Body[p.body], later, true);
+        const eL = A.Ecliptic(vL);
+        let delta = eL.elon - e.elon;
+        if(delta > 180) delta -= 360;
+        if(delta < -180) delta += 360;
+        retrograde = delta < 0;
+      } catch(_){}
+    }
+    return { ...p, lon:e.elon, sign:s.name, signGlyph:s.glyph, degree:s.deg, retrograde };
   });
 }
 

@@ -1379,6 +1379,7 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .natal-section li .val{color:var(--silver,#C0C8D8);font-family:var(--font-script,'Cormorant Garamond'),serif;font-style:italic;font-size:1.05em}
 .natal-section li .val .deg{color:var(--silver-dim,#7A8090);font-family:var(--font-mono,'Major Mono Display'),monospace;font-size:.85em;margin-left:6px}
 .natal-jump{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid var(--gold,#D4AF37);color:var(--gold,#D4AF37);font-family:var(--font-mono,'Major Mono Display'),monospace;font-size:18px;font-weight:700;text-decoration:none;transition:all .25s cubic-bezier(.34,1.56,.64,1);background:rgba(212,175,55,.06);flex-shrink:0;margin-left:8px}
+.rx-badge{display:inline-block;margin-left:4px;padding:1px 5px;background:#C24438;color:#FFE08A;font-family:'Cinzel',serif;font-size:.7em;font-weight:700;border-radius:3px;vertical-align:middle;line-height:1.4}
 .natal-jump:hover{background:var(--gold,#D4AF37);color:#0A0508;transform:translateX(3px) scale(1.08);box-shadow:0 0 14px -2px var(--gold,#D4AF37)}
 
 .natal-next-step{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:18px 22px;margin-bottom:18px;background:linear-gradient(135deg,rgba(212,175,55,.12),rgba(212,175,55,.04));border:1px solid var(--gold,#D4AF37);border-left-width:4px;color:var(--parchment,#E8DCC4)}
@@ -1406,6 +1407,9 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .tr-today-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
 .tr-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.3);font-family:var(--font-tech,'Space Mono'),monospace;font-size:11px;color:var(--silver,#C0C8D8);letter-spacing:.05em}
 .tr-pill .tr-glyph{color:var(--gold,#D4AF37);font-size:1.2em}
+.tr-pill .rx-mini{display:inline-block;color:#FFE08A;background:#C24438;font-family:'Cinzel',serif;font-size:.7em;font-weight:700;padding:0 4px;border-radius:2px;margin:0 3px;vertical-align:middle}
+.rx-banner{padding:10px 14px;margin-bottom:12px;background:rgba(194,68,56,.15);border:1px solid #C24438;border-left-width:4px;color:#FFC0B5;font-family:'Cormorant Garamond',serif;font-size:14px;line-height:1.5}
+.rx-banner strong{color:#FFE08A;font-weight:700;font-style:normal}
 .tr-pill small{opacity:.7;font-size:.85em}
 .tr-list{display:flex;flex-direction:column;gap:6px;max-height:280px;overflow:auto;border:1px solid rgba(212,175,55,.18);padding:10px;background:rgba(0,0,0,.3)}
 .tr-row{display:flex;align-items:center;gap:12px;padding:8px 10px;background:rgba(212,175,55,.04);border-left:2px solid rgba(212,175,55,.4);font-family:var(--font-tech,'Space Mono'),monospace;font-size:12px}
@@ -2050,9 +2054,10 @@ function renderDetail(){
 
   const planets = d.planets.map(p => {
     const houseLbl = p.house ? `<span class="deg">第 ${p.house} 宮</span>` : '';
-    const subtitle = `${p.sign}${p.house ? ' · 第 '+p.house+' 宮' : ''}`;
+    const rxBadge = p.retrograde ? '<span class="rx-badge" title="逆行">℞</span>' : '';
+    const subtitle = `${p.sign}${p.house ? ' · 第 '+p.house+' 宮' : ''}${p.retrograde ? ' · 逆行' : ''}`;
     return `<li>
-      <span class="glyph">${p.glyph}</span>
+      <span class="glyph">${p.glyph}${rxBadge}</span>
       <span class="name">${p.name}</span>
       <span class="val">${p.signGlyph} ${p.sign} <span class="deg">${p.degree.toFixed(1)}°</span> ${houseLbl}</span>
       <a class="natal-jump" href="./${p.key}/" title="解讀我的${p.name}（${subtitle}）" aria-label="解讀我的${p.name}">→</a>
@@ -2169,9 +2174,17 @@ function renderDetail(){
     ${aspectsHtml}
     <div class="natal-transit" id="natal-transit-block"></div>
   `;
-  // 渲染輪盤
+  // 渲染輪盤（含今日行運外圈）
   if(window.NatalWheel){
-    NatalWheel.render(document.getElementById('natal-wheel-wrap'), d, { size: 400, linkPrefix: './' });
+    let transitPlanets = null;
+    try {
+      if(window.AstroTransit) transitPlanets = window.AstroTransit.calcToday();
+    } catch(_){}
+    NatalWheel.render(document.getElementById('natal-wheel-wrap'), d, {
+      size: 400,
+      linkPrefix: './',
+      transit: transitPlanets,
+    });
   }
   // 渲染今日行運
   renderTransit();
@@ -2186,8 +2199,10 @@ function renderTransit(){
     const { today, transits } = window.AstroTransit.findActiveTransits(chartData);
     const dateStr = new Date().toISOString().slice(0, 10);
     const todayHtml = today.map(t =>
-      `<span class="tr-pill"><span class="tr-glyph">${t.glyph}</span> ${t.signGlyph} <small>${t.degree.toFixed(1)}°</small></span>`
+      `<span class="tr-pill"><span class="tr-glyph">${t.glyph}</span>${t.retrograde?'<span class="rx-mini">℞</span>':''} ${t.signGlyph} <small>${t.degree.toFixed(1)}°</small></span>`
     ).join('');
+    const rxList = today.filter(t => t.retrograde);
+    const rxBanner = rxList.length ? `<div class="rx-banner">⚠ 目前逆行中：${rxList.map(t => `<strong>${t.glyph} ${t.name}</strong>`).join(' · ')}</div>` : '';
     const top5 = transits.slice(0, 8);
     const trHtml = top5.length
       ? top5.map(a => `
@@ -2262,6 +2277,7 @@ function renderTransit(){
         ☉ 此刻太陽運行至：${today[0].signGlyph} ${today[0].sign}座 ${today[0].degree.toFixed(1)}°
         <br>下方列出今日對你本命盤形成的緊密相位（orb &lt; 3°），按精準度排序：
       </p>
+      ${rxBanner}
       <div class="tr-today-pills">${todayHtml}</div>
       <div class="tr-list">${trHtml}</div>
       ${forecastHtml}

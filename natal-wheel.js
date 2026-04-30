@@ -216,9 +216,27 @@ function render(container, chart, opt){
     t.textContent = p.glyph;
     g.appendChild(t);
 
+    // 逆行小標 ℞
+    if(p.retrograde){
+      const rxX = px + size * 0.04;
+      const rxY = py - size * 0.025;
+      g.appendChild(el('circle', { cx: rxX, cy: rxY, r: size * 0.018, fill:'#C24438', stroke:'#FFE08A', 'stroke-width':.5 }));
+      const rxT = el('text', {
+        x: rxX, y: rxY + 3,
+        'text-anchor':'middle',
+        fill:'#FFF6D8',
+        'font-family':"'Cinzel',serif",
+        'font-size': size * 0.022,
+        'font-weight':'700',
+        style:'pointer-events:none'
+      });
+      rxT.textContent = '℞';
+      g.appendChild(rxT);
+    }
+
     // hover tooltip
     const titleEl = el('title');
-    titleEl.textContent = `${p.name} ${p.glyph} · ${p.signGlyph} ${p.sign}座 ${p.degree.toFixed(1)}°${p.house ? ' · 第 '+p.house+' 宮' : ''}`;
+    titleEl.textContent = `${p.name} ${p.glyph}${p.retrograde ? ' ℞ 逆行' : ''} · ${p.signGlyph} ${p.sign}座 ${p.degree.toFixed(1)}°${p.house ? ' · 第 '+p.house+' 宮' : ''}`;
     g.appendChild(titleEl);
 
     g.addEventListener('click', () => {
@@ -263,6 +281,63 @@ function render(container, chart, opt){
       ln.appendChild(titleEl);
       svg.appendChild(ln);
     });
+  }
+
+  // ── 5. 外圈：今日行運（可選）
+  if(opt.transit && Array.isArray(opt.transit) && opt.transit.length){
+    const R_OUTER_PLN = R_OUT + size * 0.04;
+    // 擴大 viewBox（透過修改 svg 屬性）
+    const ext = size * 0.06;
+    svg.setAttribute('viewBox', `${-ext} ${-ext} ${size + ext * 2} ${size + ext * 2}`);
+
+    const placedT = opt.transit.map(p => ({
+      p, angle: lonToSvgAngle(p.lon, ascDeg)
+    })).sort((a,b) => a.angle - b.angle);
+    const MIN_GAP_T = 7;
+    for(let i = 1; i < placedT.length; i++){
+      let diff = placedT[i].angle - placedT[i-1].angle;
+      if(diff < 0) diff += 360;
+      if(diff < MIN_GAP_T) placedT[i].angle = (placedT[i-1].angle + MIN_GAP_T) % 360;
+    }
+
+    placedT.forEach(({p, angle}) => {
+      const [px, py] = polar(cx, cy, R_OUTER_PLN, angle);
+      // 從黃道帶往外指示線
+      const [tickX, tickY] = polar(cx, cy, R_OUT + 1, lonToSvgAngle(p.lon, ascDeg));
+      svg.appendChild(el('line', {
+        x1: tickX, y1: tickY, x2: px, y2: py,
+        stroke:'rgba(125,168,217,.5)', 'stroke-width': .5, 'stroke-dasharray':'2 2'
+      }));
+      const g = el('g', { 'data-transit': p.key });
+      g.appendChild(el('circle', { cx: px, cy: py, r: size * 0.026, fill:'rgba(10,5,30,.7)', stroke:'#7DA8D9', 'stroke-width': 1 }));
+      const t = el('text', {
+        x: px, y: py + 4,
+        'text-anchor':'middle',
+        fill:'#7DA8D9',
+        'font-family':"'Cinzel',serif",
+        'font-size': size * 0.034,
+        'font-weight':'700',
+        style:'pointer-events:none'
+      });
+      t.textContent = p.glyph;
+      g.appendChild(t);
+      const titleEl = el('title');
+      titleEl.textContent = `今日 ${p.name}${p.retrograde ? ' ℞' : ''} · ${p.signGlyph} ${p.sign}座 ${p.degree.toFixed(1)}°`;
+      g.appendChild(titleEl);
+      svg.appendChild(g);
+    });
+
+    // 外圈標籤
+    const lbl = el('text', {
+      x: cx, y: -ext * 0.4,
+      'text-anchor':'middle',
+      fill:'#7DA8D9',
+      'font-family':"'Major Mono Display','VT323',monospace",
+      'font-size': size * 0.032,
+      'letter-spacing':'.2em'
+    });
+    lbl.textContent = '◐ TRANSIT';
+    svg.appendChild(lbl);
   }
 
   // 中心點

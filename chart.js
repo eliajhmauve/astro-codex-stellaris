@@ -99,11 +99,24 @@ function calcChart(input){
   // 本地時間 → UTC（減去時區 offset）
   const utc = new Date(Date.UTC(y, mo - 1, d, h - c.tz, mi));
 
-  // 10 行星黃經
+  // 10 行星黃經 + 逆行偵測
   const planets = PLANETS.map(p => {
     const v = A.GeoVector(A.Body[p.body], utc, true);  // aberration=true
     const e = A.Ecliptic(v);
     const s = lonToSign(e.elon);
+    // 逆行偵測：1 天後的位置 < 現在 = 逆行
+    let retrograde = false;
+    if(p.body !== 'Sun' && p.body !== 'Moon'){
+      try {
+        const utcLater = new Date(utc.getTime() + 86400000);
+        const vLater = A.GeoVector(A.Body[p.body], utcLater, true);
+        const eLater = A.Ecliptic(vLater);
+        let delta = eLater.elon - e.elon;
+        if(delta > 180) delta -= 360;
+        if(delta < -180) delta += 360;
+        retrograde = delta < 0;
+      } catch(_){}
+    }
     return {
       ...p,
       lon:    e.elon,
@@ -111,6 +124,7 @@ function calcChart(input){
       sign:   s.name,
       signGlyph: s.glyph,
       degree: s.deg,
+      retrograde,
     };
   });
 
