@@ -1154,6 +1154,7 @@ addEventListener('DOMContentLoaded',()=>{
 <script src="./big3-content.js" defer></script>
 <script src="./daily-tip.js" defer></script>
 <script src="./poetic-intro.js" defer></script>
+<script src="./tarot.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
 
 <!-- 觸發按鈕（未輸入時顯示） / 結果 pill（已輸入後顯示） -->
@@ -1550,6 +1551,23 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .pi-sig{text-align:right;margin-top:18px;font-style:italic;color:#9D8FC2;font-size:14px;font-family:'Cormorant Garamond',serif}
 .pi-sig strong{color:#E8DCC4;font-weight:700;font-style:normal;margin:0 4px}
 @media(max-width:600px){.pi-p{padding:14px 0 14px 0}.pi-p .pi-line{position:static;display:inline-block;width:auto;border-right:none;margin-right:8px;padding:2px 6px;background:rgba(212,175,55,.12);text-align:center}}
+
+.tarot-card{margin:0 0 22px;padding:24px;background:linear-gradient(135deg,rgba(157,143,194,.12),rgba(10,5,8,.5));border:1px solid #9D8FC2;border-left:4px solid #9D8FC2}
+.tarot-grid{display:grid;grid-template-columns:160px 1fr;gap:24px;margin-top:14px;align-items:center}
+.tarot-img{position:relative;height:230px;background:linear-gradient(180deg,#3D2C5A 0%,#1A0F2A 50%,#3D2C5A 100%);border:2px solid #FFE08A;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;box-shadow:0 12px 32px -8px rgba(157,143,194,.4),inset 0 0 24px rgba(0,0,0,.5);text-align:center;transition:transform .4s ease}
+.tarot-card.is-reversed .tarot-img{transform:rotate(180deg)}
+.tarot-card.is-reversed .tarot-img>*{transform:rotate(180deg)}
+.tarot-card.is-reversed .tarot-img{background:linear-gradient(180deg,#3D2C5A 0%,#5A1A2A 50%,#3D2C5A 100%);border-color:#E8634C}
+.tc-num{font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.4em;color:#FFE08A}
+.tc-glyph{font-family:'Cinzel',serif;font-size:5rem;color:#FFE08A;text-shadow:0 0 30px rgba(255,224,138,.6);line-height:1;margin:8px 0}
+.tc-stamp{position:absolute;top:6px;right:8px;padding:2px 8px;background:rgba(255,224,138,.18);border:1px solid #FFE08A;color:#FFE08A;font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.2em}
+.tarot-card.is-reversed .tc-stamp{background:rgba(232,99,76,.18);border-color:#E8634C;color:#E8634C}
+.tarot-meta h4{font-family:'Cinzel',serif;font-size:1.4rem;color:#FFE08A;font-weight:900;margin-bottom:4px;letter-spacing:.04em}
+.tarot-meta h4 em{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:400;color:#9D8FC2;font-size:.85em}
+.tc-planet{font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.2em;color:#9D8FC2;text-transform:uppercase;margin-bottom:14px}
+.tc-meaning{font-family:'Cormorant Garamond',serif;color:#E8DCC4;font-size:15px;line-height:1.7;margin-bottom:12px;font-style:italic}
+.tc-note{font-size:11px;color:#7A8090;font-family:'Major Mono Display','VT323',monospace;letter-spacing:.15em}
+@media(max-width:600px){.tarot-grid{grid-template-columns:1fr;justify-items:center}.tarot-img{width:160px}}
 
 .qa-card{margin:18px 0;padding:20px 24px;background:linear-gradient(135deg,rgba(125,168,217,.08),rgba(10,5,8,.4));border:1px solid #7DA8D9;border-left:4px solid #7DA8D9}
 .qa-card .natal-label{margin-bottom:14px}
@@ -2451,7 +2469,35 @@ function renderDetail(){
     }
   }
 
-  body.innerHTML = hdr + dailyTipHtml + sealHtml + poeticHtml + big3Html + balanceHtml + `
+  // 每日塔羅
+  let tarotHtml = '';
+  try {
+    if(window.DailyTarot){
+      const card = window.DailyTarot.getCard();
+      const isReversed = card.reversed;
+      const meaning = isReversed ? card.shadow : card.upright;
+      tarotHtml = `
+        <div class="tarot-card ${isReversed?'is-reversed':''}">
+          <span class="natal-label">// daily tarot · 今日抽到</span>
+          <div class="tarot-grid">
+            <div class="tarot-img">
+              <div class="tc-num">${card.num}</div>
+              <div class="tc-glyph">${card.glyph}</div>
+              <div class="tc-stamp">${isReversed?'逆位':'正位'}</div>
+            </div>
+            <div class="tarot-meta">
+              <h4>${card.name} · <em>${card.en}</em></h4>
+              <p class="tc-planet">守護：${card.planet}</p>
+              <p class="tc-meaning">${meaning}</p>
+              <p class="tc-note">★ 每天的卡按日期固定 ─ 隔天會抽到不同的，但你跟全世界看到同一張。</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  } catch(_){}
+
+  body.innerHTML = hdr + dailyTipHtml + tarotHtml + sealHtml + poeticHtml + big3Html + balanceHtml + `
     <div class="natal-wheel-wrap" id="natal-wheel-wrap"></div>
     <div class="natal-detail-grid">
       <div class="natal-section">
