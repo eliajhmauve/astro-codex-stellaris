@@ -1174,6 +1174,42 @@ addEventListener('DOMContentLoaded',()=>{
 <!-- 詞彙表觸發按鈕 -->
 <button class="glossary-fab" id="glossary-fab" aria-label="占星詞彙表">?</button>
 
+<!-- 合盤 Modal -->
+<div class="natal-modal" id="syn-modal" role="dialog" aria-modal="true">
+  <div class="natal-modal-card natal-modal-wide">
+    <button class="natal-close" data-close>×</button>
+    <span class="natal-label">// synastry · 合盤</span>
+    <h2>跟另一個人合盤</h2>
+    <p class="natal-hint">輸入對方的生日，看你們行星之間的交叉相位。100 個可能組合中找出最緊密的化學反應。</p>
+
+    <form class="natal-form" id="syn-form">
+      <label class="natal-field">
+        <span class="natal-field-label">對方姓名（自定義名稱）</span>
+        <input type="text" id="syn-name" placeholder="例：阿德 / Sarah" maxlength="20">
+      </label>
+      <label class="natal-field">
+        <span class="natal-field-label">對方出生日期 <em>必填</em></span>
+        <input type="date" id="syn-date" required min="1900-01-01" max="2100-12-31">
+      </label>
+      <label class="natal-field">
+        <span class="natal-field-label">出生時間（可選）</span>
+        <input type="time" id="syn-time">
+      </label>
+      <label class="natal-field">
+        <span class="natal-field-label">出生城市</span>
+        <select id="syn-city" required></select>
+      </label>
+      <div class="natal-form-actions">
+        <button type="submit" class="natal-btn-primary">$ COMPUTE_SYNASTRY</button>
+        <button type="button" class="natal-btn-ghost" data-close>取消</button>
+      </div>
+      <p class="natal-status" id="syn-status"></p>
+    </form>
+
+    <div id="syn-result" style="margin-top:24px"></div>
+  </div>
+</div>
+
 <!-- Onboarding Overlay -->
 <div class="ob-overlay" id="ob-overlay" role="dialog" aria-modal="true">
   <div class="ob-spotlight" id="ob-spotlight"></div>
@@ -1232,6 +1268,8 @@ addEventListener('DOMContentLoaded',()=>{
       <button type="button" class="natal-btn-ghost" id="natal-edit">$ EDIT_INPUT</button>
       <button type="button" class="natal-btn-ghost" id="natal-share">$ COPY_SHARE_LINK</button>
       <button type="button" class="natal-btn-ghost" id="natal-print">$ PRINT</button>
+      <button type="button" class="natal-btn-ghost" id="natal-synastry">$ COMPARE_PERSON</button>
+      <button type="button" class="natal-btn-ghost" id="natal-replay-tour">$ REPLAY_TOUR</button>
       <button type="button" class="natal-btn-ghost" id="natal-clear" style="color:#C49097;border-color:#C49097">清除我的盤</button>
     </div>
   </div>
@@ -1397,6 +1435,16 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .lc-desc{font-family:'Cormorant Garamond',serif;font-style:italic;color:#C0C8D8;font-size:13px;line-height:1.6;margin-bottom:6px}
 .lc-date{font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.15em;color:#7A8090}
 @media(max-width:600px){.lc-row{flex-wrap:wrap;gap:8px}.lc-age{min-width:auto;font-size:1.2em}}
+
+.syn-list{display:flex;flex-direction:column;gap:7px;margin-top:8px;max-height:380px;overflow:auto;border:1px solid rgba(212,175,55,.18);padding:10px;background:rgba(0,0,0,.3)}
+.syn-row{display:flex;align-items:center;gap:14px;padding:9px 12px;background:rgba(212,175,55,.04);border-left:3px solid #D4AF37;font-family:'Space Mono',monospace;font-size:12px}
+.syn-row .syn-pair{display:flex;align-items:center;gap:6px;flex-shrink:0;min-width:80px}
+.syn-row .syn-glyph{font-family:'Cinzel',serif;font-size:1.4em;color:#FFE08A;font-weight:700}
+.syn-row .syn-arrow{font-weight:700;font-size:1.1em}
+.syn-row .syn-name{flex:1;color:#E8DCC4;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:1.1em}
+.syn-row .syn-name strong{font-style:normal;color:#FFE08A;font-weight:700}
+.syn-row .syn-name .syn-tag{font-style:normal;font-family:'Major Mono Display',monospace;font-size:.75em;letter-spacing:.15em;margin-left:6px;text-transform:uppercase}
+.syn-row .syn-orb{color:#7A8090;font-size:.9em;flex-shrink:0;font-family:'Major Mono Display',monospace}
 
 .big3-card{margin:0 0 22px;padding:20px;background:linear-gradient(135deg,rgba(212,175,55,.12),rgba(10,5,8,.4));border:1px solid var(--gold,#D4AF37);border-left-width:4px}
 .big3-card .natal-label{margin-bottom:14px}
@@ -1682,6 +1730,129 @@ function bindEvents(){
   $('#natal-print').addEventListener('click', () => {
     window.print();
   });
+
+  $('#natal-synastry').addEventListener('click', () => {
+    if(!chartData){ alert('請先輸入你自己的本命盤'); return; }
+    populateSynCities();
+    $('#natal-detail-modal').classList.remove('show');
+    $('#syn-modal').classList.add('show');
+  });
+
+  $('#natal-replay-tour').addEventListener('click', () => {
+    $('#natal-detail-modal').classList.remove('show');
+    setTimeout(startOnboarding, 300);
+  });
+
+  // 合盤 form 綁事件
+  const synForm = document.getElementById('syn-form');
+  if(synForm){
+    synForm.addEventListener('submit', onSynSubmit);
+    document.getElementById('syn-modal').addEventListener('click', e => {
+      if(e.target.id === 'syn-modal') document.getElementById('syn-modal').classList.remove('show');
+    });
+    document.querySelectorAll('#syn-modal [data-close]').forEach(b => {
+      b.addEventListener('click', () => document.getElementById('syn-modal').classList.remove('show'));
+    });
+  }
+}
+
+function populateSynCities(){
+  const sel = document.getElementById('syn-city');
+  if(!sel || sel.options.length > 0) return;
+  const src = (window.AstroNatal && window.AstroNatal.CITIES) || {};
+  Object.keys(src).forEach(k => {
+    const opt = document.createElement('option');
+    opt.value = k;
+    opt.textContent = src[k].name;
+    if(k === 'taipei') opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function setSynStatus(msg, kind){
+  const el = document.getElementById('syn-status');
+  el.className = 'natal-status' + (kind ? ' ' + kind : '');
+  el.textContent = msg || '';
+}
+
+function onSynSubmit(e){
+  e.preventDefault();
+  setSynStatus('');
+  const name  = document.getElementById('syn-name').value.trim() || '對方';
+  const date  = document.getElementById('syn-date').value;
+  const time  = document.getElementById('syn-time').value;
+  const city  = document.getElementById('syn-city').value;
+  if(!date || !city){ setSynStatus('需要日期與城市', 'error'); return; }
+
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.disabled = true;
+  setSynStatus('< calculating > 算對方盤 + 交叉相位 ...');
+
+  waitForLib(() => !!(window.Astronomy && window.AstroNatal), function(loaded){
+    btn.disabled = false;
+    if(!loaded){ setSynStatus('天文引擎載入失敗', 'error'); return; }
+    try {
+      const otherChart = window.AstroNatal.calcChart({ dateStr: date, timeStr: time || null, city });
+      const synList = window.AstroNatal.calcSynastry(chartData, otherChart);
+      renderSynastry(name, otherChart, synList);
+      setSynStatus(`✓ 找到 ${synList.length} 組交叉相位`, 'success');
+    } catch(err){
+      console.error(err);
+      setSynStatus('計算失敗：' + (err.message || err), 'error');
+    }
+  }, 10000);
+}
+
+function renderSynastry(name, otherChart, synList){
+  const box = document.getElementById('syn-result');
+  if(!box) return;
+  if(!synList.length){
+    box.innerHTML = '<p style="color:#C49097;font-style:italic;text-align:center;padding:14px">沒有找到任何 orb &lt; 6° 的交叉相位 ─ 你們互動很「平」，沒有特別的化學反應。</p>';
+    return;
+  }
+
+  // 統計
+  const counts = { con:0, opp:0, sqr:0, tri:0, sex:0 };
+  synList.forEach(a => counts[a.type]++);
+  const ASPECT_VIBE = {
+    con: { color:'#FFE08A', tag:'融合' },
+    opp: { color:'#E8634C', tag:'拉扯' },
+    sqr: { color:'#E8A04C', tag:'衝突' },
+    tri: { color:'#7AC48E', tag:'流暢' },
+    sex: { color:'#7DA8D9', tag:'機會' },
+  };
+  const summary = Object.entries(counts).filter(([,v]) => v > 0)
+    .map(([k,v]) => `<span style="color:${ASPECT_VIBE[k].color}">${v} 個 ${ASPECT_VIBE[k].tag}</span>`)
+    .join(' · ');
+
+  // 顯示前 12 個最緊密的
+  const top = synList.slice(0, 12);
+  const rows = top.map(a => {
+    const v = ASPECT_VIBE[a.type];
+    return `<div class="syn-row" style="border-left-color:${v.color}">
+      <span class="syn-pair"><span class="syn-glyph">${a.aPlanetGlyph}</span><span class="syn-arrow" style="color:${v.color}">×</span><span class="syn-glyph">${a.bPlanetGlyph}</span></span>
+      <span class="syn-name">你的<strong>${a.aPlanetName}</strong> ${a.aspectName} ${name}的<strong>${a.bPlanetName}</strong> <span class="syn-tag" style="color:${v.color}">${v.tag} ${a.angle}°</span></span>
+      <span class="syn-orb">orb ${a.orbDelta.toFixed(2)}°</span>
+    </div>`;
+  }).join('');
+
+  // 分析「最強的化學反應」
+  const strongest = synList[0];
+  const v = ASPECT_VIBE[strongest.type];
+  const insight = strongest.orbDelta < 1
+    ? `★★★ ${strongest.aPlanetName} × ${strongest.bPlanetName} ${strongest.aspectName}（orb 小於 1°）── 這是占星級「命中註定」的精準度。`
+    : strongest.orbDelta < 3
+    ? `★★ 最強連結是你的 ${strongest.aPlanetName} × ${name}的 ${strongest.bPlanetName}（${strongest.aspectName}）。`
+    : `主要連結較分散，沒有單一壓倒性的相位。`;
+
+  box.innerHTML = `
+    <h3 style="font-family:'Cinzel',serif;color:#FFE08A;margin-bottom:8px">合盤分析 · 你 × ${name}</h3>
+    <p class="natal-hint">${otherChart.input.dateStr}${otherChart.input.timeStr ? ' · ' + otherChart.input.timeStr : ''} · ${otherChart.input.cityName}</p>
+    <p class="natal-hint" style="font-size:13px;margin-bottom:14px">${summary}</p>
+    <p style="background:rgba(212,175,55,.1);border-left:3px solid #FFE08A;padding:12px 16px;font-family:'Cormorant Garamond',serif;font-style:italic;color:#E8DCC4;font-size:1.05rem;line-height:1.6">${insight}</p>
+    <h4 style="font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.3em;color:#D4AF37;margin:18px 0 10px;text-transform:uppercase">前 12 強相位（共 ${synList.length} 組）</h4>
+    <div class="syn-list">${rows}</div>
+  `;
 }
 
 function fallbackCopy(text, btn, orig){

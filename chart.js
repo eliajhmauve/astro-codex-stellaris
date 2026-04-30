@@ -170,6 +170,32 @@ function calcChart(input){
   };
 }
 
-global.AstroNatal = { SIGNS, GLYPHS, PLANETS, ASPECTS, CITIES, lonToSign, calcChart };
+// 合盤：兩個本命盤 = 100 個交叉相位
+function calcSynastry(chartA, chartB){
+  if(!chartA || !chartB || !chartA.planets || !chartB.planets) return [];
+  const list = [];
+  chartA.planets.forEach(a => {
+    chartB.planets.forEach(b => {
+      const diff = angleDiff(a.lon, b.lon);
+      for(const asp of ASPECTS){
+        const orb = 6; // 合盤用較緊的 orb
+        if(Math.abs(diff - asp.angle) <= orb){
+          list.push({
+            aPlanet: a.key, aPlanetName: a.name, aPlanetGlyph: a.glyph,
+            bPlanet: b.key, bPlanetName: b.name, bPlanetGlyph: b.glyph,
+            type: asp.key, aspectName: asp.name, angle: asp.angle,
+            actualDiff: diff,
+            orbDelta: Math.abs(diff - asp.angle),
+          });
+          break;
+        }
+      }
+    });
+  });
+  // 按精準度排序
+  return list.sort((a, b) => a.orbDelta - b.orbDelta);
+}
+
+global.AstroNatal = { SIGNS, GLYPHS, PLANETS, ASPECTS, CITIES, lonToSign, calcChart, calcSynastry };
 
 })(typeof window !== 'undefined' ? window : globalThis);
