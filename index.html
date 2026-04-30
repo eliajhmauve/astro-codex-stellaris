@@ -1269,8 +1269,11 @@ addEventListener('DOMContentLoaded',()=>{
       <button type="button" class="natal-btn-ghost" id="natal-share">$ COPY_SHARE_LINK</button>
       <button type="button" class="natal-btn-ghost" id="natal-print">$ PRINT</button>
       <button type="button" class="natal-btn-ghost" id="natal-synastry">$ COMPARE_PERSON</button>
+      <button type="button" class="natal-btn-ghost" id="natal-export">$ EXPORT_JSON</button>
+      <button type="button" class="natal-btn-ghost" id="natal-import">$ IMPORT_JSON</button>
       <button type="button" class="natal-btn-ghost" id="natal-replay-tour">$ REPLAY_TOUR</button>
       <button type="button" class="natal-btn-ghost" id="natal-clear" style="color:#C49097;border-color:#C49097">清除我的盤</button>
+      <input type="file" id="natal-import-file" accept=".json,application/json" style="display:none">
     </div>
   </div>
 </div>
@@ -1741,6 +1744,45 @@ function bindEvents(){
   $('#natal-replay-tour').addEventListener('click', () => {
     $('#natal-detail-modal').classList.remove('show');
     setTimeout(startOnboarding, 300);
+  });
+
+  $('#natal-export').addEventListener('click', () => {
+    if(!chartData) return;
+    const data = JSON.stringify({
+      app: 'codex-stellaris', version: 1, exportedAt: new Date().toISOString(),
+      chart: chartData,
+      progress: JSON.parse(localStorage.getItem('astro_progress_visited') || '[]'),
+    }, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `codex-stellaris-${chartData.input.dateStr}.json`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  });
+
+  $('#natal-import').addEventListener('click', () => {
+    $('#natal-import-file').click();
+  });
+
+  $('#natal-import-file').addEventListener('change', async (e) => {
+    const f = e.target.files[0];
+    if(!f) return;
+    try {
+      const text = await f.text();
+      const obj = JSON.parse(text);
+      if(!obj.chart || !obj.chart.planets) throw new Error('無效的本命盤檔案');
+      chartData = obj.chart;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj.chart));
+      if(Array.isArray(obj.progress)) localStorage.setItem('astro_progress_visited', JSON.stringify(obj.progress));
+      refreshFab();
+      openDetail();
+      alert('✓ 匯入成功！');
+    } catch(err){
+      alert('匯入失敗：' + (err.message || err));
+    }
+    e.target.value = '';
   });
 
   // 合盤 form 綁事件

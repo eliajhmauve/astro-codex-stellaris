@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://eliajhmauve.github.io/astro-codex-stellaris/sitemap.xml
