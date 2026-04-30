@@ -96,6 +96,51 @@ function findActiveTransits(natalChart){
   return { today, transits: list };
 }
 
-global.AstroTransit = { calcToday, findActiveTransits, PLANETS };
+// 未來 N 天的精準相位事件
+function forecastDays(natalChart, days){
+  if(!global.Astronomy) return [];
+  if(!natalChart || !natalChart.planets) return [];
+  days = days || 7;
+  const A = global.Astronomy;
+  const events = [];
+  const seen = new Set(); // 去重相同 transit×natal×aspect 組
+
+  for(let d = 0; d < days; d++){
+    const day = new Date();
+    day.setHours(12, 0, 0, 0);
+    day.setDate(day.getDate() + d);
+
+    PLANETS.forEach(t => {
+      const v = A.GeoVector(A.Body[t.body], day, true);
+      const e = A.Ecliptic(v);
+      natalChart.planets.forEach(n => {
+        const diff = angleDiff(e.elon, n.lon);
+        for(const asp of ASPECTS){
+          const orbThis = Math.abs(diff - asp.angle);
+          if(orbThis <= 1.5){ // 精準
+            const k = `${t.key}-${n.key}-${asp.key}`;
+            if(!seen.has(k)){
+              seen.add(k);
+              events.push({
+                date: day.toISOString().slice(0,10),
+                dayOffset: d,
+                weekday: ['日','一','二','三','四','五','六'][day.getDay()],
+                transitKey: t.key, transitName: t.name, transitGlyph: t.glyph,
+                natalKey: n.key, natalName: n.name, natalGlyph: n.glyph,
+                type: asp.key, aspectName: asp.name, angle: asp.angle,
+                orbDelta: orbThis,
+              });
+            }
+            break;
+          }
+        }
+      });
+    });
+  }
+
+  return events.sort((a, b) => a.dayOffset - b.dayOffset || a.orbDelta - b.orbDelta);
+}
+
+global.AstroTransit = { calcToday, findActiveTransits, forecastDays, PLANETS };
 
 })(typeof window !== 'undefined' ? window : globalThis);

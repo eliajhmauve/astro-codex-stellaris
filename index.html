@@ -1293,6 +1293,17 @@ addEventListener('DOMContentLoaded',()=>{
 .tr-row .tr-name{flex:1;color:var(--parchment,#E8DCC4);font-family:var(--font-script,'Cormorant Garamond'),serif;font-style:italic;font-size:1.05em}
 .tr-row .tr-orb{color:#7A8090;font-size:.85em;flex-shrink:0}
 
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:10px}
+.fc-day{padding:12px 14px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.3);border-left-width:3px}
+.fc-day-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;border-bottom:1px dashed rgba(212,175,55,.2);padding-bottom:6px}
+.fc-tag{font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.2em;color:#FFE08A;text-transform:uppercase}
+.fc-date{font-family:'Major Mono Display','VT323',monospace;font-size:10px;color:#7A8090}
+.fc-event{display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;font-family:'Cormorant Garamond',serif;font-style:italic;color:#E8DCC4;border-bottom:1px dotted rgba(212,175,55,.15)}
+.fc-event:last-child{border-bottom:none}
+.fc-event .fc-glyph{font-family:'Cinzel',serif;font-size:1.3em;color:#FFE08A;font-weight:700;font-style:normal}
+.fc-event .fc-arrow{color:#7A8090;font-style:normal}
+.fc-event .fc-name{flex:1;font-size:1em}
+
 .big3-card{margin:0 0 22px;padding:20px;background:linear-gradient(135deg,rgba(212,175,55,.12),rgba(10,5,8,.4));border:1px solid var(--gold,#D4AF37);border-left-width:4px}
 .big3-card .natal-label{margin-bottom:14px}
 .big3-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
@@ -1731,6 +1742,29 @@ function renderTransit(){
           </div>
         `).join('')
       : '<p style="color:#7A8090;font-style:italic;font-family:var(--font-script,Cormorant Garamond),serif;text-align:center;padding:14px">今日無緊密相位（orb &lt; 3°）— 是相對平靜的一天。</p>';
+    // 未來 7 天 forecast
+    let forecastHtml = '';
+    try {
+      const forecast = window.AstroTransit.forecastDays(chartData, 7);
+      if(forecast.length){
+        const byDay = {};
+        forecast.forEach(f => { (byDay[f.dayOffset] = byDay[f.dayOffset] || []).push(f); });
+        const days = Object.keys(byDay).sort((a,b) => +a - +b).slice(0, 7);
+        const dayCards = days.map(d => {
+          const items = byDay[d].slice(0, 3);
+          const dStr = items[0].date;
+          const wd = items[0].weekday;
+          const dayLabel = d === '0' ? '今日' : d === '1' ? '明日' : `+${d} 天`;
+          const rows = items.map(f => `<div class="fc-event"><span class="fc-glyph">${f.transitGlyph}</span><span class="fc-arrow">→</span><span class="fc-glyph">${f.natalGlyph}</span> <span class="fc-name">${f.transitName} ${f.aspectName} ${f.natalName}</span></div>`).join('');
+          return `<div class="fc-day"><div class="fc-day-head"><span class="fc-tag">${dayLabel}</span><span class="fc-date">${dStr} 週${wd}</span></div>${rows}</div>`;
+        }).join('');
+        forecastHtml = `
+          <h3 style="font-family:var(--font-display,Cinzel),serif;font-size:1rem;letter-spacing:.18em;color:var(--gold);margin:24px 0 10px;border-bottom:1px solid rgba(212,175,55,.25);padding-bottom:6px;text-transform:uppercase">未來 7 天 · 重要相位日曆</h3>
+          <p class="natal-hint" style="margin-bottom:10px">orb &lt; 1.5° 的精準時刻 — 這幾天會明顯感受到該行星帶來的變化：</p>
+          <div class="fc-grid">${dayCards}</div>`;
+      }
+    } catch(_){}
+
     box.innerHTML = `
       <h3 style="font-family:var(--font-display,Cinzel),serif;font-size:1rem;letter-spacing:.18em;color:var(--gold);margin:24px 0 10px;border-bottom:1px solid rgba(212,175,55,.25);padding-bottom:6px;text-transform:uppercase">今日行運 · ${dateStr}</h3>
       <p class="natal-hint" style="margin-bottom:10px">
@@ -1739,6 +1773,7 @@ function renderTransit(){
       </p>
       <div class="tr-today-pills">${todayHtml}</div>
       <div class="tr-list">${trHtml}</div>
+      ${forecastHtml}
     `;
   } catch(e){
     console.warn('transit render failed', e);
