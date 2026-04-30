@@ -1171,6 +1171,42 @@ addEventListener('DOMContentLoaded',()=>{
   </div>
 </div>
 
+<!-- 詞彙表觸發按鈕 -->
+<button class="glossary-fab" id="glossary-fab" aria-label="占星詞彙表">?</button>
+
+<!-- 詞彙表 Modal -->
+<div class="natal-modal" id="glossary-modal" role="dialog" aria-modal="true">
+  <div class="natal-modal-card natal-modal-wide">
+    <button class="natal-close" data-close>×</button>
+    <span class="natal-label">// glossary</span>
+    <h2>占星詞彙表</h2>
+    <p class="natal-hint">看不懂某個詞？這裡找。</p>
+
+    <div class="gloss-grid">
+      <div class="gloss-item"><h4>本命盤（Natal Chart）</h4><p>你出生那一刻，從地球上看到的天空 ─ 太陽、月亮、行星各在哪個星座、哪個宮位的快照。一輩子不變，是你人格底層的座標。</p></div>
+      <div class="gloss-item"><h4>上升星座（ASC / Ascendant）</h4><p>出生那一刻，東方地平線正在升起的星座。決定你「給人的第一印象」、外貌氣質、宮位起點。需要精確出生時間才能算。</p></div>
+      <div class="gloss-item"><h4>太陽星座</h4><p>大眾理解的「我是 XX 座」。代表你的核心身分、自我意志、創造力的方向。</p></div>
+      <div class="gloss-item"><h4>月亮星座</h4><p>你的情緒底色、潛意識習慣、最深層的需求。常常自己沒意識到，但跟你最親的人最知道。</p></div>
+      <div class="gloss-item"><h4>12 宮位（Houses）</h4><p>把天空分成 12 等份，每個宮對應人生一個領域：1 自我、2 金錢、3 溝通、4 家庭、5 創造、6 工作、7 伴侶、8 深度、9 信仰、10 事業、11 朋友、12 潛意識。</p></div>
+      <div class="gloss-item"><h4>Whole Sign 整宮制</h4><p>本網站使用的宮位系統 ─ 上升所在的星座 = 第 1 宮，往後依序排。最古老、最簡潔的系統。</p></div>
+      <div class="gloss-item"><h4>相位（Aspect）</h4><p>兩顆行星在天空中的角度關係。本網站用 5 種主要相位：合相 0°、對分 180°、四分 90°、三分 120°、六分 60°。</p></div>
+      <div class="gloss-item"><h4>合相（Conjunction · 0°）</h4><p>兩星距離很近 ─ 能量融合，互相加強。可能是好搭擋也可能互相干擾，看星性。</p></div>
+      <div class="gloss-item"><h4>對分相（Opposition · 180°）</h4><p>兩星正對 ─ 拉扯、需要找平衡。常感覺「兩個我在打架」。</p></div>
+      <div class="gloss-item"><h4>四分相（Square · 90°）</h4><p>兩星 90° ─ 衝突、緊張、推著你動。最不舒服但也最會逼你成長的相位。</p></div>
+      <div class="gloss-item"><h4>三分相（Trine · 120°）</h4><p>兩星 120° ─ 流暢、天賦、毫無摩擦。但有時太順了反而懶得用。</p></div>
+      <div class="gloss-item"><h4>六分相（Sextile · 60°）</h4><p>兩星 60° ─ 機會、合作。需要主動才能用上的天賦。</p></div>
+      <div class="gloss-item"><h4>容許度（Orb）</h4><p>相位的「精準誤差範圍」。orb 0° = 完全精準；orb 3° = 偏差 3 度但仍算這個相位。本站本命盤用 5-8°，行運用 1.5-3°（更嚴格）。</p></div>
+      <div class="gloss-item"><h4>行運（Transit）</h4><p>今天的天空（行星位置）對你出生時的本命盤造成的相位。每天都不同 ─ 是占星「最像氣象預報」的部分。</p></div>
+      <div class="gloss-item"><h4>逆行（Retrograde · ℞）</h4><p>從地球看，行星好像在倒退（其實是視覺錯位）。逆行期間該行星管轄的領域常出現「重新檢視」的主題。</p></div>
+      <div class="gloss-item"><h4>三方（Big 3）</h4><p>太陽 + 月亮 + 上升 = 占星 App 最常問的「你的三方是？」這三個合起來就是你 80% 的人格樣貌。</p></div>
+      <div class="gloss-item"><h4>四元素</h4><p>火（牡羊獅子射手）= 行動、土（金牛處女摩羯）= 物質、風（雙子天秤水瓶）= 思考、水（巨蟹天蠍雙魚）= 情感。看你哪一元素最多就知道你的能量主軸。</p></div>
+      <div class="gloss-item"><h4>三模式（Modalities）</h4><p>開創（牡羊巨蟹天秤摩羯）= 啟動、固定（金牛獅子天蠍水瓶）= 堅持、變動（雙子處女射手雙魚）= 適應。</p></div>
+      <div class="gloss-item"><h4>Tropical Zodiac 回歸黃道</h4><p>本網站用的星座系統 ─ 以春分點為牡羊 0°。和「節氣占星」（Sidereal）不同，但西方占星 99% 用這個。</p></div>
+      <div class="gloss-item"><h4>世代行星</h4><p>天王星 / 海王星 / 冥王星。它們轉一圈 84/165/248 年，所以同一星座位置會持續好幾年 ─ 影響的是「你那一代的共同主題」而不是個人。</p></div>
+    </div>
+  </div>
+</div>
+
 <!-- 結果詳情 Modal -->
 <div class="natal-modal" id="natal-detail-modal" role="dialog" aria-modal="true" aria-labelledby="natal-detail-title">
   <div class="natal-modal-card natal-modal-wide">
@@ -1206,6 +1242,17 @@ addEventListener('DOMContentLoaded',()=>{
 @keyframes natalPulse{0%,100%{opacity:.7;transform:rotate(0deg)}50%{opacity:1;transform:rotate(180deg)}}
 .natal-fab.has-chart .natal-fab-text{font-family:var(--font-mono,'Major Mono Display'),monospace;letter-spacing:.05em;font-size:12px;text-transform:none}
 @media(max-width:600px){.natal-fab{bottom:18px;right:18px;padding:10px 16px;font-size:12px}.natal-fab-text{display:none}.natal-fab.has-chart .natal-fab-text{display:inline}}
+
+.glossary-fab{position:fixed;bottom:28px;right:28px;z-index:59;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:rgba(10,5,8,.9);border:1px solid #C0C8D8;color:#C0C8D8;font-family:'Cinzel',serif;font-weight:700;font-size:16px;cursor:pointer;backdrop-filter:blur(8px);transition:all .25s ease;box-shadow:0 8px 24px -6px rgba(0,0,0,.6);transform:translateY(0)}
+.glossary-fab:hover{color:#FFE08A;border-color:#D4AF37;transform:scale(1.1) translateY(-2px);box-shadow:0 12px 32px -6px rgba(212,175,55,.5)}
+/* 跟 natal-fab 共存：natal-fab 已存在時把 glossary-fab 推上去 */
+body:has(.natal-fab) .glossary-fab{bottom:88px}
+@media(max-width:600px){.glossary-fab{width:38px;height:38px;bottom:18px;right:18px}body:has(.natal-fab) .glossary-fab{bottom:74px}}
+
+.gloss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:14px;max-height:65vh;overflow:auto;padding:4px}
+.gloss-item{padding:14px;background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.2);border-left:3px solid #D4AF37}
+.gloss-item h4{font-family:'Cinzel',serif;color:#FFE08A;font-size:1rem;letter-spacing:.04em;margin-bottom:6px;font-weight:700}
+.gloss-item p{font-family:'Cormorant Garamond',serif;color:#E8DCC4;font-size:13px;line-height:1.65;margin:0}
 
 .natal-modal{position:fixed;inset:0;background:rgba(2,1,3,.85);backdrop-filter:blur(10px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
 .natal-modal.show{display:flex;animation:natalFade .3s}
@@ -1432,6 +1479,14 @@ function bindEvents(){
     if (chartData) openDetail();
     else openInput();
   });
+
+  // 詞彙表
+  const glossFab = document.getElementById('glossary-fab');
+  const glossModal = document.getElementById('glossary-modal');
+  if(glossFab && glossModal){
+    glossFab.addEventListener('click', () => glossModal.classList.add('show'));
+    glossModal.addEventListener('click', e => { if(e.target === glossModal) glossModal.classList.remove('show'); });
+  }
 
   $$('[data-close]').forEach(b => b.addEventListener('click', () => {
     inputModal.classList.remove('show');
