@@ -1153,6 +1153,7 @@ addEventListener('DOMContentLoaded',()=>{
 <script src="./transit.js" defer></script>
 <script src="./big3-content.js" defer></script>
 <script src="./daily-tip.js" defer></script>
+<script src="./poetic-intro.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
 
 <!-- 觸發按鈕（未輸入時顯示） / 結果 pill（已輸入後顯示） -->
@@ -1536,6 +1537,18 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .seal-lbl{font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.15em;color:#C0C8D8;text-transform:uppercase}
 .seal-line{font-family:'Cormorant Garamond',serif;font-style:italic;color:#E8DCC4;font-size:1.2rem;margin-top:14px}
 .seal-line strong{font-family:'Noto Serif TC','Songti SC',serif;font-style:normal;color:#FFE08A;font-size:1.6rem;font-weight:900;letter-spacing:.2em;margin:0 4px;text-shadow:0 0 18px rgba(255,224,138,.4)}
+
+.pi-card{margin:0 0 22px;padding:30px 32px;background:linear-gradient(180deg,rgba(232,99,76,.08) 0%,rgba(10,5,8,.6) 50%,rgba(157,143,194,.08) 100%);border:1px solid rgba(212,175,55,.5);position:relative;overflow:hidden}
+.pi-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#E8634C,#FFE08A,#9D8FC2,#7DA8D9,#7AC48E)}
+.pi-card .natal-label{margin-bottom:18px;display:block}
+.pi-body{font-family:'Cormorant Garamond','Times New Roman',serif;color:#E8DCC4;line-height:1.85;font-size:16px}
+.pi-p{position:relative;padding:14px 0 14px 90px;border-bottom:1px dashed rgba(212,175,55,.18)}
+.pi-p:last-of-type{border-bottom:none}
+.pi-p .pi-line{position:absolute;left:0;top:14px;font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.3em;color:#D4AF37;text-transform:uppercase;width:70px;border-right:1px solid rgba(212,175,55,.25);padding-right:8px;text-align:right}
+.pi-p strong{color:#FFE08A;font-weight:700;font-style:normal}
+.pi-sig{text-align:right;margin-top:18px;font-style:italic;color:#9D8FC2;font-size:14px;font-family:'Cormorant Garamond',serif}
+.pi-sig strong{color:#E8DCC4;font-weight:700;font-style:normal;margin:0 4px}
+@media(max-width:600px){.pi-p{padding:14px 0 14px 0}.pi-p .pi-line{position:static;display:inline-block;width:auto;border-right:none;margin-right:8px;padding:2px 6px;background:rgba(212,175,55,.12);text-align:center}}
 
 .qa-card{margin:18px 0;padding:20px 24px;background:linear-gradient(135deg,rgba(125,168,217,.08),rgba(10,5,8,.4));border:1px solid #7DA8D9;border-left:4px solid #7DA8D9}
 .qa-card .natal-label{margin-bottom:14px}
@@ -2425,7 +2438,19 @@ function renderDetail(){
     </div>
   `;
 
-  body.innerHTML = hdr + dailyTipHtml + sealHtml + big3Html + balanceHtml + `
+  // 詩意自介
+  let poeticHtml = '';
+  if(window.PoeticIntro){
+    const text = window.PoeticIntro.generate(d);
+    if(text){
+      poeticHtml = `<div class="pi-card">
+        <span class="natal-label">// poetic introduction · 給你的本命自介信</span>
+        <div class="pi-body">${text}</div>
+      </div>`;
+    }
+  }
+
+  body.innerHTML = hdr + dailyTipHtml + sealHtml + poeticHtml + big3Html + balanceHtml + `
     <div class="natal-wheel-wrap" id="natal-wheel-wrap"></div>
     <div class="natal-detail-grid">
       <div class="natal-section">
