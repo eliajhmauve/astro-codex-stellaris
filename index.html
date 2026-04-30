@@ -5,6 +5,21 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Codex Stellaris ─ 星盤 · 十大星體入口</title>
 <meta name="description" content="西洋星盤十大星體互動入口 — 太陽 月亮 水星 金星 火星 木星 土星 天王星 海王星 冥王星">
+<meta name="theme-color" content="#D4AF37">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/svg+xml" href="./icon-192.svg">
+<link rel="apple-touch-icon" href="./icon-192.svg">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Codex Stellaris · 星盤">
+<meta property="og:description" content="輸入生日 → 解鎖你的本命盤、12 宮、45 相位、Big 3 人格三角，今日行運每天更新。">
+<meta property="og:image" content="https://eliajhmauve.github.io/astro-codex-stellaris/icon-512.svg">
+<meta property="og:url" content="https://eliajhmauve.github.io/astro-codex-stellaris/">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Codex Stellaris · 星盤">
+<meta name="twitter:description" content="輸入生日 → 解鎖你的本命盤、12 宮、45 相位、Big 3 人格三角。">
+<meta name="twitter:image" content="https://eliajhmauve.github.io/astro-codex-stellaris/icon-512.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Major+Mono+Display&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -1734,5 +1749,14 @@ function renderTransit(){
 })();
 </script>
 <!-- ═══ END NATAL CHART ═══ -->
+
+<!-- ═══ PWA Service Worker 註冊 ═══ -->
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW failed', err));
+  });
+}
+</script>
 </body>
 </html>

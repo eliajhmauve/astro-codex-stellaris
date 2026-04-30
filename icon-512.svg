@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#1A0F0A"/>
+      <stop offset="60%" stop-color="#0A0508"/>
+      <stop offset="100%" stop-color="#020103"/>
+    </radialGradient>
+    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFF5C4"/>
+      <stop offset="40%" stop-color="#FFB546"/>
+      <stop offset="100%" stop-color="#7A2C0A"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- 雙黃道環 -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="#D4AF37" stroke-width="3" opacity=".55"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#D4AF37" stroke-width="1.5" opacity=".4" stroke-dasharray="6 8"/>
+  <circle cx="256" cy="256" r="140" fill="none" stroke="#D4AF37" stroke-width="1" opacity=".25"/>
+  <!-- 12 黃道刻度 -->
+  <g stroke="#D4AF37" stroke-width="2" opacity=".75">
+    <line x1="256" y1="56" x2="256" y2="76"/>
+    <line x1="456" y1="256" x2="436" y2="256"/>
+    <line x1="256" y1="456" x2="256" y2="436"/>
+    <line x1="56" y1="256" x2="76" y2="256"/>
+    <line x1="397" y1="115" x2="383" y2="129"/>
+    <line x1="397" y1="397" x2="383" y2="383"/>
+    <line x1="115" y1="397" x2="129" y2="383"/>
+    <line x1="115" y1="115" x2="129" y2="129"/>
+  </g>
+  <!-- 12 星座符號（中圈） -->
+  <g font-family="serif" font-size="20" font-weight="700" fill="#D4AF37" text-anchor="middle" opacity=".85">
+    <text x="256" y="98">♈</text>
+    <text x="354" y="124">♉</text>
+    <text x="420" y="190">♊</text>
+    <text x="446" y="262">♋</text>
+    <text x="420" y="334">♌</text>
+    <text x="354" y="400">♍</text>
+    <text x="256" y="426">♎</text>
+    <text x="158" y="400">♏</text>
+    <text x="92" y="334">♐</text>
+    <text x="66" y="262">♑</text>
+    <text x="92" y="190">♒</text>
+    <text x="158" y="124">♓</text>
+  </g>
+  <!-- 中央太陽光暈 -->
+  <circle cx="256" cy="256" r="100" fill="url(#sun)" opacity=".25" filter="blur(10px)"/>
+  <circle cx="256" cy="256" r="70" fill="url(#sun)"/>
+  <text x="256" y="282" text-anchor="middle" font-family="serif" font-size="80" font-weight="900" fill="#3A1A0A">☉</text>
+  <!-- 軌道上的小行星 -->
+  <circle cx="256" cy="76" r="10" fill="#FFE08A"/>
+  <circle cx="436" cy="256" r="8" fill="#C8C2B0"/>
+  <circle cx="256" cy="436" r="9" fill="#7DC0C5"/>
+  <circle cx="76" cy="256" r="8" fill="#E8634C"/>
+  <circle cx="397" cy="115" r="7" fill="#D9A65C"/>
+  <circle cx="115" cy="397" r="7" fill="#9D8FC2"/>
+</svg>
