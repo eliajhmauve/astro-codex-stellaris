@@ -1424,6 +1424,15 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .demo-divider{display:flex;align-items:center;gap:14px;margin:20px 0 14px;font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.4em;color:#7A8090;text-transform:uppercase}
 .demo-divider::before,.demo-divider::after{content:"";flex:1;height:1px;background:rgba(212,175,55,.25)}
 .demo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+
+/* Sticky TOC 詳情面板目錄 */
+.natal-toc{position:sticky;top:-2px;z-index:10;margin:14px -36px 22px;padding:10px 36px;background:linear-gradient(180deg,#0A0508 0%,rgba(10,5,8,.92) 100%);border-bottom:1px solid rgba(212,175,55,.4);backdrop-filter:blur(12px);overflow:hidden}
+.natal-toc .toc-track{display:flex;gap:4px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin;scrollbar-color:rgba(212,175,55,.4) transparent}
+.natal-toc .toc-track::-webkit-scrollbar{height:4px}
+.natal-toc .toc-track::-webkit-scrollbar-thumb{background:rgba(212,175,55,.4);border-radius:2px}
+.natal-toc a{flex-shrink:0;display:inline-flex;align-items:center;padding:5px 12px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:.05em;color:#C0C8D8;text-decoration:none;border:1px solid rgba(212,175,55,.2);background:rgba(212,175,55,.04);transition:all .25s ease;cursor:pointer}
+.natal-toc a:hover{color:#FFE08A;border-color:#D4AF37;background:rgba(212,175,55,.12)}
+.natal-toc a.active{color:#FFE08A;border-color:#FFE08A;background:rgba(255,224,138,.18);box-shadow:0 0 12px -4px #FFE08A}
 .demo-btn{padding:10px 12px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.3);color:#E8DCC4;font-family:'Cinzel',serif;font-size:13px;text-align:left;cursor:pointer;transition:all .25s ease;display:flex;flex-direction:column;gap:3px}
 .demo-btn:hover{background:rgba(212,175,55,.14);border-color:#D4AF37;transform:translateY(-2px);box-shadow:0 6px 16px -6px rgba(212,175,55,.4)}
 .demo-btn small{font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.1em;color:#7A8090;font-weight:400}
@@ -2765,19 +2774,69 @@ function renderDetail(){
     }
   } catch(_){}
 
-  body.innerHTML = hdr + dailyTipHtml + tarotHtml + sealHtml + poeticHtml + big3Html + balanceHtml + `
-    <div class="natal-wheel-wrap" id="natal-wheel-wrap"></div>
-    <div class="natal-detail-grid">
-      <div class="natal-section">
-        <h3>10 行星位置</h3>
-        <ul>${planets}</ul>
+  // sticky 目錄導航
+  const tocHtml = `
+    <nav class="natal-toc" id="natal-toc">
+      <div class="toc-track">
+        <a href="#sec-tip">今日</a>
+        <a href="#sec-tarot">塔羅</a>
+        <a href="#sec-seal">印章</a>
+        <a href="#sec-poetic">自介</a>
+        <a href="#sec-big3">Big 3</a>
+        <a href="#sec-balance">元素</a>
+        <a href="#sec-wheel">輪盤</a>
+        <a href="#sec-planets">行星</a>
+        <a href="#sec-aspects">相位</a>
+        <a href="#sec-qa">問答</a>
+        <a href="#sec-today">行運</a>
+        <a href="#sec-forecast">7 天</a>
+        <a href="#sec-ingress">節氣</a>
+        <a href="#sec-sr">年盤</a>
+        <a href="#sec-mooncal">月曆</a>
+        <a href="#sec-milestones">里程</a>
       </div>
-      ${ascHtml}
+    </nav>
+  `;
+
+  body.innerHTML = hdr + tocHtml +
+    `<div id="sec-tip">${dailyTipHtml}</div>` +
+    `<div id="sec-tarot">${tarotHtml}</div>` +
+    `<div id="sec-seal">${sealHtml}</div>` +
+    `<div id="sec-poetic">${poeticHtml}</div>` +
+    `<div id="sec-big3">${big3Html}</div>` +
+    `<div id="sec-balance">${balanceHtml}</div>` + `
+    <div id="sec-wheel"><div class="natal-wheel-wrap" id="natal-wheel-wrap"></div></div>
+    <div id="sec-planets">
+      <div class="natal-detail-grid">
+        <div class="natal-section">
+          <h3>10 行星位置</h3>
+          <ul>${planets}</ul>
+        </div>
+        ${ascHtml}
+      </div>
     </div>
-    ${aspectsHtml}
-    ${qaHtml}
+    <div id="sec-aspects">${aspectsHtml}</div>
+    <div id="sec-qa">${qaHtml}</div>
     <div class="natal-transit" id="natal-transit-block"></div>
   `;
+  // 攔截 toc 點擊讓 scroll 在 modal 內進行
+  setTimeout(() => {
+    document.querySelectorAll('.natal-toc a').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const id = a.getAttribute('href');
+        const target = document.querySelector(id);
+        const modalCard = document.querySelector('#natal-detail-modal .natal-modal-card');
+        if(target && modalCard){
+          const offset = target.offsetTop - 100;
+          modalCard.scrollTo({ top: offset, behavior: 'smooth' });
+        }
+        // 高亮 active
+        document.querySelectorAll('.natal-toc a').forEach(x => x.classList.remove('active'));
+        a.classList.add('active');
+      });
+    });
+  }, 200);
   // 渲染輪盤（含今日行運外圈）
   if(window.NatalWheel){
     let transitPlanets = null;
@@ -2961,6 +3020,7 @@ function renderTransit(){
     } catch(_){}
 
     box.innerHTML = `
+      <div id="sec-today">
       <h3 style="font-family:var(--font-display,Cinzel),serif;font-size:1rem;letter-spacing:.18em;color:var(--gold);margin:24px 0 10px;border-bottom:1px solid rgba(212,175,55,.25);padding-bottom:6px;text-transform:uppercase">今日行運 · ${dateStr}</h3>
       <p class="natal-hint" style="margin-bottom:10px">
         ☉ 此刻太陽運行至：${today[0].signGlyph} ${today[0].sign}座 ${today[0].degree.toFixed(1)}°
@@ -2969,11 +3029,12 @@ function renderTransit(){
       ${rxBanner}
       <div class="tr-today-pills">${todayHtml}</div>
       <div class="tr-list">${trHtml}</div>
-      ${forecastHtml}
-      ${ingressHtml}
-      ${srHtml}
-      ${calHtml}
-      ${lcHtml}
+      </div>
+      <div id="sec-forecast">${forecastHtml}</div>
+      <div id="sec-ingress">${ingressHtml}</div>
+      <div id="sec-sr">${srHtml}</div>
+      <div id="sec-mooncal">${calHtml}</div>
+      <div id="sec-milestones">${lcHtml}</div>
     `;
   } catch(e){
     console.warn('transit render failed', e);
