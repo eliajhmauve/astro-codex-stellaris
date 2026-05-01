@@ -1235,9 +1235,26 @@ addEventListener('DOMContentLoaded',()=>{
 <button class="glossary-fab" id="glossary-fab" aria-label="占星詞彙表">?</button>
 
 <!-- 環境音氛圍按鈕 -->
-<button class="ambient-fab" id="ambient-fab" aria-label="切換環境音氛圍" title="切換環境音 ambient drone">
+<button class="ambient-fab" id="ambient-fab" aria-label="切換環境音氛圍" title="切換環境音 ambient drone（長按啟動冥想模式）">
   <span class="ambient-icon" id="ambient-icon">♪</span>
 </button>
+
+<!-- 冥想模式 overlay -->
+<div class="med-overlay" id="med-overlay" role="dialog" aria-modal="true">
+  <button class="med-close" id="med-close" aria-label="結束冥想">×</button>
+  <div class="med-stage">
+    <div class="med-time" id="med-time">05:00</div>
+    <div class="med-circle-wrap">
+      <div class="med-circle" id="med-circle"></div>
+      <div class="med-breath-text" id="med-breath">準備</div>
+    </div>
+    <div class="med-guide" id="med-guide">把注意力帶到此刻 ─ 你不需要做什麼，只要在這裡。</div>
+    <div class="med-info">
+      <span class="med-pill" id="med-sun-pill">─</span>
+      <span class="med-pill" id="med-moon-pill">─</span>
+    </div>
+  </div>
+</div>
 
 <!-- 全螢幕輪盤 Modal -->
 <div class="natal-modal" id="wheel-fullscreen" role="dialog" aria-modal="true">
@@ -1404,6 +1421,24 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .ambient-fab.playing .ambient-icon{animation:ambBeat 1.4s ease-in-out infinite}
 @keyframes ambBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
 @media(max-width:600px){.ambient-fab{width:38px;height:38px;bottom:134px;right:18px}}
+
+/* ─── 冥想模式 ─── */
+.med-overlay{position:fixed;inset:0;z-index:9500;background:radial-gradient(circle at 50% 50%,rgba(20,8,36,1) 0%,rgba(2,1,3,1) 70%);display:none;align-items:center;justify-content:center;padding:30px;animation:medFade .8s ease}
+.med-overlay.show{display:flex}
+@keyframes medFade{from{opacity:0}to{opacity:1}}
+.med-close{position:absolute;top:24px;right:30px;width:44px;height:44px;background:transparent;border:1px solid rgba(212,175,55,.3);color:rgba(212,175,55,.7);font-family:'Cinzel',serif;font-size:24px;line-height:1;cursor:pointer;transition:all .3s ease;z-index:5;border-radius:50%}
+.med-close:hover{color:#FFE08A;border-color:#D4AF37;transform:rotate(90deg)}
+.med-stage{display:flex;flex-direction:column;align-items:center;gap:38px;text-align:center;max-width:540px;width:100%}
+.med-time{font-family:'Major Mono Display','VT323',monospace;font-size:1.4rem;letter-spacing:.4em;color:rgba(212,175,55,.7)}
+.med-circle-wrap{position:relative;width:240px;height:240px;display:flex;align-items:center;justify-content:center}
+.med-circle{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(212,175,55,.4);background:radial-gradient(circle at 50% 50%,rgba(212,175,55,.18) 0%,rgba(157,143,194,.08) 60%,transparent 100%);box-shadow:0 0 60px rgba(212,175,55,.25),inset 0 0 40px rgba(255,224,138,.1);transform:scale(.5);animation:medBreathe 14s ease-in-out infinite;transform-origin:center}
+@keyframes medBreathe{0%,100%{transform:scale(.5);box-shadow:0 0 30px rgba(212,175,55,.2)}28.5%{transform:scale(1);box-shadow:0 0 100px rgba(212,175,55,.45),0 0 200px rgba(157,143,194,.25)}57.1%{transform:scale(1);box-shadow:0 0 100px rgba(212,175,55,.45),0 0 200px rgba(157,143,194,.25)}100%{transform:scale(.5);box-shadow:0 0 30px rgba(212,175,55,.2)}}
+.med-breath-text{position:relative;font-family:'Cinzel',serif;font-size:1.1rem;color:#FFE08A;letter-spacing:.3em;text-transform:uppercase;text-shadow:0 0 20px rgba(255,224,138,.6);z-index:2}
+.med-guide{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.3rem;line-height:1.7;color:#E8DCC4;letter-spacing:.04em;min-height:5em;max-width:480px;transition:opacity .8s ease}
+.med-info{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.med-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:rgba(157,143,194,.12);border:1px solid rgba(157,143,194,.5);color:#9D8FC2;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.04em}
+@media(prefers-reduced-motion:reduce){.med-circle{animation:none;transform:scale(.85)}}
+@media(max-width:520px){.med-circle-wrap{width:180px;height:180px}.med-guide{font-size:1.1rem}}
 
 .gloss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:14px;max-height:65vh;overflow:auto;padding:4px}
 .gloss-item{padding:14px;background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.2);border-left:3px solid #D4AF37}
@@ -1873,7 +1908,245 @@ function setupAmbient(){
   if(localStorage.getItem('astro_ambient_on') === '1'){
     setTimeout(() => toggleAmbient(true), 600);
   }
-  fab.addEventListener('click', () => toggleAmbient());
+  // 短按 = 切換 / 長按 1 秒 = 冥想模式
+  let pressTimer = null;
+  let pressedLong = false;
+  fab.addEventListener('mousedown', () => {
+    pressedLong = false;
+    pressTimer = setTimeout(() => {
+      pressedLong = true;
+      startMeditation();
+    }, 900);
+  });
+  fab.addEventListener('mouseup', () => {
+    if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
+    if(!pressedLong) toggleAmbient();
+  });
+  fab.addEventListener('mouseleave', () => {
+    if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
+  });
+  // 觸控
+  fab.addEventListener('touchstart', e => {
+    pressedLong = false;
+    pressTimer = setTimeout(() => {
+      pressedLong = true;
+      startMeditation();
+    }, 900);
+  }, { passive:true });
+  fab.addEventListener('touchend', e => {
+    if(pressTimer){ clearTimeout(pressTimer); pressTimer = null; }
+    if(!pressedLong){ e.preventDefault(); toggleAmbient(); }
+  });
+
+  // 提示橫條（首次訪問）
+  if(!localStorage.getItem('astro_ambient_hint')){
+    setTimeout(() => {
+      fab.title = '輕點切換音 / 長按 1 秒進入冥想模式';
+    }, 100);
+  }
+
+  // ESC 關閉冥想
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){
+      const ov = document.getElementById('med-overlay');
+      if(ov && ov.classList.contains('show')) endMeditation();
+    }
+  });
+  document.getElementById('med-close').addEventListener('click', endMeditation);
+}
+
+// 冥想引導文案（依太陽星座個人化）
+const MED_GUIDES = {
+  '牡羊': [
+    '你的火很旺 ─ 但火也需要休息。讓它在這 5 分鐘裡靜靜燃燒，不要去追什麼。',
+    '吸氣時，感覺火種被氧氣餵養。吐氣時，讓火變成微光，不必持續發亮。',
+    '你不需要永遠在前面。此刻，停在這裡。',
+    '感覺心臟的跳動 ─ 那就是你的引擎，它從不需要你催它。',
+    '當你回到日常，記得：行動之前，先吸三口氣。',
+  ],
+  '金牛': [
+    '你的身體記得安全的感覺。讓肩膀垂下來，讓背貼住椅子。',
+    '感覺呼吸進入胸腔的重量 ─ 你是被大地承接著的。',
+    '不需要做任何決定。這 5 分鐘屬於感官 ─ 聽、聞、感覺。',
+    '你的速度本來就慢。現在更慢一點，不會輸給誰。',
+    '吐氣時，把這份扎實感記下來 ─ 它會跟你回到日常。',
+  ],
+  '雙子': [
+    '你的腦子很忙 ─ 沒關係。看著想法來來去去，不抓不推。',
+    '吸氣，數一。吐氣，數二。回到一。讓數字成為你的錨。',
+    '你不需要回應每一個訊息。此刻你不在線。',
+    '感覺空氣穿過鼻腔 ─ 那是你最早學會的事情。',
+    '帶著這份留白回去 ─ 留白會讓你的話更有重量。',
+  ],
+  '巨蟹': [
+    '把雙手放在心上。感覺它的溫度 ─ 那是你給自己的家。',
+    '你不需要照顧任何人這 5 分鐘。被照顧的是你。',
+    '吸氣時，邀請所有情緒進來。吐氣時，讓它們被海帶走。',
+    '你內在的小孩很安全。她（他）就在這裡，跟你一起呼吸。',
+    '把這份柔軟收進口袋 ─ 等你回去面對世界時可以摸到它。',
+  ],
+  '獅子': [
+    '此刻沒有觀眾。你不需要表演。',
+    '感覺胸口的擴張 ─ 那是你天生的光，不用刻意點亮。',
+    '吸氣時想：我已經夠了。吐氣時相信它。',
+    '你的價值不是別人給的 ─ 此刻就在你的呼吸裡。',
+    '當你發光時，記得也要看見其他光點。',
+  ],
+  '處女': [
+    '你不需要把這次冥想做對。沒有完美版本。',
+    '感覺呼吸的不規則 ─ 那才是真實的你，不是教科書版本。',
+    '允許自己現在不完美。世界一樣會運轉。',
+    '吐氣時，放下今天那張清單上的最後一項。',
+    '你的細節能力是天賦 ─ 但休息也是一種精準的細節。',
+  ],
+  '天秤': [
+    '把注意力從外面拿回來。這 5 分鐘只給自己 ─ 不必平衡別人。',
+    '感覺身體左右兩側的呼吸 ─ 你本來就有兩個版本，都是你。',
+    '吸氣時邀請美進來。吐氣時讓不和諧的部分溶解。',
+    '你不需要決定喜歡誰多一點。你可以全部都愛。',
+    '把這份和諧帶回去 ─ 它會自然地擴散到周圍。',
+  ],
+  '天蠍': [
+    '深呼吸 ─ 進入比平常更深的地方。你天生就會。',
+    '感覺胸腔最底部那個沉默的房間 ─ 那是你的力量泉源。',
+    '不需要害怕黑暗。它從來不是你的敵人。',
+    '吐氣時，讓一個你抓太緊的東西鬆開。看看會發生什麼。',
+    '從深處浮上來時，你會發現你還是你 ─ 只是更整合了一點。',
+  ],
+  '射手': [
+    '你的心想去遠方 ─ 沒關係，但這 5 分鐘的遠方就在你裡面。',
+    '感覺呼吸像浪 ─ 一波一波，沒有目的地，這就是旅程。',
+    '你不需要立刻知道答案。讓問題自己慢慢回答自己。',
+    '吐氣時，把「應該」這個詞還給它原來的主人。',
+    '帶著這份開闊回去 ─ 開闊不是去多遠，是內在多大。',
+  ],
+  '摩羯': [
+    '此刻沒有 KPI。這 5 分鐘不是任何流程的一部分。',
+    '感覺脊椎像山一樣穩固 ─ 你本來就是地基紮實的人。',
+    '吸氣時，讓肩膀的責任暫時放在地上。它不會跑掉。',
+    '你的時間感比別人長。這 5 分鐘對你來說是長期投資。',
+    '當你回到工作，會發現一些事自己解開了 ─ 那是休息的禮物。',
+  ],
+  '水瓶': [
+    '你以為自己跟別人不一樣 ─ 此刻，你跟所有冥想的人一樣。',
+    '感覺呼吸是一個系統 ─ 一個你不需要寫程式碼也能跑的系統。',
+    '不需要分析什麼。讓直覺接管 5 分鐘。',
+    '吐氣時，原諒一個你曾經評判過的人 ─ 包括你自己。',
+    '帶著這份連結回去 ─ 你不用為了獨特而孤獨。',
+  ],
+  '雙魚': [
+    '你已經在水裡了 ─ 這是你的本元素。',
+    '感覺邊界融化的舒適 ─ 但記得，你還是你。',
+    '吸氣時，吸進整個宇宙。吐氣時，把它送回去。',
+    '你的敏感是天賦不是缺陷。它讓你聽得見別人聽不見的。',
+    '回到日常時，記得關門 ─ 不是隔絕，是保護你的內在海洋。',
+  ],
+};
+const MED_DEFAULT = [
+  '把注意力帶到此刻 ─ 你不需要做什麼，只要在這裡。',
+  '感覺呼吸 ─ 這是你跟身體最直接的對話。',
+  '想法會來來去去。看著它們，不抓不推。',
+  '吐氣時，讓今天的某個負擔暫時放下。',
+  '帶著這份安靜回到日常。它一直都在你裡面。',
+];
+
+let medTimer = null;
+let medGuideTimer = null;
+const MED_DURATION = 5 * 60; // 5 分鐘
+
+function startMeditation(){
+  // 先確保 ambient 開
+  if(!ambientPlaying) toggleAmbient(true);
+  const overlay = document.getElementById('med-overlay');
+  overlay.classList.add('show');
+
+  // 個人化 pill
+  let guides = MED_DEFAULT;
+  let sunSign = '', moonSign = '';
+  try {
+    if(chartData && chartData.planets){
+      const sun = chartData.planets.find(p => p.key === 'sun');
+      const moon = chartData.planets.find(p => p.key === 'moon');
+      if(sun){ sunSign = sun.sign; if(MED_GUIDES[sun.sign]) guides = MED_GUIDES[sun.sign]; }
+      if(moon){ moonSign = moon.sign; }
+    }
+  } catch(_){}
+  document.getElementById('med-sun-pill').textContent = sunSign ? `☉ ${sunSign}座的引導` : '☉ 通用引導';
+  document.getElementById('med-moon-pill').textContent = moonSign ? `☽ ${moonSign}座 chord` : '';
+
+  // 倒數
+  let remaining = MED_DURATION;
+  const timeEl = document.getElementById('med-time');
+  const guideEl = document.getElementById('med-guide');
+  const breathEl = document.getElementById('med-breath');
+
+  function fmt(s){ const m = Math.floor(s/60); const sec = s%60; return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
+  timeEl.textContent = fmt(remaining);
+
+  guideEl.textContent = guides[0];
+  let guideIdx = 0;
+
+  // 呼吸文字（4 吸 / 4 停 / 6 吐，循環 14 秒）
+  let breathTime = 0;
+  function updateBreath(){
+    breathTime = (breathTime + 1) % 14;
+    if(breathTime < 4) breathEl.textContent = '吸';
+    else if(breathTime < 8) breathEl.textContent = '停';
+    else breathEl.textContent = '吐';
+  }
+  updateBreath();
+  const breathInterval = setInterval(updateBreath, 1000);
+
+  // 倒數
+  medTimer = setInterval(() => {
+    remaining--;
+    timeEl.textContent = fmt(remaining);
+    if(remaining <= 0){
+      clearInterval(medTimer);
+      clearInterval(breathInterval);
+      breathEl.textContent = '✦';
+      guideEl.textContent = '冥想完成。慢慢張開眼睛。';
+      timeEl.textContent = '00:00';
+      // 輕鈴聲
+      try {
+        if(ambientCtx){
+          const bell = ambientCtx.createOscillator();
+          bell.frequency.value = 880;
+          const bg = ambientCtx.createGain();
+          bg.gain.value = 0;
+          bell.connect(bg).connect(ambientCtx.destination);
+          bell.start();
+          const t = ambientCtx.currentTime;
+          bg.gain.linearRampToValueAtTime(0.18, t + 0.05);
+          bg.gain.exponentialRampToValueAtTime(0.001, t + 4);
+          setTimeout(() => bell.stop(), 4500);
+        }
+      } catch(_){}
+    }
+  }, 1000);
+
+  // 每 60 秒換引導文字
+  medGuideTimer = setInterval(() => {
+    guideIdx = (guideIdx + 1) % guides.length;
+    guideEl.style.opacity = '0';
+    setTimeout(() => {
+      guideEl.textContent = guides[guideIdx];
+      guideEl.style.opacity = '1';
+    }, 600);
+  }, 60000);
+
+  // 暫存 cleanup refs
+  medTimer.cleanup = () => { clearInterval(breathInterval); };
+}
+
+function endMeditation(){
+  if(medTimer){
+    if(medTimer.cleanup) medTimer.cleanup();
+    clearInterval(medTimer);
+    medTimer = null;
+  }
+  if(medGuideTimer){ clearInterval(medGuideTimer); medGuideTimer = null; }
+  document.getElementById('med-overlay').classList.remove('show');
 }
 
 function toggleAmbient(forceOn){
