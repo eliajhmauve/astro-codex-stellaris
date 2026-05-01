@@ -1673,6 +1673,13 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .syn-row .syn-name .syn-tag{font-style:normal;font-family:'Major Mono Display',monospace;font-size:.75em;letter-spacing:.15em;margin-left:6px;text-transform:uppercase}
 .syn-row .syn-orb{color:#7A8090;font-size:.9em;flex-shrink:0;font-family:'Major Mono Display',monospace}
 
+.syn-wheel-wrap{width:100%;max-width:440px;margin:18px auto;padding:14px;background:radial-gradient(circle at 50% 50%,rgba(212,175,55,.06) 0%,transparent 70%);border:1px solid rgba(212,175,55,.18);position:relative}
+.syn-wheel-wrap svg{filter:drop-shadow(0 8px 24px rgba(212,175,55,.18))}
+.syn-wheel-legend{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-top:14px;padding-top:12px;border-top:1px dashed rgba(212,175,55,.25);font-family:'Cinzel',serif;font-size:11px;letter-spacing:.05em}
+.swl-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid;font-size:11px}
+.swl-inner{background:rgba(255,224,138,.14);border-color:#FFE08A;color:#FFE08A}
+.swl-outer{background:rgba(125,168,217,.14);border-color:#7DA8D9;color:#7DA8D9}
+
 .big3-card{margin:0 0 22px;padding:20px;background:linear-gradient(135deg,rgba(212,175,55,.12),rgba(10,5,8,.4));border:1px solid var(--gold,#D4AF37);border-left-width:4px}
 .big3-card .natal-label{margin-bottom:14px}
 .big3-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
@@ -3040,8 +3047,20 @@ function onSynSubmit(e){
 function renderSynastry(name, otherChart, synList){
   const box = document.getElementById('syn-result');
   if(!box) return;
+
+  // 雙人合盤輪盤
+  let wheelHtml = '';
+  if(window.NatalWheel){
+    wheelHtml = '<div class="syn-wheel-wrap" id="syn-wheel-wrap"></div>';
+  }
+
   if(!synList.length){
-    box.innerHTML = '<p style="color:#C49097;font-style:italic;text-align:center;padding:14px">沒有找到任何 orb &lt; 6° 的交叉相位 ─ 你們互動很「平」，沒有特別的化學反應。</p>';
+    box.innerHTML = wheelHtml + '<p style="color:#C49097;font-style:italic;text-align:center;padding:14px">沒有找到任何 orb &lt; 6° 的交叉相位 ─ 你們互動很「平」，沒有特別的化學反應。</p>';
+    if(window.NatalWheel){
+      window.NatalWheel.render(document.getElementById('syn-wheel-wrap'), chartData, {
+        size:380, transit:otherChart.planets, linkPrefix:false, aspects:false,
+      });
+    }
     return;
   }
 
@@ -3082,11 +3101,30 @@ function renderSynastry(name, otherChart, synList){
   box.innerHTML = `
     <h3 style="font-family:'Cinzel',serif;color:#FFE08A;margin-bottom:8px">合盤分析 · 你 × ${name}</h3>
     <p class="natal-hint">${otherChart.input.dateStr}${otherChart.input.timeStr ? ' · ' + otherChart.input.timeStr : ''} · ${otherChart.input.cityName}</p>
+    ${wheelHtml}
     <p class="natal-hint" style="font-size:13px;margin-bottom:14px">${summary}</p>
     <p style="background:rgba(212,175,55,.1);border-left:3px solid #FFE08A;padding:12px 16px;font-family:'Cormorant Garamond',serif;font-style:italic;color:#E8DCC4;font-size:1.05rem;line-height:1.6">${insight}</p>
     <h4 style="font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.3em;color:#D4AF37;margin:18px 0 10px;text-transform:uppercase">前 12 強相位（共 ${synList.length} 組）</h4>
     <div class="syn-list">${rows}</div>
   `;
+
+  // 渲染雙人輪盤（內 = 你 / 外 = 對方）
+  if(window.NatalWheel){
+    window.NatalWheel.render(document.getElementById('syn-wheel-wrap'), chartData, {
+      size:400, transit:otherChart.planets, linkPrefix:false, aspects:false,
+    });
+    // 在輪盤下加標籤說明
+    const wrap = document.getElementById('syn-wheel-wrap');
+    if(wrap){
+      const lbl = document.createElement('div');
+      lbl.className = 'syn-wheel-legend';
+      lbl.innerHTML = `
+        <span class="swl-pill swl-inner"><span style="font-family:Cinzel">●</span> 內圈：你的本命</span>
+        <span class="swl-pill swl-outer"><span style="font-family:Cinzel">○</span> 外圈：${name} 的本命</span>
+      `;
+      wrap.appendChild(lbl);
+    }
+  }
 }
 
 // 5 題本命盤挑戰測驗
