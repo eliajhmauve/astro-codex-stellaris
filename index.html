@@ -1638,6 +1638,19 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .ump-tip{font-family:'Cormorant Garamond',serif;font-style:italic;color:#E8DCC4;font-size:13px;line-height:1.55}
 @media(max-width:600px){.ump-row{grid-template-columns:36px 1fr;gap:10px}.ump-tip{grid-column:1/-1;padding-top:6px;border-top:1px dashed rgba(212,175,55,.2)}}
 
+.ye-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-top:8px}
+.ye-month{padding:10px 12px;background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.2);border-left:3px solid rgba(212,175,55,.4)}
+.ye-month.ye-current{border-left-color:#FFE08A;background:rgba(255,224,138,.08);box-shadow:0 0 12px -4px rgba(255,224,138,.4)}
+.ye-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;padding-bottom:5px;border-bottom:1px dashed rgba(212,175,55,.2)}
+.ye-tag{font-family:'Major Mono Display','VT323',monospace;font-size:9px;letter-spacing:.18em;color:#FFE08A;text-transform:uppercase}
+.ye-label{font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.1em;color:#7A8090}
+.ye-event{display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(0,0,0,.3);border-left:2px solid;font-size:11px;font-family:'Cormorant Garamond',serif;color:#E8DCC4;margin-bottom:3px}
+.ye-event .ye-glyph{font-family:'Cinzel',serif;font-size:1.15em;color:#FFE08A;font-weight:700;flex-shrink:0}
+.ye-event .ye-arrow{color:#7A8090}
+.ye-event .ye-name{flex:1;font-style:italic;font-size:1em;line-height:1.3}
+.ye-event .ye-date{flex-shrink:0;font-family:'Major Mono Display',monospace;color:#7A8090;font-size:.85em}
+.ye-quiet{padding:6px;color:#7A8090;font-style:italic;font-size:11px;text-align:center;font-family:'Cormorant Garamond',serif}
+
 .lc-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .lc-row{display:flex;gap:14px;padding:14px 16px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.3);border-left-width:4px;border-left-color:#FFE08A}
 .lc-row.lc-passed{opacity:.65;border-left-color:#7A8090}
@@ -3802,6 +3815,7 @@ function renderDetail(){
         <a href="#sec-ingress">節氣</a>
         <a href="#sec-sr">年盤</a>
         <a href="#sec-mooncal">月曆</a>
+        <a href="#sec-year">12 月</a>
         <a href="#sec-milestones">里程</a>
       </div>
     </nav>
@@ -3915,23 +3929,61 @@ function renderDetail(){
       }
     }
   }, 200);
-  // 攔截 toc 點擊讓 scroll 在 modal 內進行
+  // 攔截 toc 點擊讓 scroll 在 modal 內進行 + scroll spy 跟蹤當前區塊
   setTimeout(() => {
-    document.querySelectorAll('.natal-toc a').forEach(a => {
+    const tocLinks = document.querySelectorAll('.natal-toc a');
+    const modalCard = document.querySelector('#natal-detail-modal .natal-modal-card');
+
+    tocLinks.forEach(a => {
       a.addEventListener('click', e => {
         e.preventDefault();
         const id = a.getAttribute('href');
         const target = document.querySelector(id);
-        const modalCard = document.querySelector('#natal-detail-modal .natal-modal-card');
         if(target && modalCard){
           const offset = target.offsetTop - 100;
           modalCard.scrollTo({ top: offset, behavior: 'smooth' });
         }
-        // 高亮 active
-        document.querySelectorAll('.natal-toc a').forEach(x => x.classList.remove('active'));
+        tocLinks.forEach(x => x.classList.remove('active'));
         a.classList.add('active');
       });
     });
+
+    // scroll spy
+    if(modalCard){
+      const sections = Array.from(tocLinks).map(a => {
+        const id = a.getAttribute('href');
+        return { a, id, el: document.querySelector(id) };
+      }).filter(x => x.el);
+      let rafScheduled = false;
+      const onScroll = () => {
+        if(rafScheduled) return;
+        rafScheduled = true;
+        requestAnimationFrame(() => {
+          rafScheduled = false;
+          const scrollTop = modalCard.scrollTop;
+          let activeIdx = 0;
+          for(let i = 0; i < sections.length; i++){
+            if(sections[i].el.offsetTop - 150 <= scrollTop){
+              activeIdx = i;
+            } else break;
+          }
+          tocLinks.forEach(x => x.classList.remove('active'));
+          if(sections[activeIdx]) sections[activeIdx].a.classList.add('active');
+          // 確保 active 標籤在 toc 視窗內可見
+          if(sections[activeIdx]){
+            const a = sections[activeIdx].a;
+            const track = a.parentElement;
+            const aRect = a.getBoundingClientRect();
+            const tRect = track.getBoundingClientRect();
+            if(aRect.left < tRect.left || aRect.right > tRect.right){
+              a.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+            }
+          }
+        });
+      };
+      modalCard.addEventListener('scroll', onScroll, { passive:true });
+      onScroll();
+    }
   }, 200);
   // 渲染輪盤（含今日行運外圈）
   if(window.NatalWheel){
@@ -4003,6 +4055,31 @@ function renderTransit(){
           <h3 style="font-family:var(--font-display,Cinzel),serif;font-size:1rem;letter-spacing:.18em;color:var(--gold);margin:24px 0 10px;border-bottom:1px solid rgba(212,175,55,.25);padding-bottom:6px;text-transform:uppercase">未來 7 天 · 重要相位日曆</h3>
           <p class="natal-hint" style="margin-bottom:10px">orb &lt; 1.5° 的精準時刻 — 這幾天會明顯感受到該行星帶來的變化：</p>
           <div class="fc-grid">${dayCards}</div>`;
+      }
+    } catch(_){}
+
+    // 12 個月年度大事件
+    let yearHtml = '';
+    try {
+      const months = window.AstroTransit.calc12MonthEvents(chartData);
+      if(months && months.length){
+        const ASP_COLOR = { con:'#FFE08A', opp:'#E8634C', sqr:'#E8A04C', tri:'#7AC48E', sex:'#7DA8D9' };
+        const monthCards = months.map(m => {
+          const evs = m.events.length ? m.events.map(e => `<div class="ye-event" style="border-left-color:${ASP_COLOR[e.type] || '#D4AF37'}">
+            <span class="ye-glyph">${e.transitGlyph}</span><span class="ye-arrow">→</span><span class="ye-glyph">${e.natalGlyph}</span>
+            <span class="ye-name">行運 ${e.transitName} ${e.aspectName} 本命 ${e.natalName}</span>
+            <span class="ye-date">${e.date.slice(5)}</span>
+          </div>`).join('') : '<div class="ye-quiet">本月相對平靜</div>';
+          return `<div class="ye-month ${m.isCurrent?'ye-current':''}">
+            <div class="ye-head"><span class="ye-tag">${m.isCurrent?'本月':'下'+(months.indexOf(m))+'月'}</span><span class="ye-label">${m.label}</span></div>
+            ${evs}
+          </div>`;
+        }).join('');
+        yearHtml = `
+          <h3 style="font-family:var(--font-display,Cinzel),serif;font-size:1rem;letter-spacing:.18em;color:var(--gold);margin:24px 0 10px;border-bottom:1px solid rgba(212,175,55,.25);padding-bottom:6px;text-transform:uppercase">未來 12 個月 · 年度大事件月曆</h3>
+          <p class="natal-hint">慢行星（木/土/天/海/冥）對你本命的精準相位 ─ 一年內的能量轉折點。</p>
+          <div class="ye-grid">${monthCards}</div>
+        `;
       }
     } catch(_){}
 
@@ -4141,6 +4218,7 @@ function renderTransit(){
       <div id="sec-ingress">${ingressHtml}</div>
       <div id="sec-sr">${srHtml}</div>
       <div id="sec-mooncal">${calHtml}</div>
+      <div id="sec-year">${yearHtml}</div>
       <div id="sec-milestones">${lcHtml}</div>
     `;
   } catch(e){

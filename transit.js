@@ -470,6 +470,72 @@ function calcSunNextIngress(){
   return null;
 }
 
-global.AstroTransit = { calcToday, findActiveTransits, forecastDays, calcLifecycleMilestones, calcSolarReturn, calcMoonPhase, calcMonthMoonCalendar, calcSunNextIngress, calcUpcomingMoonPhases, PLANETS };
+// 12 個月年度大事件 — 每月挑最重要的 2-3 個慢行星相位
+function calc12MonthEvents(natalChart){
+  if(!global.Astronomy || !natalChart || !natalChart.planets) return [];
+  const A = global.Astronomy;
+  const SLOW = ['Jupiter','Saturn','Uranus','Neptune','Pluto'];
+  const months = [];
+  const start = new Date();
+  start.setHours(12,0,0,0);
+
+  for(let m = 0; m < 12; m++){
+    const monthStart = new Date(start);
+    monthStart.setDate(1);
+    monthStart.setMonth(monthStart.getMonth() + m);
+    const monthEnd = new Date(monthStart);
+    monthEnd.setMonth(monthEnd.getMonth() + 1);
+
+    const events = [];
+    const seen = new Set();
+
+    // 每 3 天取樣一次
+    for(let dt = monthStart.getTime(); dt < monthEnd.getTime(); dt += 3 * 86400000){
+      const date = new Date(dt);
+      SLOW.forEach(bodyName => {
+        const v = A.GeoVector(A.Body[bodyName], date, true);
+        const e = A.Ecliptic(v);
+        natalChart.planets.forEach(n => {
+          const diff = angleDiff(e.elon, n.lon);
+          for(const asp of ASPECTS){
+            const orb = Math.abs(diff - asp.angle);
+            if(orb <= 1.5){
+              const tBody = PLANETS.find(p => p.body === bodyName);
+              if(!tBody) break;
+              const k = `${bodyName}-${n.key}-${asp.key}`;
+              if(!seen.has(k)){
+                seen.add(k);
+                events.push({
+                  date: date.toISOString().slice(0,10),
+                  transitName: tBody.name,
+                  transitGlyph: tBody.glyph,
+                  natalName: n.name,
+                  natalGlyph: n.glyph,
+                  aspectName: asp.name,
+                  aspectAngle: asp.angle,
+                  type: asp.key,
+                  orbDelta: orb,
+                });
+              }
+              break;
+            }
+          }
+        });
+      });
+    }
+
+    events.sort((a,b) => a.orbDelta - b.orbDelta);
+    months.push({
+      year: monthStart.getFullYear(),
+      month: monthStart.getMonth() + 1,
+      label: `${monthStart.getFullYear()}.${String(monthStart.getMonth()+1).padStart(2,'0')}`,
+      isCurrent: m === 0,
+      events: events.slice(0, 3),
+    });
+  }
+  return months;
+}
+
+global.AstroTransit = { calcToday, findActiveTransits, forecastDays, calcLifecycleMilestones, calcSolarReturn, calcMoonPhase, calcMonthMoonCalendar, calcSunNextIngress, calcUpcomingMoonPhases, calc12MonthEvents, PLANETS };
 
 })(typeof window !== 'undefined' ? window : globalThis);
