@@ -1380,6 +1380,7 @@ addEventListener('DOMContentLoaded',()=>{
       <button type="button" class="natal-btn-ghost" id="natal-synastry">$ COMPARE_PERSON</button>
       <button type="button" class="natal-btn-ghost" id="natal-poster">$ DOWNLOAD_POSTER</button>
       <button type="button" class="natal-btn-ghost" id="natal-copy-text">$ COPY_TEXT_SUMMARY</button>
+      <button type="button" class="natal-btn-ghost" id="natal-notify">$ NOTIFY_ME</button>
       <button type="button" class="natal-btn-ghost" id="natal-export">$ EXPORT_JSON</button>
       <button type="button" class="natal-btn-ghost" id="natal-import">$ IMPORT_JSON</button>
       <button type="button" class="natal-btn-ghost" id="natal-replay-tour">$ REPLAY_TOUR</button>
@@ -1684,6 +1685,13 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .dt-tag-warn{background:#E8A04C;color:#0A0508}
 .dt-rx{margin-top:10px;padding:8px 12px;background:rgba(194,68,56,.12);border-left:3px solid #C24438;color:#FFC0B5;font-size:13px;font-family:'Cormorant Garamond',serif;font-style:italic}
 
+.bday-card{padding:14px 22px;margin-bottom:14px;background:linear-gradient(135deg,rgba(255,224,138,.1),rgba(232,99,76,.06));border:1px solid #FFE08A;border-left:4px solid #FFE08A}
+.bday-tag{display:inline-block;font-family:'Major Mono Display','VT323',monospace;font-size:9px;letter-spacing:.4em;color:#FFE08A;text-transform:uppercase;margin-bottom:6px;opacity:.7}
+.bday-text{font-family:'Cormorant Garamond',serif;color:#E8DCC4;font-style:italic;font-size:14px;line-height:1.55}
+.bday-card.bday-today{background:linear-gradient(135deg,rgba(255,224,138,.35),rgba(232,99,76,.18));animation:bdayPulse 2.4s ease-in-out infinite}
+@keyframes bdayPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,224,138,.3)}50%{box-shadow:0 0 32px 4px rgba(255,224,138,.4)}}
+.bday-card.bday-today .bday-text{color:#FFE08A;font-size:1.1rem}
+
 .seal-card{margin:0 0 22px;padding:24px;background:linear-gradient(135deg,rgba(232,99,76,.1),rgba(10,5,8,.5));border:1px solid #E8634C;border-left:4px solid #E8634C;text-align:center}
 .seal-card .natal-label{margin-bottom:8px}
 .seal-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:18px auto;max-width:600px}
@@ -1895,7 +1903,39 @@ ready(function(){
 
   // 環境音 ambient
   setupAmbient();
+
+  // 自動檢查重要相位推通知（如已訂閱）
+  setTimeout(autoNotifyIfDue, 5000);
 });
+
+function checkAndNotifyTransits(){
+  if(!('Notification' in window) || Notification.permission !== 'granted') return;
+  if(!chartData || !window.AstroTransit) return;
+  try {
+    const { transits } = window.AstroTransit.findActiveTransits(chartData);
+    // 只挑 orb < 1° 的
+    const tight = transits.filter(t => t.orbDelta < 1);
+    if(tight.length === 0){
+      new Notification('Codex Stellaris', { body:'今天天氣相對平靜 ─ 沒有 orb < 1° 的精準相位。', icon:'./icon-192.svg' });
+      return;
+    }
+    const top = tight.slice(0, 3);
+    const body = top.map(t => `${t.transitGlyph} ${t.transitName} ${t.aspectName} ${t.natalGlyph} ${t.natalName} (orb ${t.orbDelta.toFixed(2)}°)`).join('\n');
+    new Notification(`Codex Stellaris · 今日 ${tight.length} 個精準相位`, { body, icon:'./icon-192.svg', tag:'astro-daily-transit' });
+  } catch(e){ console.warn('notify check failed', e); }
+}
+
+function autoNotifyIfDue(){
+  if(localStorage.getItem('astro_notify_on') !== '1') return;
+  if(!('Notification' in window) || Notification.permission !== 'granted') return;
+  const today = new Date().toISOString().slice(0,10);
+  const lastNotify = localStorage.getItem('astro_notify_last');
+  if(lastNotify === today) return; // 一天一次
+  // 等 chartData 載入
+  if(!chartData) return;
+  checkAndNotifyTransits();
+  localStorage.setItem('astro_notify_last', today);
+}
 
 let ambientCtx = null;
 let ambientNodes = null;
@@ -2850,6 +2890,29 @@ function bindEvents(){
 
   $('#natal-poster').addEventListener('click', generatePoster);
 
+  // 通知訂閱
+  $('#natal-notify').addEventListener('click', async () => {
+    const btn = $('#natal-notify');
+    const orig = btn.textContent;
+    if(!('Notification' in window)){
+      btn.textContent = '你的瀏覽器不支援通知'; setTimeout(() => btn.textContent = orig, 2000); return;
+    }
+    if(Notification.permission === 'granted'){
+      checkAndNotifyTransits();
+      btn.textContent = '✓ 已啟用 — 立刻檢查今日';
+    } else if(Notification.permission === 'denied'){
+      btn.textContent = '已被拒絕 → 請到瀏覽器設定開啟';
+    } else {
+      const result = await Notification.requestPermission();
+      if(result === 'granted'){
+        localStorage.setItem('astro_notify_on', '1');
+        new Notification('Codex Stellaris', { body:'✦ 已訂閱重要相位提醒。下次開啟網頁如有 orb < 1° 的精準相位，會自動通知你。', icon:'./icon-192.svg' });
+        btn.textContent = '✓ 已訂閱';
+      } else btn.textContent = '已拒絕';
+    }
+    setTimeout(() => btn.textContent = orig, 2400);
+  });
+
   $('#natal-copy-text').addEventListener('click', () => {
     if(!chartData) return;
     const sun = chartData.planets.find(p => p.key === 'sun');
@@ -3542,6 +3605,24 @@ function renderDetail(){
     </div>
   `;
 
+  // 生日倒數
+  let bdayHtml = '';
+  try {
+    const [y,m,day] = d.input.dateStr.split('-').map(Number);
+    const now = new Date();
+    let next = new Date(now.getFullYear(), m-1, day);
+    if(next < now) next = new Date(now.getFullYear()+1, m-1, day);
+    const diffDays = Math.ceil((next - now) / 86400000);
+    const age = next.getFullYear() - y;
+    let bdayLabel, bdayClass = 'bday-card';
+    if(diffDays === 0){ bdayLabel = `★★★ 今天是你的生日！太陽剛好回到出生位置 ─ 你的 ${age} 歲年盤就是今年的能量主軸。`; bdayClass += ' bday-today'; }
+    else if(diffDays === 1) bdayLabel = `★★ 明天就是你的生日 ─ 太陽即將回到出生位置（${age} 歲）。`;
+    else if(diffDays <= 7) bdayLabel = `★ ${diffDays} 天後 ─ 你的 ${age} 歲生日（太陽回歸期，最有占星意義的個人化轉折）。`;
+    else if(diffDays <= 30) bdayLabel = `${diffDays} 天後是你的生日 ─ 太陽回歸期會啟動 ${age} 歲新週期。`;
+    else bdayLabel = `${diffDays} 天後生日（${age} 歲）`;
+    bdayHtml = `<div class="${bdayClass}"><span class="bday-tag">// birthday countdown</span><div class="bday-text">${bdayLabel}</div></div>`;
+  } catch(_){}
+
   // 今日建議卡
   let dailyTipHtml = '';
   try {
@@ -3713,7 +3794,7 @@ function renderDetail(){
     </nav>
   `;
 
-  body.innerHTML = hdr + tocHtml +
+  body.innerHTML = hdr + bdayHtml + tocHtml +
     `<div id="sec-tip">${dailyTipHtml}</div>` +
     `<div id="sec-tarot">${tarotHtml}</div>` +
     `<div id="sec-seal">${sealHtml}</div>` +
