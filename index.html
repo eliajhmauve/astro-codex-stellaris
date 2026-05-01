@@ -399,6 +399,9 @@ body::after{
   flex-wrap:wrap;gap:18px;
 }
 .codex-foot .quote{font-family:var(--font-script);font-style:italic;color:var(--gold-deep);font-size:13px;letter-spacing:.04em;text-transform:none}
+.foot-links{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.foot-links a{color:var(--silver-dim,#7A8090);text-decoration:none;transition:color .2s ease;border-bottom:1px solid transparent;padding-bottom:1px}
+.foot-links a:hover{color:var(--gold,#D4AF37);border-bottom-color:var(--gold,#D4AF37)}
 
 /* ───── Responsive ───── */
 @media(max-width:1080px){
@@ -824,9 +827,13 @@ body::after{
 
   <!-- ───── FOOTER ───── -->
   <footer class="codex-foot">
-    <div>v1.0 · CODEX STELLARIS · 2026</div>
+    <div>v2.9 · CODEX STELLARIS · 2026</div>
     <div class="quote">"As above, so below — the planets are mirrors of you."</div>
-    <div>© Elijah Sensei</div>
+    <div class="foot-links">
+      <a href="https://github.com/eliajhmauve/astro-codex-stellaris" target="_blank" rel="noopener" title="GitHub repo">⌥ Source</a>
+      <a href="https://github.com/eliajhmauve/astro-codex-stellaris/blob/main/CHANGELOG.md" target="_blank" rel="noopener" title="完整版本歷史">CHANGELOG</a>
+      <span>© Elijah Sensei</span>
+    </div>
   </footer>
 
 </div>
@@ -2103,8 +2110,8 @@ function bindEvents(){
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-      inputModal.classList.remove('show');
-      detailModal.classList.remove('show');
+      // 全域關閉所有 modal
+      document.querySelectorAll('.natal-modal.show').forEach(m => m.classList.remove('show'));
     }
   });
 

@@ -248,6 +248,9 @@ function render(container, chart, opt){
     });
     g.addEventListener('mouseenter', () => g.querySelector('circle').setAttribute('stroke-width', 2));
     g.addEventListener('mouseleave', () => g.querySelector('circle').setAttribute('stroke-width', 1));
+    // 觸控反饋（手機）
+    g.addEventListener('touchstart', () => g.querySelector('circle').setAttribute('stroke-width', 2.5), { passive:true });
+    g.addEventListener('touchend', () => g.querySelector('circle').setAttribute('stroke-width', 1));
 
     svg.appendChild(g);
 
