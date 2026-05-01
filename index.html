@@ -1884,23 +1884,51 @@ function toggleAmbient(forceOn){
   if(want && !ambientPlaying){
     try {
       ambientCtx = ambientCtx || new (window.AudioContext || window.webkitAudioContext)();
-      // ambient drone 結構：2 osc（低頻基底+高頻泛音）→ filter → master gain
+      // 12 星座 → 12 個基底音（半音階，從 A2=110 開始）
+      const SIGN_FREQ = {
+        '牡羊':146.83, // D3 開創火
+        '金牛':174.61, // F3 固定土
+        '雙子':220.00, // A3 變動風
+        '巨蟹':130.81, // C3 開創水
+        '獅子':293.66, // D4 固定火（高八度）
+        '處女':164.81, // E3 變動土
+        '天秤':246.94, // B3 開創風
+        '天蠍':123.47, // B2 固定水（低）
+        '射手':261.63, // C4 變動火（高）
+        '摩羯':196.00, // G3 開創土
+        '水瓶':233.08, // A#3 固定風
+        '雙魚':155.56, // D#3 變動水
+      };
+      // 個人化：太陽星座決定基底，月亮星座決定五度音的色彩
+      let baseFreq = 110, fifthFreq = 165, harmonicFreq = 880;
+      try {
+        if(chartData && chartData.planets){
+          const sun = chartData.planets.find(p => p.key === 'sun');
+          const moon = chartData.planets.find(p => p.key === 'moon');
+          if(sun && SIGN_FREQ[sun.sign]) baseFreq = SIGN_FREQ[sun.sign];
+          if(moon && SIGN_FREQ[moon.sign]) fifthFreq = SIGN_FREQ[moon.sign] * 1.5; // 完美五度
+          else fifthFreq = baseFreq * 1.5;
+          harmonicFreq = baseFreq * 4; // 兩個八度
+        }
+      } catch(_){}
+
+      // ambient drone 結構：3 osc（低頻基底+月亮五度+高頻泛音）→ filter → master gain
       const master = ambientCtx.createGain();
       master.gain.value = 0;
       master.connect(ambientCtx.destination);
 
-      // 基底低頻
+      // 基底低頻（太陽星座）
       const osc1 = ambientCtx.createOscillator();
       osc1.type = 'sine';
-      osc1.frequency.value = 110; // A2
+      osc1.frequency.value = baseFreq;
       const g1 = ambientCtx.createGain();
       g1.gain.value = 0.06;
       osc1.connect(g1);
 
-      // 完美五度
+      // 月亮星座的五度
       const osc2 = ambientCtx.createOscillator();
       osc2.type = 'sine';
-      osc2.frequency.value = 165; // E3
+      osc2.frequency.value = fifthFreq;
       const g2 = ambientCtx.createGain();
       g2.gain.value = 0.04;
       osc2.connect(g2);
@@ -1908,7 +1936,7 @@ function toggleAmbient(forceOn){
       // 高泛音
       const osc3 = ambientCtx.createOscillator();
       osc3.type = 'triangle';
-      osc3.frequency.value = 880;
+      osc3.frequency.value = harmonicFreq;
       const g3 = ambientCtx.createGain();
       g3.gain.value = 0.012;
       osc3.connect(g3);
