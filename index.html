@@ -1356,6 +1356,7 @@ addEventListener('DOMContentLoaded',()=>{
       <button type="button" class="natal-btn-ghost" id="natal-print">$ PRINT</button>
       <button type="button" class="natal-btn-ghost" id="natal-synastry">$ COMPARE_PERSON</button>
       <button type="button" class="natal-btn-ghost" id="natal-poster">$ DOWNLOAD_POSTER</button>
+      <button type="button" class="natal-btn-ghost" id="natal-copy-text">$ COPY_TEXT_SUMMARY</button>
       <button type="button" class="natal-btn-ghost" id="natal-export">$ EXPORT_JSON</button>
       <button type="button" class="natal-btn-ghost" id="natal-import">$ IMPORT_JSON</button>
       <button type="button" class="natal-btn-ghost" id="natal-replay-tour">$ REPLAY_TOUR</button>
@@ -2414,6 +2415,38 @@ function bindEvents(){
   });
 
   $('#natal-poster').addEventListener('click', generatePoster);
+
+  $('#natal-copy-text').addEventListener('click', () => {
+    if(!chartData) return;
+    const sun = chartData.planets.find(p => p.key === 'sun');
+    const moon = chartData.planets.find(p => p.key === 'moon');
+    const asc = chartData.ascendant;
+    const ELE = { '牡羊':'火','獅子':'火','射手':'火','金牛':'土','處女':'土','摩羯':'土','雙子':'風','天秤':'風','水瓶':'風','巨蟹':'水','天蠍':'水','雙魚':'水' };
+    const eleC = { '火':0,'土':0,'風':0,'水':0 };
+    chartData.planets.forEach(p => eleC[ELE[p.sign]]++);
+    const dom = Object.entries(eleC).sort((a,b) => b[1] - a[1])[0][0];
+    const lines = [
+      '✦ 我的本命盤 · Codex Stellaris',
+      '',
+      sun ? `☉ 太陽 ${sun.signGlyph} ${sun.sign}座` : '',
+      moon ? `☽ 月亮 ${moon.signGlyph} ${moon.sign}座` : '',
+      asc ? `⏃ 上升 ${asc.glyph} ${asc.sign}座` : '⏃ 上升：（未提供時間）',
+      '',
+      `主導元素：${dom}（${eleC[dom]}/10 顆行星）`,
+      '',
+      '算你的：',
+      'eliajhmauve.github.io/astro-codex-stellaris',
+    ].filter(l => l !== '').join('\n');
+
+    const btn = $('#natal-copy-text');
+    const orig = btn.textContent;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(lines).then(() => {
+        btn.textContent = '✓ 文字已複製，可貼到 Threads/X';
+        setTimeout(() => { btn.textContent = orig; }, 2200);
+      }).catch(() => fallbackCopy(lines, btn, orig));
+    } else fallbackCopy(lines, btn, orig);
+  });
 
   $('#natal-import-file').addEventListener('change', async (e) => {
     const f = e.target.files[0];
