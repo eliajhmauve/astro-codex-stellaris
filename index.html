@@ -3384,10 +3384,23 @@ function openInput(){
   setTimeout(() => $('#natal-date').focus(), 80);
 }
 
+let _detailScrollTop = 0;
 function openDetail(){
   if (!chartData) return openInput();
   renderDetail();
   $('#natal-detail-modal').classList.add('show');
+  // 還原上次滾動位置
+  setTimeout(() => {
+    const card = document.querySelector('#natal-detail-modal .natal-modal-card');
+    if(card && _detailScrollTop > 0) card.scrollTop = _detailScrollTop;
+  }, 50);
+  // 記錄滾動位置
+  setTimeout(() => {
+    const card = document.querySelector('#natal-detail-modal .natal-modal-card');
+    if(card){
+      card.addEventListener('scroll', () => { _detailScrollTop = card.scrollTop; }, { passive:true });
+    }
+  }, 100);
 }
 
 function prefillFromStored(){
