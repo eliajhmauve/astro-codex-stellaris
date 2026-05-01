@@ -1176,6 +1176,7 @@ addEventListener('DOMContentLoaded',()=>{
 <script src="./daily-tip.js" defer></script>
 <script src="./poetic-intro.js" defer></script>
 <script src="./tarot.js" defer></script>
+<script src="./sabian.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
 
 <!-- 觸發按鈕（未輸入時顯示） / 結果 pill（已輸入後顯示） -->
@@ -1232,6 +1233,11 @@ addEventListener('DOMContentLoaded',()=>{
 
 <!-- 詞彙表觸發按鈕 -->
 <button class="glossary-fab" id="glossary-fab" aria-label="占星詞彙表">?</button>
+
+<!-- 環境音氛圍按鈕 -->
+<button class="ambient-fab" id="ambient-fab" aria-label="切換環境音氛圍" title="切換環境音 ambient drone">
+  <span class="ambient-icon" id="ambient-icon">♪</span>
+</button>
 
 <!-- 全螢幕輪盤 Modal -->
 <div class="natal-modal" id="wheel-fullscreen" role="dialog" aria-modal="true">
@@ -1391,6 +1397,13 @@ addEventListener('DOMContentLoaded',()=>{
 /* 跟 natal-fab 共存：natal-fab 已存在時把 glossary-fab 推上去 */
 body:has(.natal-fab) .glossary-fab{bottom:88px}
 @media(max-width:600px){.glossary-fab{width:38px;height:38px;bottom:18px;right:18px}body:has(.natal-fab) .glossary-fab{bottom:74px}}
+
+.ambient-fab{position:fixed;bottom:148px;right:28px;z-index:58;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:rgba(10,5,8,.9);border:1px solid #9D8FC2;color:#9D8FC2;font-family:'Cinzel',serif;font-size:18px;cursor:pointer;backdrop-filter:blur(8px);transition:all .3s ease;box-shadow:0 8px 24px -6px rgba(0,0,0,.6)}
+.ambient-fab:hover{color:#FFE08A;border-color:#D4AF37;transform:scale(1.1) translateY(-2px)}
+.ambient-fab.playing{color:#7AC48E;border-color:#7AC48E;box-shadow:0 0 24px -4px rgba(122,196,142,.6),0 8px 24px -6px rgba(0,0,0,.6)}
+.ambient-fab.playing .ambient-icon{animation:ambBeat 1.4s ease-in-out infinite}
+@keyframes ambBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+@media(max-width:600px){.ambient-fab{width:38px;height:38px;bottom:134px;right:18px}}
 
 .gloss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:14px;max-height:65vh;overflow:auto;padding:4px}
 .gloss-item{padding:14px;background:rgba(212,175,55,.04);border:1px solid rgba(212,175,55,.2);border-left:3px solid #D4AF37}
@@ -1682,6 +1695,15 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .cloud-tag{font-family:'Noto Serif TC','Songti SC',serif;font-weight:700;letter-spacing:.05em;line-height:1.4;text-shadow:0 0 12px currentColor;transition:transform .25s ease;display:inline-block;cursor:default}
 .cloud-tag:hover{transform:scale(1.15) rotate(-2deg)}
 
+.sab-card{margin:0 0 22px;padding:24px;background:linear-gradient(135deg,rgba(232,194,130,.08),rgba(10,5,8,.5));border:1px solid #E5C282;border-left:4px solid #E5C282}
+.sab-card .natal-label{margin-bottom:8px}
+.sab-item{margin-top:18px;padding:16px 20px;background:rgba(0,0,0,.3);border:1px solid rgba(232,194,130,.25)}
+.sab-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.sab-planet{font-family:'Cinzel',serif;font-weight:700;color:#FFE08A;font-size:1.05rem;letter-spacing:.04em}
+.sab-deg{font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.18em;color:#7A8090}
+.sab-symbol{font-family:'Cormorant Garamond',serif;font-style:italic;color:#FFE08A;font-size:1.25rem;line-height:1.55;padding:10px 14px;background:rgba(232,194,130,.1);border-left:3px solid #E5C282;margin-bottom:8px}
+.sab-meaning{font-family:'Cormorant Garamond',serif;color:#E8DCC4;font-size:14px;line-height:1.7}
+
 .ch-card{margin:18px 0;padding:24px;background:linear-gradient(135deg,rgba(122,196,142,.1),rgba(10,5,8,.5));border:1px solid #7AC48E;border-left:4px solid #7AC48E}
 .ch-card .natal-label{margin-bottom:8px}
 .ch-list{display:flex;flex-direction:column;gap:14px;margin-top:18px}
@@ -1835,7 +1857,118 @@ ready(function(){
 
   // Cmd+K 搜尋面板
   setupCmdK();
+
+  // 環境音 ambient
+  setupAmbient();
 });
+
+let ambientCtx = null;
+let ambientNodes = null;
+let ambientPlaying = false;
+
+function setupAmbient(){
+  const fab = document.getElementById('ambient-fab');
+  if(!fab) return;
+  // 跨會話記憶上次狀態
+  if(localStorage.getItem('astro_ambient_on') === '1'){
+    setTimeout(() => toggleAmbient(true), 600);
+  }
+  fab.addEventListener('click', () => toggleAmbient());
+}
+
+function toggleAmbient(forceOn){
+  const fab = document.getElementById('ambient-fab');
+  const icon = document.getElementById('ambient-icon');
+  const want = forceOn !== undefined ? forceOn : !ambientPlaying;
+
+  if(want && !ambientPlaying){
+    try {
+      ambientCtx = ambientCtx || new (window.AudioContext || window.webkitAudioContext)();
+      // ambient drone 結構：2 osc（低頻基底+高頻泛音）→ filter → master gain
+      const master = ambientCtx.createGain();
+      master.gain.value = 0;
+      master.connect(ambientCtx.destination);
+
+      // 基底低頻
+      const osc1 = ambientCtx.createOscillator();
+      osc1.type = 'sine';
+      osc1.frequency.value = 110; // A2
+      const g1 = ambientCtx.createGain();
+      g1.gain.value = 0.06;
+      osc1.connect(g1);
+
+      // 完美五度
+      const osc2 = ambientCtx.createOscillator();
+      osc2.type = 'sine';
+      osc2.frequency.value = 165; // E3
+      const g2 = ambientCtx.createGain();
+      g2.gain.value = 0.04;
+      osc2.connect(g2);
+
+      // 高泛音
+      const osc3 = ambientCtx.createOscillator();
+      osc3.type = 'triangle';
+      osc3.frequency.value = 880;
+      const g3 = ambientCtx.createGain();
+      g3.gain.value = 0.012;
+      osc3.connect(g3);
+
+      // LFO 給 osc3 frequency 製造輕微飄移
+      const lfo = ambientCtx.createOscillator();
+      lfo.type = 'sine';
+      lfo.frequency.value = 0.08;
+      const lfoGain = ambientCtx.createGain();
+      lfoGain.gain.value = 4;
+      lfo.connect(lfoGain).connect(osc3.frequency);
+
+      // 低通濾波柔化
+      const filter = ambientCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 1200;
+      filter.Q.value = 0.8;
+
+      g1.connect(filter);
+      g2.connect(filter);
+      g3.connect(filter);
+      filter.connect(master);
+
+      osc1.start();
+      osc2.start();
+      osc3.start();
+      lfo.start();
+
+      // fade in
+      master.gain.linearRampToValueAtTime(0.5, ambientCtx.currentTime + 1.5);
+
+      ambientNodes = { osc1, osc2, osc3, lfo, master };
+      ambientPlaying = true;
+      fab.classList.add('playing');
+      icon.textContent = '◉';
+      localStorage.setItem('astro_ambient_on', '1');
+    } catch(e){
+      console.warn('ambient failed', e);
+    }
+  } else if(!want && ambientPlaying && ambientNodes){
+    // fade out + stop
+    const t = ambientCtx.currentTime;
+    ambientNodes.master.gain.cancelScheduledValues(t);
+    ambientNodes.master.gain.setValueAtTime(ambientNodes.master.gain.value, t);
+    ambientNodes.master.gain.linearRampToValueAtTime(0, t + 0.8);
+    setTimeout(() => {
+      try {
+        ambientNodes.osc1.stop();
+        ambientNodes.osc2.stop();
+        ambientNodes.osc3.stop();
+        ambientNodes.lfo.stop();
+      } catch(_){}
+      ambientNodes = null;
+    }, 900);
+    ambientPlaying = false;
+    fab.classList.remove('playing');
+    icon.textContent = '♪';
+    localStorage.setItem('astro_ambient_on', '0');
+  }
+}
 
 const CMDK_ITEMS = [
   // 動作類
@@ -3263,6 +3396,7 @@ function renderDetail(){
         <a href="#sec-poetic">自介</a>
         <a href="#sec-big3">Big 3</a>
         <a href="#sec-balance">元素</a>
+        <a href="#sec-sabian">Sabian</a>
         <a href="#sec-wheel">輪盤</a>
         <a href="#sec-planets">行星</a>
         <a href="#sec-aspects">相位</a>
@@ -3285,7 +3419,35 @@ function renderDetail(){
     `<div id="sec-cloud">${cloudHtml}</div>` +
     `<div id="sec-poetic">${poeticHtml}</div>` +
     `<div id="sec-big3">${big3Html}</div>` +
-    `<div id="sec-balance">${balanceHtml}</div>` + `
+    `<div id="sec-balance">${balanceHtml}</div>` +
+    `<div id="sec-sabian">${(() => {
+      if(!window.SabianSymbols) return '';
+      const items = [];
+      if(sun){
+        const s = window.SabianSymbols.forDegree(sun.sign, sun.degree);
+        if(s) items.push({ planet:'☉ 太陽', s });
+      }
+      if(moon){
+        const s = window.SabianSymbols.forDegree(moon.sign, moon.degree);
+        if(s) items.push({ planet:'☽ 月亮', s });
+      }
+      if(asc){
+        const s = window.SabianSymbols.forDegree(asc.sign, asc.deg);
+        if(s) items.push({ planet:'⏃ 上升', s });
+      }
+      if(!items.length) return '';
+      return `<div class="sab-card">
+        <span class="natal-label">// sabian symbols · 古老占星每度符號</span>
+        <p class="natal-hint">Marc Edmund Jones 1925 年從通靈所得，每一度都有一個圖像化符號 ─ 最隱密的占星玩法。</p>
+        ${items.map(it => `
+          <div class="sab-item">
+            <div class="sab-head"><span class="sab-planet">${it.planet}</span><span class="sab-deg">${it.s.sign}座 ${it.s.atDegree}°（你 ${(it.planet === '⏃ 上升' ? asc.deg : (chartData.planets.find(p => p.glyph === it.planet[0]) || {}).degree || 0).toFixed(1)}°）</span></div>
+            <div class="sab-symbol">「${it.s.symbol}」</div>
+            <div class="sab-meaning">${it.s.meaning}</div>
+          </div>
+        `).join('')}
+      </div>`;
+    })()}</div>` + `
     <div id="sec-wheel"><div class="natal-wheel-wrap" id="natal-wheel-wrap"></div></div>
     <div id="sec-planets">
       <div class="natal-detail-grid">
