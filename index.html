@@ -1651,6 +1651,20 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .ye-event .ye-date{flex-shrink:0;font-family:'Major Mono Display',monospace;color:#7A8090;font-size:.85em}
 .ye-quiet{padding:6px;color:#7A8090;font-style:italic;font-size:11px;text-align:center;font-family:'Cormorant Garamond',serif}
 
+.ec-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.ec-row{display:grid;grid-template-columns:50px 1fr auto;gap:14px;align-items:center;padding:12px 16px;background:rgba(0,0,0,.3);border:1px solid;border-left-width:3px}
+.ec-solar{border-color:#FFE08A}
+.ec-lunar{border-color:#9D8FC2}
+.ec-icon{font-family:'Cinzel',serif;font-size:2.4rem;text-align:center;line-height:1}
+.ec-solar .ec-icon{color:#FFE08A;text-shadow:0 0 16px #FFE08A}
+.ec-lunar .ec-icon{color:#9D8FC2;text-shadow:0 0 16px #9D8FC2}
+.ec-name{font-family:'Cinzel',serif;color:#E8DCC4;font-weight:700;font-size:1.05rem;letter-spacing:.04em}
+.ec-name .ec-kind{font-family:'Major Mono Display','VT323',monospace;font-size:.7em;letter-spacing:.2em;color:#7A8090;text-transform:uppercase;margin-left:6px}
+.ec-pos{font-family:'Cormorant Garamond',serif;color:#FFE08A;font-style:italic;font-size:14px;margin-top:2px}
+.ec-tip{font-family:'Cormorant Garamond',serif;color:#C0C8D8;font-style:italic;font-size:12px;margin-top:4px}
+.ec-date{font-family:'Major Mono Display','VT323',monospace;font-size:11px;color:#FFE08A;letter-spacing:.1em;text-align:right;flex-shrink:0}
+.ec-date small{color:#7A8090;font-size:.85em}
+
 .lc-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .lc-row{display:flex;gap:14px;padding:14px 16px;background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.3);border-left-width:4px;border-left-color:#FFE08A}
 .lc-row.lc-passed{opacity:.65;border-left-color:#7A8090}
@@ -3853,6 +3867,7 @@ function renderDetail(){
         <a href="#sec-ingress">節氣</a>
         <a href="#sec-sr">年盤</a>
         <a href="#sec-mooncal">月曆</a>
+        <a href="#sec-eclipse">日月蝕</a>
         <a href="#sec-year">12 月</a>
         <a href="#sec-milestones">里程</a>
       </div>
@@ -4096,6 +4111,39 @@ function renderTransit(){
       }
     } catch(_){}
 
+    // 日蝕 / 月蝕
+    let eclipseHtml = '';
+    try {
+      const ecs = window.AstroTransit.findUpcomingEclipses();
+      if(ecs && ecs.length){
+        const upcoming = ecs.filter(e => e.daysFromNow >= 0).slice(0, 4);
+        if(upcoming.length){
+          const KIND_TIP = {
+            'total':'全食 ─ 占星上影響最深、可能持續 6 個月',
+            'partial':'偏食 ─ 影響中度，持續約 3 個月',
+            'annular':'環食 ─ 太陽中心被遮，視野焦點轉變',
+            'penumbral':'半影食 ─ 微妙影響，需細察',
+          };
+          const rows = upcoming.map(e => {
+            const isS = e.type === 'solar';
+            return `<div class="ec-row ${isS?'ec-solar':'ec-lunar'}">
+              <div class="ec-icon">${isS?'☉':'☽'}</div>
+              <div class="ec-meta">
+                <div class="ec-name">${isS?'日蝕':'月蝕'} <span class="ec-kind">${e.kind}</span></div>
+                <div class="ec-pos">於 ${e.signGlyph} ${e.sign}座 ${e.degree.toFixed(1)}°</div>
+                <div class="ec-tip">${KIND_TIP[e.kind] || ''}</div>
+              </div>
+              <div class="ec-date">${e.dateLocal}<br><small>${e.daysFromNow} 天後</small></div>
+            </div>`;
+          }).join('');
+          eclipseHtml = `
+            <h3 style="font-family:var(--font-display,Cinzel),serif;font-size:1rem;letter-spacing:.18em;color:var(--gold);margin:24px 0 10px;border-bottom:1px solid rgba(212,175,55,.25);padding-bottom:6px;text-transform:uppercase">未來日蝕 / 月蝕</h3>
+            <p class="natal-hint">日月蝕在占星上是最強事件 ─ 啟動 6 個月以上的轉折期。發生在你本命行星 ±5° 附近的，影響特別深。</p>
+            <div class="ec-list">${rows}</div>`;
+        }
+      }
+    } catch(_){}
+
     // 12 個月年度大事件
     let yearHtml = '';
     try {
@@ -4256,6 +4304,7 @@ function renderTransit(){
       <div id="sec-ingress">${ingressHtml}</div>
       <div id="sec-sr">${srHtml}</div>
       <div id="sec-mooncal">${calHtml}</div>
+      <div id="sec-eclipse">${eclipseHtml}</div>
       <div id="sec-year">${yearHtml}</div>
       <div id="sec-milestones">${lcHtml}</div>
     `;

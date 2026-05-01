@@ -470,6 +470,55 @@ function calcSunNextIngress(){
   return null;
 }
 
+// 找未來 2 年內的日蝕/月蝕（占星最強事件）
+function findUpcomingEclipses(){
+  if(!global.Astronomy) return [];
+  const A = global.Astronomy;
+  const now = new Date();
+  const events = [];
+  try {
+    // 日蝕（最近 4 次）
+    let lastSolar = A.SearchGlobalSolarEclipse(now);
+    for(let i = 0; i < 4 && lastSolar; i++){
+      const dt = lastSolar.peak.date;
+      const v = A.GeoVector(A.Body.Sun, dt, true);
+      const lon = A.Ecliptic(v).elon;
+      const sign = lonToSign(lon);
+      events.push({
+        type: 'solar',
+        kind: lastSolar.kind, // 'partial' | 'annular' | 'total'
+        date: dt,
+        dateLocal: dt.toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }),
+        sign: sign.name,
+        signGlyph: sign.glyph,
+        degree: sign.deg,
+        daysFromNow: Math.ceil((dt - now) / 86400000),
+      });
+      lastSolar = A.NextGlobalSolarEclipse(lastSolar.peak);
+    }
+    // 月蝕（最近 4 次）
+    let lastLunar = A.SearchLunarEclipse(now);
+    for(let i = 0; i < 4 && lastLunar; i++){
+      const dt = lastLunar.peak.date;
+      const v = A.GeoVector(A.Body.Moon, dt, true);
+      const lon = A.Ecliptic(v).elon;
+      const sign = lonToSign(lon);
+      events.push({
+        type: 'lunar',
+        kind: lastLunar.kind, // 'penumbral' | 'partial' | 'total'
+        date: dt,
+        dateLocal: dt.toLocaleString('zh-TW', { month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' }),
+        sign: sign.name,
+        signGlyph: sign.glyph,
+        degree: sign.deg,
+        daysFromNow: Math.ceil((dt - now) / 86400000),
+      });
+      lastLunar = A.NextLunarEclipse(lastLunar.peak);
+    }
+  } catch(e){ console.warn('eclipse calc failed', e); return []; }
+  return events.sort((a,b) => a.date - b.date);
+}
+
 // 12 個月年度大事件 — 每月挑最重要的 2-3 個慢行星相位
 function calc12MonthEvents(natalChart){
   if(!global.Astronomy || !natalChart || !natalChart.planets) return [];
@@ -536,6 +585,6 @@ function calc12MonthEvents(natalChart){
   return months;
 }
 
-global.AstroTransit = { calcToday, findActiveTransits, forecastDays, calcLifecycleMilestones, calcSolarReturn, calcMoonPhase, calcMonthMoonCalendar, calcSunNextIngress, calcUpcomingMoonPhases, calc12MonthEvents, PLANETS };
+global.AstroTransit = { calcToday, findActiveTransits, forecastDays, calcLifecycleMilestones, calcSolarReturn, calcMoonPhase, calcMonthMoonCalendar, calcSunNextIngress, calcUpcomingMoonPhases, calc12MonthEvents, findUpcomingEclipses, PLANETS };
 
 })(typeof window !== 'undefined' ? window : globalThis);
