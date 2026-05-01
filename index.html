@@ -1279,6 +1279,23 @@ addEventListener('DOMContentLoaded',()=>{
   </div>
 </div>
 
+<!-- Cmd+K 搜尋面板 -->
+<div class="cmdk-overlay" id="cmdk-overlay" role="dialog" aria-modal="true">
+  <div class="cmdk-card">
+    <div class="cmdk-search">
+      <span class="cmdk-icon">⌘</span>
+      <input type="text" id="cmdk-input" placeholder="搜尋功能、行星、術語…  (試試「塔羅」「太陽」「合相」)" autocomplete="off" spellcheck="false">
+      <kbd>ESC</kbd>
+    </div>
+    <div class="cmdk-list" id="cmdk-list"></div>
+    <div class="cmdk-foot">
+      <span><kbd>↑↓</kbd> 切換</span>
+      <span><kbd>↵</kbd> 選擇</span>
+      <span><kbd>ESC</kbd> 關閉</span>
+    </div>
+  </div>
+</div>
+
 <!-- Onboarding Overlay -->
 <div class="ob-overlay" id="ob-overlay" role="dialog" aria-modal="true">
   <div class="ob-spotlight" id="ob-spotlight"></div>
@@ -1681,6 +1698,33 @@ body:has(.natal-fab) .glossary-fab{bottom:88px}
 .ch-final .ch-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.2rem;margin-top:8px;letter-spacing:.04em}
 @media(max-width:520px){.ch-opts{grid-template-columns:1fr}}
 
+/* ─── Cmd+K 搜尋面板 ─── */
+.cmdk-overlay{position:fixed;inset:0;z-index:9000;background:rgba(2,1,3,.85);backdrop-filter:blur(10px);display:none;align-items:flex-start;justify-content:center;padding:18vh 24px 24px;animation:cmdkFade .25s ease}
+.cmdk-overlay.show{display:flex}
+@keyframes cmdkFade{from{opacity:0}to{opacity:1}}
+.cmdk-card{width:100%;max-width:620px;background:linear-gradient(180deg,#0A0508,#1A0F0A);border:1px solid #D4AF37;box-shadow:0 32px 80px -20px rgba(0,0,0,.95),0 0 48px -8px rgba(212,175,55,.4);overflow:hidden;animation:cmdkPop .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes cmdkPop{from{transform:translateY(-20px) scale(.96);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.cmdk-search{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(212,175,55,.25);background:rgba(212,175,55,.04)}
+.cmdk-icon{font-family:'Cinzel',serif;font-size:1.5rem;color:#D4AF37;font-weight:900}
+.cmdk-search input{flex:1;background:transparent;border:none;outline:none;color:#FFE08A;font-family:'Cormorant Garamond',serif;font-size:1.1rem;letter-spacing:.02em}
+.cmdk-search input::placeholder{color:#7A8090;font-style:italic}
+.cmdk-search kbd{padding:3px 8px;background:rgba(212,175,55,.14);border:1px solid #D4AF37;color:#D4AF37;font-family:'Major Mono Display','VT323',monospace;font-size:11px;letter-spacing:.15em;border-radius:3px}
+.cmdk-list{max-height:50vh;overflow:auto;padding:6px;scrollbar-width:thin;scrollbar-color:rgba(212,175,55,.4) transparent}
+.cmdk-list::-webkit-scrollbar{width:5px}
+.cmdk-list::-webkit-scrollbar-thumb{background:rgba(212,175,55,.4)}
+.cmdk-item{display:flex;align-items:center;gap:14px;padding:11px 14px;cursor:pointer;border-left:3px solid transparent;transition:all .15s ease}
+.cmdk-item.active{background:rgba(212,175,55,.12);border-left-color:#FFE08A}
+.cmdk-cat{flex-shrink:0;display:inline-block;padding:3px 10px;background:rgba(212,175,55,.18);color:#FFE08A;font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;min-width:48px;text-align:center}
+.cmdk-cat[data-cat="行星"]{background:rgba(125,168,217,.18);color:#7DA8D9}
+.cmdk-cat[data-cat="區塊"]{background:rgba(122,196,142,.18);color:#7AC48E}
+.cmdk-text{flex:1;min-width:0}
+.cmdk-label{font-family:'Cinzel',serif;color:#E8DCC4;font-size:14px;font-weight:700;letter-spacing:.02em}
+.cmdk-item.active .cmdk-label{color:#FFE08A}
+.cmdk-desc{font-family:'Cormorant Garamond',serif;font-style:italic;color:#7A8090;font-size:12px;margin-top:2px}
+.cmdk-empty{padding:30px;text-align:center;color:#7A8090;font-style:italic;font-family:'Cormorant Garamond',serif}
+.cmdk-foot{display:flex;gap:18px;justify-content:center;padding:10px;border-top:1px solid rgba(212,175,55,.18);background:rgba(0,0,0,.4);font-family:'Major Mono Display','VT323',monospace;font-size:10px;letter-spacing:.18em;color:#7A8090}
+.cmdk-foot kbd{display:inline-block;padding:1px 6px;background:rgba(212,175,55,.14);border:1px solid rgba(212,175,55,.3);color:#D4AF37;font-family:inherit;border-radius:2px;margin-right:4px}
+
 .qa-card{margin:18px 0;padding:20px 24px;background:linear-gradient(135deg,rgba(125,168,217,.08),rgba(10,5,8,.4));border:1px solid #7DA8D9;border-left:4px solid #7DA8D9}
 .qa-card .natal-label{margin-bottom:14px}
 .qa-list{display:flex;flex-direction:column;gap:8px}
@@ -1787,7 +1831,125 @@ ready(function(){
 
   // Konami Code 終極彩蛋
   setupKonamiCode();
+
+  // Cmd+K 搜尋面板
+  setupCmdK();
 });
+
+const CMDK_ITEMS = [
+  // 動作類
+  { kw:['本命盤','輸入','生日'], label:'解鎖本命盤', desc:'輸入生日 / 時間 / 城市', cat:'動作', action:() => { const c = chartData; if(c) openDetail(); else openInput(); } },
+  { kw:['輪盤','wheel','SVG','放大'], label:'全螢幕輪盤', desc:'放大本命盤輪盤', cat:'動作', action:() => { if(chartData) openWheelFullscreen(chartData, window.AstroTransit && window.AstroTransit.calcToday()); else openInput(); } },
+  { kw:['合盤','compare','synastry','配對'], label:'合盤分析', desc:'對方生日 → 100 組交叉相位', cat:'動作', action:() => { if(chartData){ openDetail(); setTimeout(() => document.getElementById('natal-synastry') && document.getElementById('natal-synastry').click(), 600); } else openInput(); } },
+  { kw:['海報','poster','分享','下載'], label:'下載 IG 海報', desc:'1080×1920 PNG', cat:'動作', action:() => { if(chartData){ openDetail(); setTimeout(() => document.getElementById('natal-poster') && document.getElementById('natal-poster').click(), 600); } } },
+  { kw:['列印','print','PDF'], label:'列印本命盤', desc:'A4 黑白友善', cat:'動作', action:() => window.print() },
+  { kw:['詞彙','glossary','術語','名詞'], label:'打開占星詞彙表', desc:'20 個術語白話解釋', cat:'動作', action:() => document.getElementById('glossary-modal').classList.add('show') },
+  { kw:['導覽','tour','教學'], label:'重看教學', desc:'4 步引導 onboarding', cat:'動作', action:() => startOnboarding() },
+  { kw:['備份','export','json'], label:'匯出 JSON', desc:'下載盤資料備份', cat:'動作', action:() => { if(chartData){ openDetail(); setTimeout(() => document.getElementById('natal-export') && document.getElementById('natal-export').click(), 400); } } },
+  // 區塊跳轉
+  { kw:['塔羅','tarot'], label:'今日塔羅', desc:'22 張大阿爾克那', cat:'區塊', hash:'#tarot' },
+  { kw:['Big 3','三角','太陽月亮上升','人格'], label:'Big 3 人格三角', desc:'太陽 + 月亮 + 上升', cat:'區塊', hash:'#big3' },
+  { kw:['元素','平衡','火土風水'], label:'元素平衡度', desc:'4 元素分布診斷', cat:'區塊', hash:'#balance' },
+  { kw:['今日','vibe','心情','此刻'], label:'今日 vibe', desc:'月亮位置決定今日基調', cat:'區塊', hash:'#today' },
+  { kw:['未來','forecast','7 天','預報'], label:'未來 7 天 forecast', desc:'精準相位提前預告', cat:'區塊', hash:'#forecast' },
+  { kw:['里程碑','土星回歸','中年','milestone'], label:'生命週期里程碑', desc:'人生重大占星轉折', cat:'區塊', hash:'#milestones' },
+  { kw:['月相','月曆','月亮','calendar'], label:'本月月相日曆', desc:'30 天月亮 + 月相', cat:'區塊', hash:'#moon-cal' },
+  // 行星
+  { kw:['太陽','sun','☉','英雄'], label:'進入太陽頁', desc:'英雄之旅 RPG', cat:'行星', hash:'#sun' },
+  { kw:['月亮','moon','☽','情緒'], label:'進入月亮頁', desc:'情緒寶可夢圖鑑', cat:'行星', hash:'#moon' },
+  { kw:['水星','mercury','☿','駭客','溝通'], label:'進入水星頁', desc:'解謎駭客', cat:'行星', hash:'#mercury' },
+  { kw:['金星','venus','♀','美學','愛情'], label:'進入金星頁', desc:'美學收藏家', cat:'行星', hash:'#venus' },
+  { kw:['火星','mars','♂','格鬥','戰'], label:'進入火星頁', desc:'格鬥競技場', cat:'行星', hash:'#mars' },
+  { kw:['木星','jupiter','♃','幸運','探險'], label:'進入木星頁', desc:'寶藏獵人探險', cat:'行星', hash:'#jupiter' },
+  { kw:['土星','saturn','♄','紀律','打卡'], label:'進入土星頁', desc:'修行打卡', cat:'行星', hash:'#saturn' },
+  { kw:['天王星','uranus','♅','革命','叛逆'], label:'進入天王星頁', desc:'駭客革命', cat:'行星', hash:'#uranus' },
+  { kw:['海王星','neptune','♆','夢境','直覺'], label:'進入海王星頁', desc:'夢境迷霧', cat:'行星', hash:'#neptune' },
+  { kw:['冥王星','pluto','♇','蛻變','黑洞'], label:'進入冥王星頁', desc:'Soulslike 蛻變', cat:'行星', hash:'#pluto' },
+];
+
+function setupCmdK(){
+  const overlay = document.getElementById('cmdk-overlay');
+  const input = document.getElementById('cmdk-input');
+  const list = document.getElementById('cmdk-list');
+  if(!overlay || !input || !list) return;
+
+  let activeIdx = 0;
+  let filtered = [];
+
+  function render(){
+    list.innerHTML = '';
+    if(!filtered.length){
+      list.innerHTML = '<div class="cmdk-empty">沒有找到相關項目，試試「塔羅」「合盤」「太陽」</div>';
+      return;
+    }
+    filtered.forEach((item, i) => {
+      const row = document.createElement('div');
+      row.className = 'cmdk-item' + (i === activeIdx ? ' active' : '');
+      row.dataset.idx = i;
+      row.innerHTML = `
+        <span class="cmdk-cat" data-cat="${item.cat}">${item.cat}</span>
+        <div class="cmdk-text">
+          <div class="cmdk-label">${item.label}</div>
+          <div class="cmdk-desc">${item.desc}</div>
+        </div>
+      `;
+      row.addEventListener('click', () => execItem(item));
+      row.addEventListener('mouseenter', () => { activeIdx = i; render(); });
+      list.appendChild(row);
+    });
+  }
+
+  function filter(){
+    const q = input.value.trim().toLowerCase();
+    if(!q){ filtered = CMDK_ITEMS.slice(0, 20); }
+    else {
+      filtered = CMDK_ITEMS.filter(it => {
+        return it.kw.some(k => k.toLowerCase().includes(q)) ||
+               it.label.toLowerCase().includes(q) ||
+               it.desc.toLowerCase().includes(q);
+      }).slice(0, 20);
+    }
+    activeIdx = 0;
+    render();
+  }
+
+  function execItem(item){
+    closeCmdK();
+    if(item.action) item.action();
+    else if(item.hash) location.hash = item.hash;
+  }
+
+  function openCmdK(){
+    overlay.classList.add('show');
+    input.value = '';
+    filter();
+    setTimeout(() => input.focus(), 100);
+  }
+
+  function closeCmdK(){
+    overlay.classList.remove('show');
+  }
+
+  document.addEventListener('keydown', e => {
+    // Cmd/Ctrl + K
+    if((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'){
+      e.preventDefault();
+      openCmdK();
+      return;
+    }
+    // 在輸入框內 才捕捉導航鍵
+    if(document.activeElement === input){
+      if(e.key === 'Escape'){ closeCmdK(); return; }
+      if(e.key === 'ArrowDown'){ e.preventDefault(); activeIdx = Math.min(activeIdx + 1, filtered.length - 1); render(); }
+      else if(e.key === 'ArrowUp'){ e.preventDefault(); activeIdx = Math.max(activeIdx - 1, 0); render(); }
+      else if(e.key === 'Enter'){ e.preventDefault(); if(filtered[activeIdx]) execItem(filtered[activeIdx]); }
+    }
+  });
+
+  input.addEventListener('input', filter);
+
+  overlay.addEventListener('click', e => { if(e.target === overlay) closeCmdK(); });
+}
 
 const KONAMI_SEQ = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
 let konamiBuf = [];
@@ -1979,9 +2141,15 @@ const OB_STEPS = [
   },
   {
     title: '步驟 3 ─ 看看 ? 詞彙表',
-    text: '看不懂某個專有名詞？右下角的 ? 按鈕打開占星詞彙表，20 個常見術語的白話解釋。完成入門後，所有功能都會解鎖。',
+    text: '看不懂某個專有名詞？右下角的 ? 按鈕打開占星詞彙表，20 個常見術語的白話解釋。',
     targetSelector: '#glossary-fab',
     cardPosition: 'bottom-left',
+  },
+  {
+    title: '步驟 4 ─ 按 Cmd+K 開搜尋',
+    text: '功能太多找不到？按 Cmd+K（Mac）或 Ctrl+K（Win）打開快速搜尋面板 ─ 試試打「塔羅」「合盤」「太陽」直接跳過去。',
+    targetSelector: null,
+    cardPosition: 'center',
   },
 ];
 
